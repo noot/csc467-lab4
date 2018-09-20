@@ -23,8 +23,9 @@ int yyline = 1;
 WS          [ \t]
 
 %%
-"/*"        { yERROR("Change this - comment unimplemented."); }
-
-.           { yERROR("Unknown token"); }
-
+"/*"        	{ yERROR("Change this - comment unimplemented."); }
+[ \t\n]			;
+[0-9]+			{ yTRACE(INT) }
+[0-9]+\.[0-9]+  { yTRACE(FLOAT)}
+[a-zA-Z0-9]+ 	{ }
 %%
