@@ -56,9 +56,25 @@ extern int yyline;        /* variable holding current line number   */
   int num;
 }
 // TODO:Replace myToken with your tokens, you can use these tokens in flex
-%token           myToken1 myToken2  
+%token NUMBER        //myToken1 myToken2  
+%token ADD SUB MUL DIV EXP
+%token TRUE FALSE
+%token EXCLAM,
+%token AND OR EQ NEQ LESS GREATER LEQ GEQ
+%token COLON EQUAL 
+%token CONST
 
+//precedence rules
+%left OR
+%left AND
+%left EQ NEQ LESS LEQ GREATER GEQ //no precendence
+%left ADD SUB
+%left MULT DIV
+%right EXP
+//the !?
+%left '['']''('')'
 
+   
 %start    program
 
 %%
@@ -87,6 +103,45 @@ token
 
 
 %%
+
+//keep in mind BEDMAS rule of operations
+exp: 	  INT
+	| FLOAT
+	| '-' exp {} //this would be negative
+	| exp ADD exp {yTRACE($$ = $1 + $3);}
+	| exp SUB exp {yTRACE($$ = $1 - $3);}
+	| exp MULT exp {yTRACE($$ = $1 * $3);}
+	| exp DIV exp {yTRACE($$ = $1 / $3);}
+	| exp EXP exp {yTRACE($$ = $1 ^ %3);}
+	| TRUE //how can this be a keyword?
+	| FALSE
+	| EXCLAM exp 
+	| exp AND exp {yTRACE($$ = $1 && $3);}
+	| exp OR exp {yTRACE($$ = $1 || $3);}
+	| exp EQ exp {yTRACE($$ = $ == $3);}
+	| exp NEQ exp {yTRACE($$ = $1 != $3);}
+	| exp LESS exp  {yTRACE($$ = $1 < $3);}
+	| exp LEQ exp {yTRACE($$ = $1 <= $3);}
+	| exp GREATER exp {yTRACE($$ = $1 > $3);}
+	| exp GEQ exp {yTRACE($$ = $1 >= $3);}
+	| '(' exp ')'
+	| VARIABLE
+	| CONSTRUCTOR
+	| FUNCTION
+	;
+declaration
+	: type ID COLON {yTRACE($$);}
+	| type ID EQ exp COLON {yTRACE($$ = =$1)}
+	| CONST type ID EQ exp COLON {yTRACE()}
+
+statement:
+	  COLON
+	| VARIABLE EQ exp COLON {yTRACE($$ = $1 = $3;);}
+	| IF '(' exp ')' statement ELSE statement {yTRACE($$ = 
+	| WHILE '(' exp ')' statement
+	| scope 
+
+
 
 /***********************************************************************ol
  * Extra C code.
