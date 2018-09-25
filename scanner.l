@@ -78,44 +78,46 @@ WS          	[ \t]
 								}
 							}
 
-"if"			{ yTRACE(IF); return IF }
-"else"			{ yTRACE(ELSE); return ELSE }
-"while"			{ yTRACE(WHILE); return WHILE }
+"if"			{ yTRACE(IF); return IF; }
+"else"			{ yTRACE(ELSE); return ELSE; }
+"while"			{ yTRACE(WHILE); return WHILE; }
 
-"vec2" 			{ yTRACE(VEC2); return VEC2}
-"vec3"			{ yTRACE(VEC3); return VEC3}
-"vec4"			{ yTRACE(VEC4); return VEC4}
-"ivec2" 		{ yTRACE(IVEC2); return IVEC2}
-"ivec3"			{ yTRACE(IVEC3); return IVEC3}
-"ivec4"			{ yTRACE(IVEC4); return IVEC4}
-"bvec2"			{ yTRACE(BVEC2); return BVEC2}
-"bvec3"			{ yTRACE(BVEC3); return BVEC3}
-"bvec4"			{ yTRACE(BVEC4); return BVEC4}
+"vec2" 			{ yTRACE(VEC2); return VEC2; }
+"vec3"			{ yTRACE(VEC3); return VEC3; }
+"vec4"			{ yTRACE(VEC4); return VEC4; }
+"ivec2" 		{ yTRACE(IVEC2); return IVEC2; }
+"ivec3"			{ yTRACE(IVEC3); return IVEC3; }
+"ivec4"			{ yTRACE(IVEC4); return IVEC4; }
+"bvec2"			{ yTRACE(BVEC2); return BVEC2; }
+"bvec3"			{ yTRACE(BVEC3); return BVEC3; }
+"bvec4"			{ yTRACE(BVEC4); return BVEC4; }
 
-"+"			{ yTRACE(ADD); return ADD;}
-"-"			{ yTRACE(SUB); return SUB;}
-"*"			{ yTRACE(MULT); return MULT;}
-"/"			{ yTRACE(DIV); return DIV;}
-"^"			{ yTRACE(EXP); return EXP;}
+"+"				{ yTRACE(ADD); return ADD;}
+"-"				{ yTRACE(SUB); return SUB;}
+"*"				{ yTRACE(MULT); return MULT;}
+"/"				{ yTRACE(DIV); return DIV;}
+"^"				{ yTRACE(EXP); return EXP;}
 "true"			{ yTRACE(True); return True;}
 "false"			{ yTRACE(False); return False;}
-"!"			{ yTRACE(EXCLAM); return EXCLAM;}
+"!"				{ yTRACE(EXCLAM); return EXCLAM;}
 "&&"			{ yTRACE(AND); return AND;}
 "||"			{ yTRACE(OR); return OR;}
 "=="			{ yTRACE(EQUAL); return EQUAL;}
 "!="			{ yTRACE(NOT_EQUAL); return NOT_EQUAL;}
-"<"			{ yTRACE(LESS_THAN); return LESS_THAN;}
-">"			{ yTRACE(MORE_THAN); return MORE_THAN;}
+"<"				{ yTRACE(LESS_THAN); return LESS_THAN;}
+">"				{ yTRACE(MORE_THAN); return MORE_THAN;}
 "<="			{ yTRACE(LESS_OR_EQUAL); return LESS_OR_EQUAL;}
 ">="			{ yTRACE(MORE_OR_EQUAL); return MORE_OR_EQUAL;}
-";"			{ yTRACE(COLON);return COLON;}
-"="			{ yTRACE(EQUAL); return EQUAL;}
+";"				{ yTRACE(COLON);return COLON;}
+"="				{ yTRACE(EQUAL); return EQUAL;}
 "const"			{ yTRACE(CONST); return CONST;}
-"."			{ yERROR("Character not recognized");}
-"("			{ yTRACE(LBRACKET); return LBRACKET; return LBRACKET;}
-")"			{ yTRACE(RBRACKET); return RBRACKET; return RBRACKET;}
+"."				{ yERROR("Character not recognized");}
+"("				{ yTRACE(LBRACKET); return LBRACKET; return LBRACKET;}
+")"				{ yTRACE(RBRACKET); return RBRACKET; return RBRACKET;}
 
-. 				( yERROR("invalid token") )
+[0-9]+[a-zA-z]  { yERROR("Variable names cannot start with a digit"); }
+
+. 				{ yERROR("invalid token"); }
 
 //Error Checking
 //Text strings that are too long
@@ -128,12 +130,6 @@ WS          	[ \t]
 //Text strings that are too long (max is 256 characters)
 //Identifier names that are too long (max is 32 chars)
 //Unmatched commenter delimeters
-
-
-
-
-[0-9]+[a-zA-z]  {yERROR("Variable names cannot start with a digit");}
-
 
 %%
 yylex();
