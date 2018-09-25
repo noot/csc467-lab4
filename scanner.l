@@ -57,17 +57,24 @@ WS          	[ \t]
 
 [ \t\n]			;
 
-[-+]?[0-9]+			{ 	if (yylval > 32767) {
-						yERROR("exceeds maximum size of 32767");
+[-+]?[0-9]+			{ 	yylval = strtoi(yytext);
+						if (yylval > 32767 || yylval < -32767) {
+						yERROR("value does not fall in range -32767 to 32767");
 					} else {
-						yylval = strtoi(yytext);
+
 						yTRACE(INT); return INT;
 					}
 				}
 
 ([0-9]+\.[0-9]+)|([0-9]*\.[0-9]+)  { 
-										yylval = strtoi(yytext);
-										yTRACE(FLOAT); return FLOAT;
+										yylval = strtof(yytext);
+										if (yylval > 32767 || yylval < -32767) {
+											yERROR("value does not fall in range -32767 to 32767");
+									 	} else {
+										
+											yTRACE(FLOAT); return FLOAT; //ask what to do for error checking with floats
+										
+										}
 									}
 
 [a-zA-Z_][a-zA-Z0-9_]+ 		{ 	if (yyleng > 32) {
@@ -78,25 +85,30 @@ WS          	[ \t]
 								}
 							}
 
-"if"			{ yTRACE(IF); return IF; }
-"else"			{ yTRACE(ELSE); return ELSE; }
-"while"			{ yTRACE(WHILE); return WHILE; }
+[0-9]+[a-zA-z_]+ { yERROR("identifier cannot start with a number");}	
+"gl_FragColor"  {yTRACE(GL_FRAGCOLOR); return GL_FRAGCOLOR;}	
+"gl_FragDepth"  {yTRACE(GL_FRAGDEPTH); return GL_FRAGDEPTH;}
 
-"vec2" 			{ yTRACE(VEC2); return VEC2; }
-"vec3"			{ yTRACE(VEC3); return VEC3; }
-"vec4"			{ yTRACE(VEC4); return VEC4; }
-"ivec2" 		{ yTRACE(IVEC2); return IVEC2; }
-"ivec3"			{ yTRACE(IVEC3); return IVEC3; }
-"ivec4"			{ yTRACE(IVEC4); return IVEC4; }
-"bvec2"			{ yTRACE(BVEC2); return BVEC2; }
-"bvec3"			{ yTRACE(BVEC3); return BVEC3; }
-"bvec4"			{ yTRACE(BVEC4); return BVEC4; }
+"if"			{ yTRACE(IF); return IF;}
+"else"			{ yTRACE(ELSE); return ELSE;}
+"while"			{ yTRACE(WHILE); return WHILE;}
 
-"+"				{ yTRACE(ADD); return ADD;}
-"-"				{ yTRACE(SUB); return SUB;}
-"*"				{ yTRACE(MULT); return MULT;}
-"/"				{ yTRACE(DIV); return DIV;}
-"^"				{ yTRACE(EXP); return EXP;}
+"vec2" 			{ yTRACE(VEC2); return VEC2;}
+"vec3"			{ yTRACE(VEC3); return VEC3;}
+"vec4"			{ yTRACE(VEC4); return VEC4;}
+"ivec2" 		{ yTRACE(IVEC2); return IVEC2;}
+"ivec3"			{ yTRACE(IVEC3); return IVEC3;}
+"ivec4"			{ yTRACE(IVEC4); return IVEC4;}
+"bvec2"			{ yTRACE(BVEC2); return BVEC2;}
+"bvec3"			{ yTRACE(BVEC3); return BVEC3;}
+"bvec4"			{ yTRACE(BVEC4); return BVEC4;}
+
+"+"			{ yTRACE(ADD); return ADD;}
+"-"			{ yTRACE(SUB); return SUB;}
+"*"			{ yTRACE(MULT); return MULT;}
+"/"			{ yTRACE(DIV); return DIV;}
+"^"			{ yTRACE(EXP); return EXP;}
+
 "true"			{ yTRACE(True); return True;}
 "false"			{ yTRACE(False); return False;}
 "!"				{ yTRACE(EXCLAM); return EXCLAM;}
@@ -111,25 +123,11 @@ WS          	[ \t]
 ";"				{ yTRACE(COLON);return COLON;}
 "="				{ yTRACE(EQUAL); return EQUAL;}
 "const"			{ yTRACE(CONST); return CONST;}
-"."				{ yERROR("Character not recognized");}
-"("				{ yTRACE(LBRACKET); return LBRACKET; return LBRACKET;}
-")"				{ yTRACE(RBRACKET); return RBRACKET; return RBRACKET;}
 
-[0-9]+[a-zA-z]  { yERROR("Variable names cannot start with a digit"); }
-
-. 				{ yERROR("invalid token"); }
-
-//Error Checking
-//Text strings that are too long
-//Integer numbers that are too long
-//Integer constants out of bounds (range is 0 to 32767)
-//Float numbers with more than one decimal
-//Variables that contain symbols that are not allowed
-//Variable names that start with a number
-//Text strings that span more than one line
-//Text strings that are too long (max is 256 characters)
-//Identifier names that are too long (max is 32 chars)
-//Unmatched commenter delimeters
+"."			{ yERROR("Character not recognized");}
+"("			{ yTRACE(LBRACKET); return LBRACKET; return LBRACKET;}
+")"			{ yTRACE(RBRACKET); return RBRACKET; return RBRACKET;}
+. 			{ yERROR("invalid token"); }
 
 %%
 yylex();
