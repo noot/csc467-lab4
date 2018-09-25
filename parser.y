@@ -59,32 +59,28 @@ extern int yyval;      /* text that is matched by scanner */
   bool bval;
   char* name;
 }
-// TODO:Replace myToken with your tokens, you can use these tokens in flex
-<<<<<<< HEAD
-%token 
 
-IDENTIFIER
+%token IDENTIFIER
 
-INT
-BOOL
-FLOAT
+%token INT
+%token BOOL
+%token FLOAT
 
-IF
-ELSE
-WHILE 
+%token IF
+%token ELSE
+%token WHILE 
 
-VEC2
-VEC3
-VEC4
-BVEC2
-BVEC3
-BVEC4
-IVEC2
-IVEC3
-IVEC4
+%token VEC2
+%token VEC3
+%token VEC4
+%token BVEC2
+%token BVEC3
+%token BVEC4
+%token IVEC2
+%token IVEC3
+%token IVEC4
 
 
-=======
 %token NUMBER        //myToken1 myToken2  
 %token ADD SUB MUL DIV EXP
 %token TRUE FALSE
@@ -103,8 +99,6 @@ IVEC4
 //the !?
 %left '['']''('')'
 
-   
->>>>>>> 99c1ed3729f7689f901730a9e53fd2f608dcda28
 %start    program
 
 %%
