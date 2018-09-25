@@ -25,6 +25,7 @@
 void yyerror(const char* s);    /* what to do in case of error            */
 int yylex();              /* procedure for calling lexical analyzer */
 extern int yyline;        /* variable holding current line number   */
+extern int yyval;      /* text that is matched by scanner */
 
 %}
 
@@ -53,10 +54,33 @@ extern int yyline;        /* variable holding current line number   */
 // Can access me from flex useing yyval
 
 %union {
-  int num;
+  int ival;
+  float fval;
+  bool bval;
+  char* name;
 }
 // TODO:Replace myToken with your tokens, you can use these tokens in flex
-%token           myToken1 myToken2  
+%token 
+
+IDENTIFIER
+
+INT
+BOOL
+FLOAT
+
+IF
+ELSE
+WHILE 
+
+VEC2
+VEC3
+VEC4
+BVEC2
+BVEC3
+BVEC4
+IVEC2
+IVEC3
+IVEC4
 
 
 %start    program
