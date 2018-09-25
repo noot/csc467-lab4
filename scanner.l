@@ -16,7 +16,7 @@
 
 int CheckInt(void);
 int yyline = 1;
-
+/*
    enum yytokentype {
      NUMBER = 256,
      INT = 257,
@@ -42,7 +42,7 @@ int yyline = 1;
      CONST = 277;
      LBRACKET = 288;
      RBRACKET = 289;
-   };
+   };*/
 
 %}
 %option noyywrap
@@ -59,21 +59,18 @@ WS          	[ \t]
 
 [-+]?[0-9]+			{ 	yylval = strtoi(yytext);
 						if (yylval > 32767 || yylval < -32767) {
-						yERROR("value does not fall in range -32767 to 32767");
-					} else {
-
-						yTRACE(INT); return INT;
+							yERROR("value does not fall in range -32767 to 32767");
+						} else {
+							yTRACE(INT); return INT;
+						}
 					}
-				}
 
 ([0-9]+\.[0-9]+)|([0-9]*\.[0-9]+)  { 
 										yylval = strtof(yytext);
 										if (yylval > 32767 || yylval < -32767) {
 											yERROR("value does not fall in range -32767 to 32767");
 									 	} else {
-										
 											yTRACE(FLOAT); return FLOAT; //ask what to do for error checking with floats
-										
 										}
 									}
 
@@ -86,31 +83,32 @@ WS          	[ \t]
 							}
 
 [0-9]+[a-zA-z_]+ { yERROR("identifier cannot start with a number");}	
+
 "gl_FragColor"  {yTRACE(GL_FRAGCOLOR); return GL_FRAGCOLOR;}	
 "gl_FragDepth"  {yTRACE(GL_FRAGDEPTH); return GL_FRAGDEPTH;}
 
-"if"			{ yTRACE(IF); return IF;}
-"else"			{ yTRACE(ELSE); return ELSE;}
-"while"			{ yTRACE(WHILE); return WHILE;}
+if/" "				{ yTRACE(IF); return IF; }
+else/" "			{ yTRACE(ELSE); return ELSE; }
+while/" " 			{ yTRACE(WHILE); return WHILE; }
 
-"vec2" 			{ yTRACE(VEC2); return VEC2;}
-"vec3"			{ yTRACE(VEC3); return VEC3;}
-"vec4"			{ yTRACE(VEC4); return VEC4;}
-"ivec2" 		{ yTRACE(IVEC2); return IVEC2;}
-"ivec3"			{ yTRACE(IVEC3); return IVEC3;}
-"ivec4"			{ yTRACE(IVEC4); return IVEC4;}
-"bvec2"			{ yTRACE(BVEC2); return BVEC2;}
-"bvec3"			{ yTRACE(BVEC3); return BVEC3;}
-"bvec4"			{ yTRACE(BVEC4); return BVEC4;}
+vec2/" " 			{ yTRACE(VEC2); return VEC2; }
+vec3/" " 			{ yTRACE(VEC3); return VEC3; }
+vec4/" " 			{ yTRACE(VEC4); return VEC4; }
+ivec2/" " 			{ yTRACE(IVEC2); return IVEC2; }
+ivec3/" " 			{ yTRACE(IVEC3); return IVEC3; }
+ivec4/" " 			{ yTRACE(IVEC4); return IVEC4; }
+bvec2/" " 			{ yTRACE(BVEC2); return BVEC2; }
+bvec3/" " 			{ yTRACE(BVEC3); return BVEC3; }
+bvec4/" " 			{ yTRACE(BVEC4); return BVEC4; }
 
-"+"			{ yTRACE(ADD); return ADD;}
-"-"			{ yTRACE(SUB); return SUB;}
-"*"			{ yTRACE(MULT); return MULT;}
-"/"			{ yTRACE(DIV); return DIV;}
-"^"			{ yTRACE(EXP); return EXP;}
+"+"				{ yTRACE(ADD); return ADD;}
+"-"				{ yTRACE(SUB); return SUB;}
+"*"				{ yTRACE(MULT); return MULT;}
+"/"				{ yTRACE(DIV); return DIV;}
+"^"				{ yTRACE(EXP); return EXP;}
+true/" "			{ yTRACE(True); return True;}
+false/" "			{ yTRACE(False); return False;}
 
-"true"			{ yTRACE(True); return True;}
-"false"			{ yTRACE(False); return False;}
 "!"				{ yTRACE(EXCLAM); return EXCLAM;}
 "&&"			{ yTRACE(AND); return AND;}
 "||"			{ yTRACE(OR); return OR;}
@@ -122,12 +120,13 @@ WS          	[ \t]
 ">="			{ yTRACE(MORE_OR_EQUAL); return MORE_OR_EQUAL;}
 ";"				{ yTRACE(COLON);return COLON;}
 "="				{ yTRACE(EQUAL); return EQUAL;}
-"const"			{ yTRACE(CONST); return CONST;}
 
-"."			{ yERROR("Character not recognized");}
-"("			{ yTRACE(LBRACKET); return LBRACKET; return LBRACKET;}
-")"			{ yTRACE(RBRACKET); return RBRACKET; return RBRACKET;}
-. 			{ yERROR("invalid token"); }
+const/" "			{ yTRACE(CONST); return CONST;}
+"."				{ yERROR("Character not recognized");}
+"("				{ yTRACE(LBRACKET); return LBRACKET; return LBRACKET;}
+")"				{ yTRACE(RBRACKET); return RBRACKET; return RBRACKET;}
+
+. 				{ yERROR("invalid token"); }
 
 %%
 yylex();

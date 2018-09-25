@@ -49,14 +49,13 @@ extern int yyval;      /* text that is matched by scanner */
 #define YYDEBUG 1
 %}
 
-
 // TODO:Modify me to add more data types
 // Can access me from flex useing yyval
 
 %union {
   int ival;
   float fval;
-  bool bval;
+  //bool bval;
   char* name;
 }
 
@@ -81,13 +80,21 @@ extern int yyval;      /* text that is matched by scanner */
 %token IVEC4
 
 
-%token NUMBER        //myToken1 myToken2  
-%token ADD SUB MUL DIV EXP
+%token NUMBER        
+%token ADD 
+%token SUB 
+%token MUL 
+%token DIV 
+%token EXP
 %token TRUE FALSE
-%token EXCLAM,
+%token EXCLAM
 %token AND OR EQ NEQ LESS GREATER LEQ GEQ
 %token COLON EQUAL 
 %token CONST
+
+%token LBRACKET
+%token RBRACKET
+%token MORE_OR_EQUAL
 
 //precedence rules
 %left OR
@@ -121,8 +128,8 @@ tokens
   ;
 // TODO: replace myToken with the token the you defined.
 token
-  :     myToken1 
-  |     myToken2                     
+  :      
+  |                          
   ;
 
 
