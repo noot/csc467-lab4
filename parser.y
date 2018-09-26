@@ -25,6 +25,7 @@
 void yyerror(const char* s);    /* what to do in case of error            */
 int yylex();              /* procedure for calling lexical analyzer */
 extern int yyline;        /* variable holding current line number   */
+extern int yyval;      /* text that is matched by scanner */
 
 %}
 
@@ -48,21 +49,52 @@ extern int yyline;        /* variable holding current line number   */
 #define YYDEBUG 1
 %}
 
-
 // TODO:Modify me to add more data types
 // Can access me from flex useing yyval
 
 %union {
-  int num;
+  int ival;
+  float fval;
+  //bool bval;
+  char* name;
 }
-// TODO:Replace myToken with your tokens, you can use these tokens in flex
-%token NUMBER        //myToken1 myToken2  
-%token ADD SUB MUL DIV EXP
+
+%token IDENTIFIER
+
+%token INT
+%token BOOL
+%token FLOAT
+
+%token IF
+%token ELSE
+%token WHILE 
+
+%token VEC2
+%token VEC3
+%token VEC4
+%token BVEC2
+%token BVEC3
+%token BVEC4
+%token IVEC2
+%token IVEC3
+%token IVEC4
+
+
+%token NUMBER        
+%token ADD 
+%token SUB 
+%token MUL 
+%token DIV 
+%token EXP
 %token TRUE FALSE
-%token EXCLAM,
+%token EXCLAM
 %token AND OR EQ NEQ LESS GREATER LEQ GEQ
 %token COLON EQUAL 
 %token CONST
+
+%token LBRACKET
+%token RBRACKET
+%token MORE_OR_EQUAL
 
 //precedence rules
 %left OR
@@ -74,7 +106,6 @@ extern int yyline;        /* variable holding current line number   */
 //the !?
 %left '['']''('')'
 
-   
 %start    program
 
 %%
@@ -97,8 +128,8 @@ tokens
   ;
 // TODO: replace myToken with the token the you defined.
 token
-  :     myToken1 
-  |     myToken2                     
+  :      
+  |                          
   ;
 
 
