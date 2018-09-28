@@ -16,33 +16,6 @@
 
 int CheckInt(void);
 int yyline = 1;
-/*
-   enum yytokentype {
-     NUMBER = 256,
-     INT = 257,
-     FLOAT = 258,
-     ADD = 259,
-     SUB = 260,
-     MUL = 261,
-     DIV = 262,
-     EXP = 263,
-     True = 264;
-     False = 265;
-     EXCLAM = 266;
-     AND = 267;
-     OR = 268;
-     DOUBLE_EQUAL = 269;
-     NOT_EQUAL = 270;
-     LESS_THAN = 271;
-     MORE_THAN = 272;
-     LESS_OR_EQUAL = 273;
-     MORE_OR_EQUAL = 274;
-     COLON = 275;
-     EQUAL = 276;
-     CONST = 277;
-     LBRACKET = 288;
-     RBRACKET = 289;
-   };*/
 
 %}
 %option noyywrap
@@ -57,17 +30,18 @@ WS          	[ \t]
 
 [ \t\n]			;
 
-[-+]?[0-9]+			{ 	yylval = strtoi(yytext);
-						if (yylval > 32767 || yylval < -32767) {
-							yERROR("value does not fall in range -32767 to 32767");
-						} else {
-							yTRACE(INT); return INT;
-						}
+([0-9]+)		{ 	
+					int tmp = atoi(yytext);
+					if (tmp > 32767 || tmp < -32767) {
+						yERROR("value does not fall in range -32767 to 32767");
+					} else {
+						yTRACE(INT); return INT;
 					}
+				}
 
 ([0-9]+\.[0-9]+)|([0-9]*\.[0-9]+)  { 
-										yylval = strtof(yytext);
-										if (yylval > 32767 || yylval < -32767) {
+										float tmp = strtof(yytext, NULL);
+										if (tmp > 32767 || tmp < -32767) {
 											yERROR("value does not fall in range -32767 to 32767");
 									 	} else {
 											yTRACE(FLOAT); return FLOAT; //ask what to do for error checking with floats
@@ -77,15 +51,15 @@ WS          	[ \t]
 [a-zA-Z_][a-zA-Z0-9_]+ 		{ 	if (yyleng > 32) {
 									yERROR("identifier exceeds maximum length");
 								} else {
-									yylval = strtoi(yytext);
+									yylval.name = strtoi(yytext);
 									yTRACE(IDENTIFIER); return IDENTIFIER;
 								}
 							}
 
 [0-9]+[a-zA-z_]+ { yERROR("identifier cannot start with a number");}	
 
-"gl_FragColor"  {yTRACE(GL_FRAGCOLOR); return GL_FRAGCOLOR;}	
-"gl_FragDepth"  {yTRACE(GL_FRAGDEPTH); return GL_FRAGDEPTH;}
+gl_FragColor/" "  {yTRACE(GL_FRAGCOLOR); return GL_FRAGCOLOR;}	
+gl_FragDepth/" "  {yTRACE(GL_FRAGDEPTH); return GL_FRAGDEPTH;}
 
 if/" "				{ yTRACE(IF); return IF; }
 else/" "			{ yTRACE(ELSE); return ELSE; }
@@ -103,30 +77,29 @@ bvec4/" " 			{ yTRACE(BVEC4); return BVEC4; }
 
 "+"				{ yTRACE(ADD); return ADD;}
 "-"				{ yTRACE(SUB); return SUB;}
-"*"				{ yTRACE(MULT); return MULT;}
+"*"				{ yTRACE(MUL); return MUL;}
 "/"				{ yTRACE(DIV); return DIV;}
 "^"				{ yTRACE(EXP); return EXP;}
-true/" "			{ yTRACE(True); return True;}
-false/" "			{ yTRACE(False); return False;}
+true/" "			{ yTRACE(T); return T;}
+false/" "			{ yTRACE(F); return F;}
 
-"!"				{ yTRACE(EXCLAM); return EXCLAM;}
 "&&"			{ yTRACE(AND); return AND;}
 "||"			{ yTRACE(OR); return OR;}
-"=="			{ yTRACE(EQUAL); return EQUAL;}
-"!="			{ yTRACE(NOT_EQUAL); return NOT_EQUAL;}
-"<"				{ yTRACE(LESS_THAN); return LESS_THAN;}
-">"				{ yTRACE(MORE_THAN); return MORE_THAN;}
-"<="			{ yTRACE(LESS_OR_EQUAL); return LESS_OR_EQUAL;}
-">="			{ yTRACE(MORE_OR_EQUAL); return MORE_OR_EQUAL;}
+"=="			{ yTRACE(EQ); return EQ;}
+"!="			{ yTRACE(NEQ); return NEQ;}
+"<"				{ yTRACE(LESS); return LESS;}
+">"				{ yTRACE(GREATER); return GREATER;}
+"<="			{ yTRACE(LEQ); return LEQ;}
+">="			{ yTRACE(GEQ); return GEQ;}
 ";"				{ yTRACE(COLON);return COLON;}
 "="				{ yTRACE(EQUAL); return EQUAL;}
 
-const/" "			{ yTRACE(CONST); return CONST;}
+const/" "		{ yTRACE(CONST); return CONST;}
 "."				{ yERROR("Character not recognized");}
 "("				{ yTRACE(LBRACKET); return LBRACKET; return LBRACKET;}
 ")"				{ yTRACE(RBRACKET); return RBRACKET; return RBRACKET;}
 
-. 				{ yERROR("invalid token"); }
+. 				{ yERROR("invalid token"); yyterminate(); }
 
 %%
 yylex();

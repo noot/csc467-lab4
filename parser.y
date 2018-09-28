@@ -79,6 +79,8 @@ extern int yyval;      /* text that is matched by scanner */
 %token IVEC3
 %token IVEC4
 
+%token GL_FRAGCOLOR
+%token GL_FRAGDEPTH
 
 %token NUMBER        
 %token ADD 
@@ -86,15 +88,22 @@ extern int yyval;      /* text that is matched by scanner */
 %token MUL 
 %token DIV 
 %token EXP
-%token TRUE FALSE
-%token EXCLAM
-%token AND OR EQ NEQ LESS GREATER LEQ GEQ
-%token COLON EQUAL 
+%token T 
+%token F
+%token AND 
+%token OR 
+%token EQ 
+%token NEQ 
+%token LESS 
+%token GREATER 
+%token LEQ 
+%token GEQ
+%token COLON
+%token EQUAL 
 %token CONST
 
 %token LBRACKET
 %token RBRACKET
-%token MORE_OR_EQUAL
 
 //precedence rules
 %left OR
@@ -131,47 +140,45 @@ token
   :      
   |                          
   ;
+//keep in mind BEDMAS rule of operations
+// exp
+//   :  
+//   | INT
+//   | FLOAT
+//   | '-' exp {} //this would be negative
+//   | exp ADD exp {yTRACE($$ = $1 + $3);}
+//   | exp SUB exp {yTRACE($$ = $1 - $3);}
+//   | exp MULT exp {yTRACE($$ = $1 * $3);}
+//   | exp DIV exp {yTRACE($$ = $1 / $3);}
+//   | exp EXP exp {yTRACE($$ = $1 ^ %3);}
+//   | TRUE 
+//   | FALSE
+//   | exp AND exp {yTRACE($$ = $1 && $3);}
+//   | exp OR exp {yTRACE($$ = $1 || $3);}
+//   | exp EQ exp {yTRACE($$ = $ == $3);}
+//   | exp NEQ exp {yTRACE($$ = $1 != $3);}
+//   | exp LESS exp  {yTRACE($$ = $1 < $3);}
+//   | exp LEQ exp {yTRACE($$ = $1 <= $3);}
+//   | exp GREATER exp {yTRACE($$ = $1 > $3);}
+//   | exp GEQ exp {yTRACE($$ = $1 >= $3);}
+//   | '(' exp ')'
+//   | VARIABLE
+//   | CONSTRUCTOR
+//   | FUNCTION
+//   ;
+// declaration
+//   : type ID COLON {yTRACE($$);}
+//   | type ID EQ exp COLON {yTRACE($$ = =$1)}
+//   | CONST type ID EQ exp COLON {yTRACE()}
 
+// statement:
+//     COLON
+//   | VARIABLE EQ exp COLON {yTRACE($$ = $1 = $3;);}
+//   | IF '(' exp ')' statement ELSE statement {yTRACE($$ = 
+//   | WHILE '(' exp ')' statement
+//   | scope 
 
 %%
-
-//keep in mind BEDMAS rule of operations
-exp: 	  INT
-	| FLOAT
-	| '-' exp {} //this would be negative
-	| exp ADD exp {yTRACE($$ = $1 + $3);}
-	| exp SUB exp {yTRACE($$ = $1 - $3);}
-	| exp MULT exp {yTRACE($$ = $1 * $3);}
-	| exp DIV exp {yTRACE($$ = $1 / $3);}
-	| exp EXP exp {yTRACE($$ = $1 ^ %3);}
-	| TRUE //how can this be a keyword?
-	| FALSE
-	| EXCLAM exp 
-	| exp AND exp {yTRACE($$ = $1 && $3);}
-	| exp OR exp {yTRACE($$ = $1 || $3);}
-	| exp EQ exp {yTRACE($$ = $ == $3);}
-	| exp NEQ exp {yTRACE($$ = $1 != $3);}
-	| exp LESS exp  {yTRACE($$ = $1 < $3);}
-	| exp LEQ exp {yTRACE($$ = $1 <= $3);}
-	| exp GREATER exp {yTRACE($$ = $1 > $3);}
-	| exp GEQ exp {yTRACE($$ = $1 >= $3);}
-	| '(' exp ')'
-	| VARIABLE
-	| CONSTRUCTOR
-	| FUNCTION
-	;
-declaration
-	: type ID COLON {yTRACE($$);}
-	| type ID EQ exp COLON {yTRACE($$ = =$1)}
-	| CONST type ID EQ exp COLON {yTRACE()}
-
-statement:
-	  COLON
-	| VARIABLE EQ exp COLON {yTRACE($$ = $1 = $3;);}
-	| IF '(' exp ')' statement ELSE statement {yTRACE($$ = 
-	| WHILE '(' exp ')' statement
-	| scope 
-
 
 
 /***********************************************************************ol
