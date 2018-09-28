@@ -1,0 +1,13 @@
+Apple /*testing variable*/
+cat_ /*testing variable*/
+0foo /*testing error*/
+56.00 /*testing floats*/
+65.32.11 /*testing error*/
+90 /*testing integer*/
+iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii /*testing length*/
+67777778989 /*testing overflow*/
+@var /*testing different symbols*/
+int /*testing identifier*/
+gl_FragColor /*testing predefined var*/
+4!=5 /*testing Not Equal*/
+
