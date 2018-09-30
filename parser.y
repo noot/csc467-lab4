@@ -55,7 +55,7 @@ extern int yyval;      /* text that is matched by scanner */
 %union {
   int ival;
   float fval;
-  //bool bval;
+  bool bval;
   char* name;
 }
 

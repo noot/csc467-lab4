@@ -6,8 +6,7 @@
 
 #include "common.h"
 #include "parser.tab.h"
-#include "string.h"
-
+#include <string.h>
 
 #define YY_USER_INIT { yyin = inputFile; }
 #define	yyinput      input
@@ -24,9 +23,11 @@ WS          	[ \t]
 
 %%
 
-"/*"       		{ while(yyinput() != "*/") {
-					yyinput();
-				}}
+"/*"       		{ 
+					while(strncmp(yytext, "*/", yyleng) != 0) {
+						yyinput();
+					}
+				}
 
 [ \t\n]			;
 
@@ -35,15 +36,17 @@ WS          	[ \t]
 					if (tmp > 32767 || tmp < -32767) {
 						yERROR("value does not fall in range -32767 to 32767");
 					} else {
+						yylval.ival = tmp;
 						yTRACE(INT); return INT;
 					}
 				}
 
 ([0-9]+\.[0-9]+)|([0-9]*\.[0-9]+)  { 
-										float tmp = strtof(yytext, NULL);
+										float tmp = atof(yytext);
 										if (tmp > 32767 || tmp < -32767) {
 											yERROR("value does not fall in range -32767 to 32767");
 									 	} else {
+									 		yylval.fval = tmp;
 											yTRACE(FLOAT); return FLOAT; //ask what to do for error checking with floats
 										}
 									}
@@ -51,7 +54,7 @@ WS          	[ \t]
 [a-zA-Z_][a-zA-Z0-9_]+ 		{ 	if (yyleng > 32) {
 									yERROR("identifier exceeds maximum length");
 								} else {
-									yylval.name = strtoi(yytext);
+									*yylval.name = atoi(yytext);
 									yTRACE(IDENTIFIER); return IDENTIFIER;
 								}
 							}
@@ -82,7 +85,7 @@ bvec4/" " 			{ yTRACE(BVEC4); return BVEC4; }
 "^"				{ yTRACE(EXP); return EXP;}
 true/" "			{ yTRACE(T); return T;}
 false/" "			{ yTRACE(F); return F;}
-
+bool/" "			{ yTRACE(BOOL); return BOOL;}
 "&&"			{ yTRACE(AND); return AND;}
 "||"			{ yTRACE(OR); return OR;}
 "=="			{ yTRACE(EQ); return EQ;}
@@ -102,4 +105,3 @@ const/" "		{ yTRACE(CONST); return CONST;}
 . 				{ yERROR("invalid token"); yyterminate(); }
 
 %%
-yylex();
