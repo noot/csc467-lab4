@@ -26,15 +26,20 @@ WS          	[ \t\n]
 
 "/*"       		{ 
 					int tmp1 = 0;
-					int tmp2 = yyinput();
-					while(tmp2 != 0) {
-						if(tmp1 == 42 && tmp2 == 47) {
+					int tmp2 = yyinput(); // yyinput gives ascii value of next character
+					while(tmp2 != 0) { // while not EOF
+						if(tmp1 == 42 && tmp2 == 47) { /* ascii values of "*" and "/" respectively */
 							break;
-						}
-						//printf("%d\n", tmp2);
+						} else if (tmp1 == 92 && tmp2 == 110) { /* ascii values of "\" and "n" respectively */
+							yyline++; /* if "\n" found, increment line number */
+						} 
 						tmp1 = tmp2;
 						tmp2 = yyinput();
 					}
+				}
+
+[\n] 			{
+					yyline++;
 				}
 
 [ \t\n]			;
