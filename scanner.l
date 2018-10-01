@@ -66,7 +66,7 @@ WS          	[ \t\n]
 														}
 													}
 
-[a-zA-Z_][a-zA-Z0-9_]+ 		{ 	if (yyleng > 32) {
+[a-zA-Z_]+|[a-zA-Z0-9_]+ 		{ 	if (yyleng > 32) {
 									yERROR("identifier exceeds maximum length");
 								} else {
 									yylval.name = yytext;
