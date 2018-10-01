@@ -62,8 +62,10 @@ extern int yyval;      /* text that is matched by scanner */
 %token <name> IDENTIFIER
 
 %token <ival> INT
-%token <bval> BOOL
 %token <fval> FLOAT
+
+%token <bval> T 
+%token <bval> F
 
 %token <name> IF
 %token <name> ELSE
@@ -92,8 +94,6 @@ extern int yyval;      /* text that is matched by scanner */
 %token <name> MUL 
 %token <name> DIV 
 %token <name> EXP
-%token <name> T 
-%token <name> F
 %token <name> AND 
 %token <name> OR 
 %token <name> EQ 

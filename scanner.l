@@ -46,7 +46,7 @@ WS          	[ \t\n]
 
 ([0-9]+\.[0-9]+)|([0-9]*\.[0-9]+)  { 
 										float tmp = atof(yytext);
-										if (tmp > 32767 || tmp < -32767) {
+										if (tmp > (10^37) || tmp < (-10^37)) {
 											yERROR("value does not fall in range -32767 to 32767");
 									 	} else {
 									 		yylval.fval = tmp;
@@ -62,12 +62,12 @@ WS          	[ \t\n]
 								}
 							}
 
-[0-9]+[a-zA-z_]+ { yERROR("identifier cannot start with a number");}	
+[0-9]+[a-zA-z_]+ 	{ yERROR("identifier cannot start with a number");}	
 
-gl_FragColor/{WS}  {yTRACE(GL_FRAGCOLOR); return GL_FRAGCOLOR;}	
-gl_FragDepth/{WS}  {yTRACE(GL_FRAGDEPTH); return GL_FRAGDEPTH;}
+gl_FragColor/{WS}  	{yTRACE(GL_FRAGCOLOR); return GL_FRAGCOLOR;}	
+gl_FragDepth/{WS}  	{yTRACE(GL_FRAGDEPTH); return GL_FRAGDEPTH;}
 
-if/{WS}			{ yTRACE(IF); return IF; }
+if/{WS}				{ yTRACE(IF); return IF; }
 else/{WS}			{ yTRACE(ELSE); return ELSE; }
 while/{WS} 			{ yTRACE(WHILE); return WHILE; }
 
@@ -85,30 +85,29 @@ bvec2/{WS}			{ yTRACE(BVEC2); return BVEC2; }
 bvec3/{WS}			{ yTRACE(BVEC3); return BVEC3; }
 bvec4/{WS}			{ yTRACE(BVEC4); return BVEC4; }
 
-"+"				{ yTRACE(ADD); return ADD;}
-"-"				{ yTRACE(SUB); return SUB;}
-"*"				{ yTRACE(MUL); return MUL;}
-"/"				{ yTRACE(DIV); return DIV;}
-"^"				{ yTRACE(EXP); return EXP;}
-true/" "			{ yTRACE(T); return T;}
-false/" "			{ yTRACE(F); return F;}
-bool/" "			{ yTRACE(BOOL); return BOOL;}
-"&&"			{ yTRACE(AND); return AND;}
-"||"			{ yTRACE(OR); return OR;}
-"=="			{ yTRACE(EQ); return EQ;}
-"!="			{ yTRACE(NEQ); return NEQ;}
-"<"				{ yTRACE(LESS); return LESS;}
-">"				{ yTRACE(GREATER); return GREATER;}
-"<="			{ yTRACE(LEQ); return LEQ;}
-">="			{ yTRACE(GEQ); return GEQ;}
-";"				{ yTRACE(COLON);return COLON;}
-"="				{ yTRACE(EQUAL); return EQUAL;}
+"+"/{WS}			{ yTRACE(ADD); return ADD;}
+"-"/{WS}			{ yTRACE(SUB); return SUB;}
+"*"/{WS}			{ yTRACE(MUL); return MUL;}
+"/"/{WS}			{ yTRACE(DIV); return DIV;}
+"^"/{WS}			{ yTRACE(EXP); return EXP;}
+true/{WS}			{ yTRACE(T); return T;}
+false/{WS}			{ yTRACE(F); return F;}
+"&&"/{WS}			{ yTRACE(AND); return AND;}
+"||"/{WS}			{ yTRACE(OR); return OR;}
+"=="/{WS}			{ yTRACE(EQ); return EQ;}
+"!="/{WS}			{ yTRACE(NEQ); return NEQ;}
+"<"/{WS}			{ yTRACE(LESS); return LESS;}
+">"/{WS}			{ yTRACE(GREATER); return GREATER;}
+"<="/{WS}			{ yTRACE(LEQ); return LEQ;}
+">="/{WS}			{ yTRACE(GEQ); return GEQ;}
+";"/{WS}			{ yTRACE(COLON);return COLON;}
+"="/{WS}			{ yTRACE(EQUAL); return EQUAL;}
 
-const/" "		{ yTRACE(CONST); return CONST;}
-"."				{ yERROR("Character not recognized");}
-"("				{ yTRACE(LBRACKET); return LBRACKET; return LBRACKET;}
-")"				{ yTRACE(RBRACKET); return RBRACKET; return RBRACKET;}
+const/{WS}			{ yTRACE(CONST); return CONST;}
+"."/{WS}			{ yERROR("Character not recognized");}
+"("/{WS}			{ yTRACE(LBRACKET); return LBRACKET; return LBRACKET;}
+")"/{WS}			{ yTRACE(RBRACKET); return RBRACKET; return RBRACKET;}
 
-. 				{ yERROR("invalid token"); yyterminate(); }
+.					{ yERROR("invalid token"); }// yyterminate(); }
 
 %%
