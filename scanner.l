@@ -92,6 +92,7 @@ bvec2/{WS}			{ yTRACE(BVEC2); return BVEC2; }
 bvec3/{WS}			{ yTRACE(BVEC3); return BVEC3; }
 bvec4/{WS}			{ yTRACE(BVEC4); return BVEC4; }
 
+","/{WS}			{ yTRACE(COMMA); return COMMA;}
 "+"/{WS}			{ yTRACE(ADD); return ADD;}
 "-"/{WS}			{ yTRACE(SUB); return SUB;}
 "*"/{WS}			{ yTRACE(MUL); return MUL;}

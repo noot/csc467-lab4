@@ -89,6 +89,7 @@ extern int yyval;      /* text that is matched by scanner */
 %token <name> GL_FRAGDEPTH
 %token <name> CONST
         
+%token <name> COMMA
 %token <name> ADD 
 %token <name> SUB 
 %token <name> MUL 
