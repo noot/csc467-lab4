@@ -6,4 +6,4 @@ to compile generated c files: `gcc lex.yy.c parser.tab.c`
 
 to make project: `make`
 
-to run compiler467 with trace scanner and input file: `./compiler467 -Tn -I test.in`
+to run compiler467 with trace scanner and input file: `./compiler467 -Tn test.in`
