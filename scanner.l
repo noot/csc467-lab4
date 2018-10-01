@@ -26,6 +26,9 @@ WS          	[ \t\n]
 "/*"       		{ 
 					while(strncmp(yytext, "*/", yyleng) != 0) {
 						yyinput();
+						if (yyinput() == EOF ) {
+							yERROR("comment not closed");
+						}
 					}
 				}
 
