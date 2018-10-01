@@ -59,51 +59,54 @@ extern int yyval;      /* text that is matched by scanner */
   char* name;
 }
 
-%token IDENTIFIER
+%token <name> IDENTIFIER
 
-%token INT
-%token BOOL
-%token FLOAT
+%token <ival> INT
+%token <bval> BOOL
+%token <fval> FLOAT
 
-%token IF
-%token ELSE
-%token WHILE 
+%token <name> IF
+%token <name> ELSE
+%token <name> WHILE 
 
-%token VEC2
-%token VEC3
-%token VEC4
-%token BVEC2
-%token BVEC3
-%token BVEC4
-%token IVEC2
-%token IVEC3
-%token IVEC4
+%token <name> INT_ID
+%token <name> FLOAT_ID
+%token <name> BOOL_ID
 
-%token GL_FRAGCOLOR
-%token GL_FRAGDEPTH
+%token <name> VEC2
+%token <name> VEC3
+%token <name> VEC4
+%token <name> BVEC2
+%token <name> BVEC3
+%token <name> BVEC4
+%token <name> IVEC2
+%token <name> IVEC3
+%token <name> IVEC4
 
-%token NUMBER        
-%token ADD 
-%token SUB 
-%token MUL 
-%token DIV 
-%token EXP
-%token T 
-%token F
-%token AND 
-%token OR 
-%token EQ 
-%token NEQ 
-%token LESS 
-%token GREATER 
-%token LEQ 
-%token GEQ
-%token COLON
-%token EQUAL 
-%token CONST
+%token <name> GL_FRAGCOLOR
+%token <name> GL_FRAGDEPTH
+%token <name> CONST
+        
+%token <name> ADD 
+%token <name> SUB 
+%token <name> MUL 
+%token <name> DIV 
+%token <name> EXP
+%token <name> T 
+%token <name> F
+%token <name> AND 
+%token <name> OR 
+%token <name> EQ 
+%token <name> NEQ 
+%token <name> LESS 
+%token <name> GREATER 
+%token <name> LEQ 
+%token <name> GEQ
+%token <name> COLON
+%token <name> EQUAL 
 
-%token LBRACKET
-%token RBRACKET
+%token <name> LBRACKET
+%token <name> RBRACKET
 
 //precedence rules
 %left OR
