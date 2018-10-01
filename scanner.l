@@ -12,7 +12,7 @@
 #define YY_USER_INIT { yyin = inputFile; }
 #define	yyinput      input
 #define yTRACE(x)    { if (traceScanner) fprintf(traceFile, "TOKEN %3d : %s\n", x, yytext); }
-#define yERROR(x)    { fprintf(errorFile, "\nLEXICAL ERROR, LINE %d: %s\n", yyline, x); errorOccurred = TRUE; yyterminate(); }
+#define yERROR(x)    { fprintf(errorFile, "\nLEXICAL ERROR, LINE %d: %s\n", yyline, x); errorOccurred = TRUE; }// yyterminate(); }
 
 int CheckInt(void);
 int yyline = 1;
@@ -25,11 +25,15 @@ WS          	[ \t\n]
 %%
 
 "/*"       		{ 
-					while(strncmp(yytext, "*/", yyleng) != 0) {
-						yyinput();
-						if (yyinput() == EOF ) {
-							yERROR("comment not closed");
+					int tmp1 = 0;
+					int tmp2 = yyinput();
+					while(tmp2 != 0) {
+						if(tmp1 == 42 && tmp2 == 47) {
+							break;
 						}
+						//printf("%d\n", tmp2);
+						tmp1 = tmp2;
+						tmp2 = yyinput();
 					}
 				}
 
