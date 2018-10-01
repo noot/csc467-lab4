@@ -97,29 +97,29 @@ bvec2/{WS}			{ yTRACE(BVEC2); return BVEC2; }
 bvec3/{WS}			{ yTRACE(BVEC3); return BVEC3; }
 bvec4/{WS}			{ yTRACE(BVEC4); return BVEC4; }
 
-","/{WS}			{ yTRACE(COMMA); return COMMA;}
-"+"/{WS}			{ yTRACE(ADD); return ADD;}
-"-"/{WS}			{ yTRACE(SUB); return SUB;}
-"*"/{WS}			{ yTRACE(MUL); return MUL;}
-"/"/{WS}			{ yTRACE(DIV); return DIV;}
-"^"/{WS}			{ yTRACE(EXP); return EXP;}
+","					{ yTRACE(COMMA); return COMMA;}
+"+"					{ yTRACE(ADD); return ADD;}
+"-"					{ yTRACE(SUB); return SUB;}
+"*"					{ yTRACE(MUL); return MUL;}
+"/"					{ yTRACE(DIV); return DIV;}
+"^"					{ yTRACE(EXP); return EXP;}
 true/{WS}			{ yTRACE(T); return T;}
 false/{WS}			{ yTRACE(F); return F;}
-"&&"/{WS}			{ yTRACE(AND); return AND;}
-"||"/{WS}			{ yTRACE(OR); return OR;}
-"=="/{WS}			{ yTRACE(EQ); return EQ;}
-"!="/{WS}			{ yTRACE(NEQ); return NEQ;}
-"<"/{WS}			{ yTRACE(LESS); return LESS;}
-">"/{WS}			{ yTRACE(GREATER); return GREATER;}
-"<="/{WS}			{ yTRACE(LEQ); return LEQ;}
-">="/{WS}			{ yTRACE(GEQ); return GEQ;}
-";"/{WS}			{ yTRACE(COLON);return COLON;}
-"="/{WS}			{ yTRACE(EQUAL); return EQUAL;}
+"&&"				{ yTRACE(AND); return AND;}
+"||"				{ yTRACE(OR); return OR;}
+"=="				{ yTRACE(EQ); return EQ;}
+"!="				{ yTRACE(NEQ); return NEQ;}
+"<"					{ yTRACE(LESS); return LESS;}
+">"					{ yTRACE(GREATER); return GREATER;}
+"<="				{ yTRACE(LEQ); return LEQ;}
+">="				{ yTRACE(GEQ); return GEQ;}
+";"					{ yTRACE(COLON);return COLON;}
+"="					{ yTRACE(EQUAL); return EQUAL;}
 
 const/{WS}			{ yTRACE(CONST); return CONST;}
-"."/{WS}			{ yERROR("Character not recognized");}
-"("/{WS}			{ yTRACE(LBRACKET); return LBRACKET; return LBRACKET;}
-")"/{WS}			{ yTRACE(RBRACKET); return RBRACKET; return RBRACKET;}
+"."					{ yERROR("Character not recognized");}
+"("					{ yTRACE(LBRACKET); return LBRACKET; return LBRACKET;}
+")"					{ yTRACE(RBRACKET); return RBRACKET; return RBRACKET;}
 
 .					{ yERROR("invalid token"); }// yyterminate(); }
 
