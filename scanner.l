@@ -44,15 +44,15 @@ WS          	[ \t\n]
 					}
 				}
 
-([0-9]+\.[0-9]+)|([0-9]*\.[0-9]+)  { 
-										float tmp = atof(yytext);
-										if (tmp > (10^37) || tmp < (-10^37)) {
-											yERROR("value does not fall in range -32767 to 32767");
-									 	} else {
-									 		yylval.fval = tmp;
-											yTRACE(FLOAT); return FLOAT; //ask what to do for error checking with floats
-										}
-									}
+([0-9]+\.[0-9]+)|([0-9]*\.[0-9]+)|([0-9]+"E"[0-9]+)  { 
+														float tmp = atof(yytext);
+														if (tmp > (10^37) || tmp < (-10^37)) {
+															yERROR("value does not fall in range -32767 to 32767");
+													 	} else {
+													 		yylval.fval = tmp;
+															yTRACE(FLOAT); return FLOAT; //ask what to do for error checking with floats
+														}
+													}
 
 [a-zA-Z_][a-zA-Z0-9_]+ 		{ 	if (yyleng > 32) {
 									yERROR("identifier exceeds maximum length");
