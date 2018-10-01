@@ -7,6 +7,7 @@
 #include "common.h"
 #include "parser.tab.h"
 #include <string.h>
+#include <stdlib.h>
 
 #define YY_USER_INIT { yyin = inputFile; }
 #define	yyinput      input
@@ -35,21 +36,23 @@ WS          	[ \t\n]
 [ \t\n]			;
 
 ([0-9]+)		{ 	
-					int tmp = atoi(yytext);
-					if (tmp > 32767 || tmp < -32767) {
+					char *tmp;
+					long ret = strtol(yytext, &tmp, 10);
+					if (ret > 32767 || ret < -32767) {
 						yERROR("value does not fall in range -32767 to 32767");
 					} else {
-						yylval.ival = tmp;
+						yylval.ival = ret;
 						yTRACE(INT); return INT;
 					}
 				}
 
 ([0-9]+\.[0-9]+)|([0-9]*\.[0-9]+)|([0-9]+"E"[0-9]+)  { 
-														float tmp = atof(yytext);
-														if (tmp > (10^37) || tmp < (-10^37)) {
+														char *tmp;
+														double ret = strtod(yytext, &tmp);
+														if (ret > (10^37) || ret < (-10^37)) {
 															yERROR("value does not fall in range -32767 to 32767");
 													 	} else {
-													 		yylval.fval = tmp;
+													 		yylval.fval = ret;
 															yTRACE(FLOAT); return FLOAT; //ask what to do for error checking with floats
 														}
 													}
@@ -57,7 +60,7 @@ WS          	[ \t\n]
 [a-zA-Z_][a-zA-Z0-9_]+ 		{ 	if (yyleng > 32) {
 									yERROR("identifier exceeds maximum length");
 								} else {
-									*yylval.name = atoi(yytext);
+									yylval.name = yytext;
 									yTRACE(IDENTIFIER); return IDENTIFIER;
 								}
 							}
