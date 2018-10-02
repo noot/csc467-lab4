@@ -8,6 +8,7 @@
 #include "parser.tab.h"
 #include <string.h>
 #include <stdlib.h>
+#include <cmath>
 
 #define YY_USER_INIT { yyin = inputFile; }
 #define	yyinput      input
@@ -48,23 +49,26 @@ WS          	[ \t\n]
 					char *tmp;
 					long ret = strtol(yytext, &tmp, 10);
 					if (ret > 32767 || ret < -32767) {
-						yERROR("value does not fall in range -32767 to 32767");
+						yERROR("integer value does not fall in range -32767 to 32767");
 					} else {
 						yylval.ival = ret;
 						yTRACE(INT); return INT;
 					}
 				}
 
+([0-9]+\.[0-9]+){2,} 								 { yERROR("not a valid float value");}
 ([0-9]+\.[0-9]+)|([0-9]*\.[0-9]+)|([0-9]+"E"[0-9]+)  { 
-														char *tmp;
-														double ret = strtod(yytext, &tmp);
-														if (ret > (10^37) || ret < (-10^37)) {
-															yERROR("value does not fall in range -32767 to 32767");
-													 	} else {
+														float threshold = pow(10,37);
+														char* tmp = yytext;
+														float ret = strtof(tmp,NULL);
+														if ((ret < (threshold)) && (ret > -(threshold))) {
 													 		yylval.fval = ret;
-															yTRACE(FLOAT); return FLOAT; //ask what to do for error checking with floats
+															yTRACE(FLOAT); return FLOAT; 
+													 	} else {
+															yERROR("float value does not fall in range -E37 to E37");
 														}
 													}
+
 
 [a-zA-Z_][a-zA-Z0-9_]+ 		{ 	if (yyleng > 32) {
 									yERROR("identifier exceeds maximum length");
@@ -76,8 +80,9 @@ WS          	[ \t\n]
 
 [0-9]+[a-zA-z_]+ 	{ yERROR("identifier cannot start with a number");}	
 
-gl_FragColor/{WS}  	{yTRACE(GL_FRAGCOLOR); return GL_FRAGCOLOR;}	
-gl_FragDepth/{WS}  	{yTRACE(GL_FRAGDEPTH); return GL_FRAGDEPTH;}
+
+"gl_FragColor"/{WS}  	{yTRACE(GL_FRAGCOLOR); return GL_FRAGCOLOR;}	
+"gl_FragDepth"/{WS}  	{yTRACE(GL_FRAGDEPTH); return GL_FRAGDEPTH;}
 
 if/{WS}				{ yTRACE(IF); return IF; }
 else/{WS}			{ yTRACE(ELSE); return ELSE; }
@@ -120,7 +125,6 @@ const/{WS}			{ yTRACE(CONST); return CONST;}
 "."/{WS}			{ yERROR("Character not recognized");}
 "("/{WS}			{ yTRACE(LBRACKET); return LBRACKET; return LBRACKET;}
 ")"/{WS}			{ yTRACE(RBRACKET); return RBRACKET; return RBRACKET;}
-
-.					{ yERROR("invalid token"); }// yyterminate(); }
+.[a-zA-Z_]+         { yERROR("invalid token");}
 
 %%
