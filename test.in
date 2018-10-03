@@ -10,4 +10,11 @@ iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
 int /*testing identifier*/
 gl_FragColor /*testing predefined var*/
 4!=5 /*testing Not Equal*/
+-4.5 /*testing negative*/
+5 - /*some multi-line comment*/ 4 /*testing separated*/
+/*testing comment that doesn't close
+var3 /*should work*/
+var# /*error*/
+v%ar/*error*/
+3E10 /*scientific notation*/
 
