@@ -13,7 +13,7 @@
 #define YY_USER_INIT { yyin = inputFile; }
 #define	yyinput      input
 #define yTRACE(x)    { if (traceScanner) fprintf(traceFile, "TOKEN %3d : %s\n", x, yytext); }
-#define yERROR(x)    { fprintf(errorFile, "\nLEXICAL ERROR, LINE %d: %s\n", yyline, x); errorOccurred = TRUE; }// yyterminate(); }
+#define yERROR(x)    { fprintf(errorFile, "\nLEXICAL ERROR, LINE %d: %s\n", yyline, x); errorOccurred = TRUE;}// yyterminate(); }
 
 int CheckInt(void);
 int yyline = 1;
@@ -81,8 +81,19 @@ WS          	[ \t\n]
 [0-9]+[a-zA-z_]+ 	{ yERROR("identifier cannot start with a number");}	
 
 
-"gl_FragColor"/{WS}  	{yTRACE(GL_FRAGCOLOR); return GL_FRAGCOLOR;}	
-"gl_FragDepth"/{WS}  	{yTRACE(GL_FRAGDEPTH); return GL_FRAGDEPTH;}
+"gl_FragColor"/{WS} 		{yTRACE(GL_FRAGCOLOR); return GL_FRAGCOLOR;}	
+"gl_FragDepth"/{WS}  		{yTRACE(GL_FRAGDEPTH); return GL_FRAGDEPTH;}
+"gl_FragCoord"/{WS}  		{yTRACE(GL_FRAGCOORD); return GL_FRAGCOORD;}
+"gl_TexCoord"/{WS}  		{yTRACE(GL_TEXCOORD); return GL_TEXCOORD;}
+"gl_Color"/{WS}  			{yTRACE(GL_COLOR); return GL_COLOR;}
+"gl_Secondary"/{WS}  		{yTRACE(GL_SECONDARY); return GL_SECONDARY;}
+"gl_FogFragCoord"/{WS}  	{yTRACE(GL_FOGFRAGCOORD); return GL_FOGFRAGCOORD;}
+"gl_Light_Half"/{WS}  		{yTRACE(GL_LIGHT_HALF); return GL_LIGHT_HALF;}
+"gl_Light_Ambient"/{WS}  	{yTRACE(GL_LIGHT_AMBIENT); return GL_LIGHT_AMBIENT;}
+"gl_Material_Shininess"/{WS} {yTRACE(GL_MATERIAL_SHININESS); return GL_MATERIAL_SHININESS;}
+"env1"/{WS} 				{yTRACE(ENV1); return ENV1;}
+"env2"/{WS}  				{yTRACE(ENV2); return ENV2;}
+"env3"/{WS}  				{yTRACE(ENV3); return ENV3;}
 
 if/{WS}				{ yTRACE(IF); return IF; }
 else/{WS}			{ yTRACE(ELSE); return ELSE; }
@@ -102,29 +113,29 @@ bvec2/{WS}			{ yTRACE(BVEC2); return BVEC2; }
 bvec3/{WS}			{ yTRACE(BVEC3); return BVEC3; }
 bvec4/{WS}			{ yTRACE(BVEC4); return BVEC4; }
 
-","/{WS}			{ yTRACE(COMMA); return COMMA;}
-"+"/{WS}			{ yTRACE(ADD); return ADD;}
-"-"/{WS}			{ yTRACE(SUB); return SUB;}
-"*"/{WS}			{ yTRACE(MUL); return MUL;}
+","					{ yTRACE(COMMA); return COMMA;}
+"+"					{ yTRACE(ADD); return ADD;}
+"-"					{ yTRACE(SUB); return SUB;}
+"*"					{ yTRACE(MUL); return MUL;}
 "/"/{WS}			{ yTRACE(DIV); return DIV;}
-"^"/{WS}			{ yTRACE(EXP); return EXP;}
+"^"					{ yTRACE(EXP); return EXP;}
 true/{WS}			{ yTRACE(T); return T;}
 false/{WS}			{ yTRACE(F); return F;}
-"&&"/{WS}			{ yTRACE(AND); return AND;}
-"||"/{WS}			{ yTRACE(OR); return OR;}
-"=="/{WS}			{ yTRACE(EQ); return EQ;}
-"!="/{WS}			{ yTRACE(NEQ); return NEQ;}
-"<"/{WS}			{ yTRACE(LESS); return LESS;}
-">"/{WS}			{ yTRACE(GREATER); return GREATER;}
-"<="/{WS}			{ yTRACE(LEQ); return LEQ;}
-">="/{WS}			{ yTRACE(GEQ); return GEQ;}
+"&&"				{ yTRACE(AND); return AND;}
+"||"				{ yTRACE(OR); return OR;}
+"=="				{ yTRACE(EQ); return EQ;}
+"!="				{ yTRACE(NEQ); return NEQ;}
+"<"					{ yTRACE(LESS); return LESS;}
+">"					{ yTRACE(GREATER); return GREATER;}
+"<="				{ yTRACE(LEQ); return LEQ;}
+">="				{ yTRACE(GEQ); return GEQ;}
 ";"/{WS}			{ yTRACE(COLON);return COLON;}
-"="/{WS}			{ yTRACE(EQUAL); return EQUAL;}
+"="					{ yTRACE(EQUAL); return EQUAL;}
 
 const/{WS}			{ yTRACE(CONST); return CONST;}
 "."/{WS}			{ yERROR("Character not recognized");}
 "("/{WS}			{ yTRACE(LBRACKET); return LBRACKET; return LBRACKET;}
 ")"/{WS}			{ yTRACE(RBRACKET); return RBRACKET; return RBRACKET;}
-.[a-zA-Z_]+         { yERROR("invalid token");}
+.[a-zA-Z_]+         { yERROR("invalid token1");} //invalid token at the start
 
 %%
