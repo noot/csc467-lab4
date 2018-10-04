@@ -87,6 +87,17 @@ extern int yyval;      /* text that is matched by scanner */
 
 %token <name> GL_FRAGCOLOR
 %token <name> GL_FRAGDEPTH
+%token <name> GL_FRAGCOORD
+%token <name> GL_TEXCOORD
+%token <name> GL_COLOR
+%token <name> GL_SECONDARY
+%token <name> GL_FOGFRAGCOORD
+%token <name> GL_LIGHT_HALF
+%token <name> GL_LIGHT_AMBIENT
+%token <name> GL_MATERIAL_SHININESS
+%token <name> ENV1
+%token <name> ENV2
+%token <name> ENV3
 %token <name> CONST
         
 %token <name> COMMA
@@ -108,6 +119,7 @@ extern int yyval;      /* text that is matched by scanner */
 
 %token <name> LBRACKET
 %token <name> RBRACKET
+
 
 //precedence rules
 %left OR
