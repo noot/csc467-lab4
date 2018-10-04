@@ -139,6 +139,6 @@ const/{WS}			{ yTRACE(CONST); return CONST;}
 "."/{WS}			{ yERROR("Character not recognized");}
 "("/{WS}			{ yTRACE(LBRACKET); return LBRACKET; return LBRACKET;}
 ")"/{WS}			{ yTRACE(RBRACKET); return RBRACKET; return RBRACKET;}
-.[a-zA-Z_]+         { yERROR("invalid token1");} //invalid token at the start
+.         			{ yERROR("invalid token1");} //invalid token at the start
 
 %%
