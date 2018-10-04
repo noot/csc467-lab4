@@ -37,6 +37,7 @@ WS          	[ \t\n]
 						tmp1 = tmp2;
 						tmp2 = yyinput();
 					}
+					yERROR("unclosed comment")
 				}
 
 [\n] 			{
