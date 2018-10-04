@@ -1,7 +1,8 @@
 abc def 123
 stuff /* multi
 line
-comment */
+comment 
+*/
 0ab
 more 
 tokens

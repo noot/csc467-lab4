@@ -143,5 +143,6 @@ const/{WS}			{ yTRACE(CONST); return CONST;}
 "."/{WS}			{ yERROR("Character not recognized");}
 "("/{WS}			{ yTRACE(LBRACKET); return LBRACKET; return LBRACKET;}
 ")"/{WS}			{ yTRACE(RBRACKET); return RBRACKET; return RBRACKET;}
+
 .         			{ yERROR("invalid token");} 
 %%
