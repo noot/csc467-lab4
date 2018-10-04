@@ -98,9 +98,13 @@ WS          	[ \t\n]
 "env2"/{WS}  				{yTRACE(ENV2); return ENV2;}
 "env3"/{WS}  				{yTRACE(ENV3); return ENV3;}
 
-if/{WS}				{ yTRACE(IF); return IF; }
-else/{WS}			{ yTRACE(ELSE); return ELSE; }
-while/{WS} 			{ yTRACE(WHILE); return WHILE; }
+"dp3"				{ yTRACE(DP3); return DP3; }
+"rsq"				{ yTRACE(RSQ); return RSQ; }
+"lit"				{ yTRACE(LIT); return LIT; }
+
+if					{ yTRACE(IF); return IF; }
+else				{ yTRACE(ELSE); return ELSE; }
+while 				{ yTRACE(WHILE); return WHILE; }
 
 int/{WS}			{ yTRACE(INT_ID); return INT_ID;}
 float/{WS}			{ yTRACE(FLOAT_ID); return FLOAT_ID;}
@@ -120,10 +124,10 @@ bvec4/{WS}			{ yTRACE(BVEC4); return BVEC4; }
 "+"					{ yTRACE(ADD); return ADD;}
 "-"					{ yTRACE(SUB); return SUB;}
 "*"					{ yTRACE(MUL); return MUL;}
-"/"/{WS}			{ yTRACE(DIV); return DIV;}
+"/"					{ yTRACE(DIV); return DIV;}
 "^"					{ yTRACE(EXP); return EXP;}
-true/{WS}			{ yTRACE(T); return T;}
-false/{WS}			{ yTRACE(F); return F;}
+true				{ yTRACE(T); return T;}
+false				{ yTRACE(F); return F;}
 "&&"				{ yTRACE(AND); return AND;}
 "||"				{ yTRACE(OR); return OR;}
 "=="				{ yTRACE(EQ); return EQ;}

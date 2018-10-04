@@ -99,6 +99,11 @@ extern int yyval;      /* text that is matched by scanner */
 %token <name> ENV2
 %token <name> ENV3
 %token <name> CONST
+
+%token <name> DP3;
+%token <name> LIT;
+%token <name> RSQ;
+
         
 %token <name> COMMA
 %token <name> ADD 
