@@ -13,7 +13,7 @@
 #define YY_USER_INIT { yyin = inputFile; }
 #define	yyinput      input
 #define yTRACE(x)    { if (traceScanner) fprintf(traceFile, "TOKEN %3d : %s\n", x, yytext); }
-#define yERROR(x)    { fprintf(errorFile, "\nLEXICAL ERROR, LINE %d: %s\n", yyline, x); errorOccurred = TRUE;}// yyterminate(); }
+#define yERROR(x)    { fprintf(errorFile, "\nLEXICAL ERROR, LINE %d: %s\n", yyline, x); errorOccurred = TRUE; yyterminate(); }
 
 int CheckInt(void);
 int yyline = 1;
@@ -98,13 +98,13 @@ WS          	[ \t\n]
 "env2"/{WS}  				{yTRACE(ENV2); return ENV2;}
 "env3"/{WS}  				{yTRACE(ENV3); return ENV3;}
 
-"dp3"				{ yTRACE(DP3); return DP3; }
-"rsq"				{ yTRACE(RSQ); return RSQ; }
-"lit"				{ yTRACE(LIT); return LIT; }
+'dp3'				{ yTRACE(DP3); return DP3; }
+'rsq'				{ yTRACE(RSQ); return RSQ; }
+'lit'				{ yTRACE(LIT); return LIT; }
 
 'if'				{ yTRACE(IF); return IF; }
 'else'				{ yTRACE(ELSE); return ELSE; }
-'while' 			{ yTRACE(WHILE); return WHILE; 
+'while' 			{ yTRACE(WHILE); return WHILE; }
 
 int/{WS}			{ yTRACE(INT_ID); return INT_ID;}
 float/{WS}			{ yTRACE(FLOAT_ID); return FLOAT_ID;}
@@ -141,8 +141,9 @@ bvec4/{WS}			{ yTRACE(BVEC4); return BVEC4; }
 
 const/{WS}			{ yTRACE(CONST); return CONST;}
 "."/{WS}			{ yERROR("Character not recognized");}
-"("/{WS}			{ yTRACE(LBRACKET); return LBRACKET; return LBRACKET;}
-")"/{WS}			{ yTRACE(RBRACKET); return RBRACKET; return RBRACKET;}
+"("/{WS}			{ yTRACE(LBRACKET); return LBRACKET;}
+")"/{WS}			{ yTRACE(RBRACKET); return RBRACKET;}
 
 .         			{ yERROR("invalid token");} 
+
 %%
