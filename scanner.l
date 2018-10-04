@@ -25,13 +25,17 @@ WS          	[ \t\n]
 
 %%
 
+[\n] 			{
+					yyline++;
+				}
+
 "/*"       		{ 
 					int tmp1 = 0;
 					int tmp2 = yyinput(); // yyinput gives ascii value of next character
 					while(tmp2 != 0) { // while not EOF
 						if(tmp1 == 42 && tmp2 == 47) { /* ascii values of "*" and "/" respectively */
 							break;
-						} else if (tmp1 == 92 && tmp2 == 110) { /* ascii values of "\" and "n" respectively */
+						} else if (tmp1 == '\n' && tmp2 != 0) { /* ascii values of "\" and "n" respectively */
 							yyline++; /* if "\n" found, increment line number */
 						} 
 						tmp1 = tmp2;
@@ -40,10 +44,6 @@ WS          	[ \t\n]
 					if(tmp2 == 0) {
 						yERROR("unclosed comment") // reach EOF without finding `*/`
 					}
-				}
-
-[\n] 			{
-					yyline++;
 				}
 
 [ \t\n]			;
@@ -139,6 +139,6 @@ const/{WS}			{ yTRACE(CONST); return CONST;}
 "."/{WS}			{ yERROR("Character not recognized");}
 "("/{WS}			{ yTRACE(LBRACKET); return LBRACKET; return LBRACKET;}
 ")"/{WS}			{ yTRACE(RBRACKET); return RBRACKET; return RBRACKET;}
-.         			{ yERROR("invalid token1");} //invalid token at the start
+.         			{ yERROR("invalid token");} //invalid token at the start
 
 %%
