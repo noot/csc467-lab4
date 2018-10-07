@@ -100,10 +100,12 @@ extern int yyval;      /* text that is matched by scanner */
 %token <name> ENV3
 %token <name> CONST
 
-%token <name> DP3;
-%token <name> LIT;
-%token <name> RSQ;
+%token <name> DP3
+%token <name> LIT
+%token <name> RSQ
 
+%token <name> INC
+%token <name> DEC
         
 %token <name> COMMA
 %token <name> ADD 
@@ -124,7 +126,10 @@ extern int yyval;      /* text that is matched by scanner */
 
 %token <name> LBRACKET
 %token <name> RBRACKET
-
+%token <name> LCURL
+%token <name> RCURL
+%token <name> LSQUARE
+%token <name> RSQUARE
 
 //precedence rules
 %left OR

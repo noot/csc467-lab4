@@ -48,7 +48,7 @@ WS          	[ \t\n]
 
 [ \t\n]			;
 
-([0-9]+)		{ 	
+([0-9]*)		{ 	
 					char *tmp;
 					long ret = strtol(yytext, &tmp, 10);
 					if (ret > 32767 || ret < -32767) {
@@ -73,7 +73,7 @@ WS          	[ \t\n]
 													}
 
 
-[a-zA-Z_][a-zA-Z0-9_]+ 		{ 	if (yyleng > 32) {
+[a-zA-Z_][a-zA-Z0-9_]* 		{ 	if (yyleng > 32) {
 									yERROR("identifier exceeds maximum length");
 								} else {
 									yylval.name = yytext;
@@ -81,7 +81,7 @@ WS          	[ \t\n]
 								}
 							}
 
-[0-9]+[a-zA-z_]+ 	{ yERROR("identifier cannot start with a number");}	
+[0-9]+[a-zA-z_]+/{WS} 	{ yERROR("identifier cannot start with a number");}	
 
 
 "gl_FragColor"/{WS} 		{yTRACE(GL_FRAGCOLOR); return GL_FRAGCOLOR;}	
@@ -120,6 +120,8 @@ bvec2/{WS}			{ yTRACE(BVEC2); return BVEC2; }
 bvec3/{WS}			{ yTRACE(BVEC3); return BVEC3; }
 bvec4/{WS}			{ yTRACE(BVEC4); return BVEC4; }
 
+"++" 				{ yTRACE(INC); return INC; }
+"--"				{ yTRACE(DEC); return DEC; }
 ","					{ yTRACE(COMMA); return COMMA;}
 "+"					{ yTRACE(ADD); return ADD;}
 "-"					{ yTRACE(SUB); return SUB;}
@@ -136,13 +138,16 @@ bvec4/{WS}			{ yTRACE(BVEC4); return BVEC4; }
 ">"					{ yTRACE(GREATER); return GREATER;}
 "<="				{ yTRACE(LEQ); return LEQ;}
 ">="				{ yTRACE(GEQ); return GEQ;}
-";"/{WS}			{ yTRACE(COLON);return COLON;}
+";"					{ yTRACE(COLON);return COLON;}
 "="					{ yTRACE(EQUAL); return EQUAL;}
 
 const/{WS}			{ yTRACE(CONST); return CONST;}
-"."/{WS}			{ yERROR("Character not recognized");}
-"("/{WS}			{ yTRACE(LBRACKET); return LBRACKET;}
-")"/{WS}			{ yTRACE(RBRACKET); return RBRACKET;}
+"("					{ yTRACE(LBRACKET); return LBRACKET;}
+")"					{ yTRACE(RBRACKET); return RBRACKET;}
+"{"					{ yTRACE(LCURL); return LCURL; }
+"}"					{ yTRACE(RCURL); return RCURL; }
+"["					{ yTRACE(LSQUARE); return LSQUARE; }
+"]"					{ yTRACE(RSQUARE); return RSQUARE; }
 
 .         			{ yERROR("invalid token");} 
 

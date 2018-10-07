@@ -3,7 +3,11 @@ stuff /* multi
 line
 comment 
 */
-0ab
 more 
 tokens
+int a
+{a*8}
+i++
+7^5
+
 
