@@ -176,17 +176,28 @@ declaration
   ;
 statement
   :   variable EQ exp COLON               { yTRACE("statement -> variable = exp ;"); } 
-  |
-  |
+  |   IF LBRACKET exp RBRACKET statement else_statement   { yTRACE("statement -> if ( exp ) statement else_statement"); }
+  |   WHILE LBRACKET exp RBRACKET statement               { yTRACE("statement -> while ( exp ) statement"); }
+  |   COLON                                { yTRACE("statement -> ;"); }
   |   scope
   ;
 else_statement
-  :
+  :   ELSE statement                      { yTRACE("else_statement -> else statement"); }
   |   /* empty */                         { yTRACE("else_statement -> empty"); }
   ;
 type
-  :
-  |
+  :   INT_ID
+  |   IVEC2
+  |   IVEC3
+  |   IVEC4
+  |   BOOL_ID
+  |   BVEC2
+  |   BVEC3
+  |   BVEC4
+  |   FLOAT_ID
+  |   VEC2
+  |   VEC3
+  |   VEC4
   ;
 exp
   :  
@@ -203,7 +214,8 @@ exp
   | LBRACKET exp RBRACKET
   ;
 variable
-  :
+  : IDENTIFIER
+  | IDENTIFIER INT
   ;
 unary_op
   :
