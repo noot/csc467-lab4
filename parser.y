@@ -155,55 +155,112 @@ extern int yyval;      /* text that is matched by scanner */
  *    1. Add code to rules for construction of AST.
  ***********************************************************************/
 program
-  :   tokens       
+  :   scope                               { yTRACE("program -> scope"); }       
   ;
-tokens
-  :  tokens token  
-  |      
+scope
+  :   LCURL declarations statements RCURL { yTRACE("scope -> { declarations statements }"); }
   ;
-// TODO: replace myToken with the token the you defined.
-token
-  :      
-  |                          
+declarations
+  :   declarations declaration            { yTRACE("declarations -> declarations declaration"); }
+  |   /* empty */                         { yTRACE("declarations -> empty"); }                                              
+  ; 
+statements
+  :   statements statement                { yTRACE("statements -> statements statement"); }
+  |   /* empty */                         { yTRACE("statements -> empty"); }
   ;
-//keep in mind BEDMAS rule of operations
-// exp
-//   :  
-//   | INT
-//   | FLOAT
-//   | '-' exp {} //this would be negative
-//   | exp ADD exp {yTRACE($$ = $1 + $3);}
-//   | exp SUB exp {yTRACE($$ = $1 - $3);}
-//   | exp MULT exp {yTRACE($$ = $1 * $3);}
-//   | exp DIV exp {yTRACE($$ = $1 / $3);}
-//   | exp EXP exp {yTRACE($$ = $1 ^ %3);}
-//   | TRUE 
-//   | FALSE
-//   | exp AND exp {yTRACE($$ = $1 && $3);}
-//   | exp OR exp {yTRACE($$ = $1 || $3);}
-//   | exp EQ exp {yTRACE($$ = $ == $3);}
-//   | exp NEQ exp {yTRACE($$ = $1 != $3);}
-//   | exp LESS exp  {yTRACE($$ = $1 < $3);}
-//   | exp LEQ exp {yTRACE($$ = $1 <= $3);}
-//   | exp GREATER exp {yTRACE($$ = $1 > $3);}
-//   | exp GEQ exp {yTRACE($$ = $1 >= $3);}
-//   | '(' exp ')'
-//   | VARIABLE
-//   | CONSTRUCTOR
-//   | FUNCTION
-//   ;
+declaration
+  :   type IDENTIFIER COLON               { yTRACE("declaration -> type identifier ;"); }
+  |   type IDENTIFIER EQ exp COLON        { yTRACE("declaration -> type idenfifier = exp ;"); }
+  |   CONST type IDENTIFIER EQ exp COLON  { yTRACE("declaration -> const type identifier = exp ;"); }
+  |   /* empty */                         { yTRACE("declaration -> empty"); }
+  ;
+statement
+  :   variable EQ exp COLON               { yTRACE("statement -> variable = exp ;"); } 
+  |
+  |
+  |   scope
+  ;
+else_statement
+  :
+  |   /* empty */                         { yTRACE("else_statement -> empty"); }
+  ;
+type
+  :
+  |
+  ;
+exp
+  :  
+  | constructor
+  | function
+  | INT
+  | FLOAT
+  | '-' exp {} //this would be negative
+  | T 
+  | F
+  | variable
+  | unary_op exp
+  | exp binary_op exp
+  | LBRACKET exp RBRACKET
+  ;
+variable
+  :
+  ;
+unary_op
+  :
+  ;
+binary_op
+  :
+  | exp ADD exp       // {yTRACE($$ = $1 + $3);}
+  | exp SUB exp       // {yTRACE($$ = $1 - $3);}
+  | exp MULT exp      // {yTRACE($$ = $1 * $3);}
+  | exp DIV exp       // {yTRACE($$ = $1 / $3);}
+  | exp EXP exp       // {yTRACE($$ = $1 ^ %3);}
+  | exp AND exp       // {yTRACE($$ = $1 && $3);}
+  | exp OR exp        // {yTRACE($$ = $1 || $3);}
+  | exp EQ exp        // {yTRACE($$ = $ == $3);}
+  | exp NEQ exp       // {yTRACE($$ = $1 != $3);}
+  | exp LESS exp      // {yTRACE($$ = $1 < $3);}
+  | exp LEQ exp       // {yTRACE($$ = $1 <= $3);}
+  | exp GREATER exp   // {yTRACE($$ = $1 > $3);}
+  | exp GEQ exp       // {yTRACE($$ = $1 >= $3);}
+  ;
+constructor 
+  :
+  ;
+function
+  :
+  ;
+function_name
+  :
+  ;
+arguments_opt
+  :
+  ;
+arguments
+  :
+  ;
 // declaration
-//   : type ID COLON {yTRACE($$);}
-//   | type ID EQ exp COLON {yTRACE($$ = =$1)}
-//   | CONST type ID EQ exp COLON {yTRACE()}
+//   : type IDENTIFIER COLON {yTRACE($$);}
+//   | type IDENTIFIER EQ exp COLON {yTRACE($$ = =$1)}
+//   | CONST type IDENTIFIER EQ exp COLON {yTRACE()}
 
 // statement:
 //     COLON
-//   | VARIABLE EQ exp COLON {yTRACE($$ = $1 = $3;);}
-//   | IF '(' exp ')' statement ELSE statement {yTRACE($$ = 
+//   | variable EQ exp COLON {yTRACE($$ = $1 = $3;);}
+//   | IF '(' exp ')' statement ELSE statement {yTRACE($$ = $1);}
 //   | WHILE '(' exp ')' statement
 //   | scope 
-
+// tokens
+//   :  tokens token  
+//   |      
+//   ;
+// // TODO: replace myToken with the token the you defined.
+// token
+//   :      
+//   | TRUE      
+//   | FALSE
+//   | ID                   
+//   ;
 %%
 
 
