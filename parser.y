@@ -224,20 +224,20 @@ unary_op
   ;
 binary_op
   :
-  | exp ADD exp        			{yTRACE("binary_op -> +");}
-  | exp SUB exp        			{yTRACE("binary_op -> -");}
-  | exp MULT exp       			{yTRACE("binary_op -> *");}
-  | exp DIV exp        			{yTRACE("binary_op -> /");}
-  | exp EXP exp        			{yTRACE("binary_op -> ^");} //not in handout
-  | exp AND exp        			{yTRACE("binary_op -> &&");}
-  | exp OR exp         			{yTRACE("binary_op -> ||");}
-  | exp EQ exp         			{yTRACE("binary_op -> ==");}
-  | exp NEQ exp        			{yTRACE("binary_op -> !=");}
-  | exp LESS exp       			{yTRACE("binary_op -> <");}
-  | exp LEQ exp        			{yTRACE("binary_op -> <=");}
-  | exp GREATER exp    			{yTRACE("binary_op -> >");}
-  | exp GEQ exp        			{yTRACE("binary_op -> >=");}
-  | exp EQUAL exp        		{yTRACE("binary_op -> =");}
+  | exp ADD exp        			{yTRACE("binary_op -> exp + exp");}
+  | exp SUB exp        			{yTRACE("binary_op -> exp - exp");}
+  | exp MULT exp       			{yTRACE("binary_op -> exp * exp");}
+  | exp DIV exp        			{yTRACE("binary_op -> exp / exp");}
+  | exp EXP exp        			{yTRACE("binary_op -> exp ^ exp");} //not in handout
+  | exp AND exp        			{yTRACE("binary_op -> exp && exp");}
+  | exp OR exp         			{yTRACE("binary_op -> exp || exp");}
+  | exp EQ exp         			{yTRACE("binary_op -> exp == exp");}
+  | exp NEQ exp        			{yTRACE("binary_op -> exp != exp");}
+  | exp LESS exp       			{yTRACE("binary_op -> exp < exp");}
+  | exp LEQ exp        			{yTRACE("binary_op -> exp <= exp");}
+  | exp GREATER exp    			{yTRACE("binary_op -> exp > exp");}
+  | exp GEQ exp        			{yTRACE("binary_op -> exp >= exp");}
+  | exp EQUAL exp        		{yTRACE("binary_op -> exp = exp");}
   ;
 constructor 
   : type LBRACKET arguments RBRACKET    		{yTRACE("constructor -> type ( arguments )");}	
