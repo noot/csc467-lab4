@@ -140,6 +140,7 @@ bvec4/{WS}			{ yTRACE(BVEC4); return BVEC4; }
 ">="				{ yTRACE(GEQ); return GEQ;}
 ";"					{ yTRACE(COLON);return COLON;}
 "="					{ yTRACE(EQUAL); return EQUAL;}
+"!"					{ yTRACE(EXCLAM); return EXCLAM;}
 
 const/{WS}			{ yTRACE(CONST); return CONST;}
 "("					{ yTRACE(LBRACKET); return LBRACKET;}

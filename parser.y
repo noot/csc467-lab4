@@ -123,6 +123,7 @@ extern int yyval;      /* text that is matched by scanner */
 %token <name> GEQ
 %token <name> COLON
 %token <name> EQUAL 
+%token <name> EXCLAM
 
 %token <name> LBRACKET
 %token <name> RBRACKET
@@ -219,7 +220,7 @@ variable
   ;
 unary_op
   : EXCLAM		  		{ yTRACE("unary_op -> !"); }
-  | SUB		  			{ yTRACE("unary_op -> -"); }
+  //| SUB		  			{ yTRACE("unary_op -> -"); }
   ;
 binary_op
   :
@@ -236,6 +237,7 @@ binary_op
   | exp LEQ exp        			{yTRACE("binary_op -> <=");}
   | exp GREATER exp    			{yTRACE("binary_op -> >");}
   | exp GEQ exp        			{yTRACE("binary_op -> >=");}
+  | exp EQUAL exp        		{yTRACE("binary_op -> =");}
   ;
 constructor 
   : type LBRACKET arguments RBRACKET    		{yTRACE("constructor -> type ( arguments )");}	
