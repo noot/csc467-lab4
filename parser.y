@@ -50,7 +50,7 @@ extern int yyval;      /* text that is matched by scanner */
 %}
 
 // TODO:Modify me to add more data types
-// Can access me from flex useing yyval
+// Can access me from flex using yyval
 
 %union {
   int ival;
@@ -186,70 +186,75 @@ else_statement
   |   /* empty */                         { yTRACE("else_statement -> empty"); }
   ;
 type
-  :   INT_ID
-  |   IVEC2
-  |   IVEC3
-  |   IVEC4
-  |   BOOL_ID
-  |   BVEC2
-  |   BVEC3
-  |   BVEC4
-  |   FLOAT_ID
-  |   VEC2
-  |   VEC3
-  |   VEC4
-  ;
+  :   INT_ID				  { yTRACE("type -> int"); }
+  |   IVEC2				  { yTRACE("type -> ivec2"); }
+  |   IVEC3				  { yTRACE("type -> ivec3"); }
+  |   IVEC4				  { yTRACE("type -> ivec4"); }
+  |   BOOL_ID				  { yTRACE("type -> bool"); }
+  |   BVEC2				  { yTRACE("type -> bvec2"); }
+  |   BVEC3				  { yTRACE("type -> bvec3"); }
+  |   BVEC4				  { yTRACE("type -> bvec4"); }
+  |   FLOAT_ID				  { yTRACE("type -> float"); }
+  |   VEC2				  { yTRACE("type -> vec2"); }
+  |   VEC3				  { yTRACE("type -> vec3"); }
+  |   VEC4				  { yTRACE("type -> vec4"); }
+  ;				  { yTRACE(); }
 exp
   :  
-  | constructor
-  | function
-  | INT
-  | FLOAT
+  | constructor				  { yTRACE("exp -> constructor"); }
+  | function				  { yTRACE("exp -> function"); }
+  | INT				  	  { yTRACE("exp -> integer_literal"); }
+  | FLOAT				  { yTRACE("exp -> float_literal"); }
   | '-' exp {} //this would be negative
-  | T 
-  | F
-  | variable
-  | unary_op exp
-  | exp binary_op exp
-  | LBRACKET exp RBRACKET
+  | T 				  	  { yTRACE("exp -> true"); }
+  | F				  	  { yTRACE("exp -> false"); }
+  | variable				  { yTRACE("exp -> variable"); }
+  | unary_op exp			  { yTRACE("exp -> unary_op ex"); }
+  | exp binary_op exp			  { yTRACE("exp -> exp binary_op exp"); }
+  | LBRACKET exp RBRACKET		  { yTRACE("exp -> ( exp )"); }
   ;
 variable
-  : IDENTIFIER
-  | IDENTIFIER INT
+  : IDENTIFIER		  		  { yTRACE("variable -> identifier"); }
+  | IDENTIFIER INT		  	  { yTRACE("variable -> identifier[integer_literal]"); }
   ;
 unary_op
-  :
+  : EXCLAM		  		{ yTRACE("unary_op -> !"); }
+  | SUB		  			{ yTRACE("unary_op -> -"); }
   ;
 binary_op
   :
-  | exp ADD exp       // {yTRACE($$ = $1 + $3);}
-  | exp SUB exp       // {yTRACE($$ = $1 - $3);}
-  | exp MULT exp      // {yTRACE($$ = $1 * $3);}
-  | exp DIV exp       // {yTRACE($$ = $1 / $3);}
-  | exp EXP exp       // {yTRACE($$ = $1 ^ %3);}
-  | exp AND exp       // {yTRACE($$ = $1 && $3);}
-  | exp OR exp        // {yTRACE($$ = $1 || $3);}
-  | exp EQ exp        // {yTRACE($$ = $ == $3);}
-  | exp NEQ exp       // {yTRACE($$ = $1 != $3);}
-  | exp LESS exp      // {yTRACE($$ = $1 < $3);}
-  | exp LEQ exp       // {yTRACE($$ = $1 <= $3);}
-  | exp GREATER exp   // {yTRACE($$ = $1 > $3);}
-  | exp GEQ exp       // {yTRACE($$ = $1 >= $3);}
+  | exp ADD exp        			{yTRACE("binary_op -> +");}
+  | exp SUB exp        			{yTRACE("binary_op -> -");}
+  | exp MULT exp       			{yTRACE("binary_op -> *");}
+  | exp DIV exp        			{yTRACE("binary_op -> /");}
+  | exp EXP exp        			{yTRACE("binary_op -> ^");} //not in handout
+  | exp AND exp        			{yTRACE("binary_op -> &&");}
+  | exp OR exp         			{yTRACE("binary_op -> ||");}
+  | exp EQ exp         			{yTRACE("binary_op -> ==");}
+  | exp NEQ exp        			{yTRACE("binary_op -> !=");}
+  | exp LESS exp       			{yTRACE("binary_op -> <");}
+  | exp LEQ exp        			{yTRACE("binary_op -> <=");}
+  | exp GREATER exp    			{yTRACE("binary_op -> >");}
+  | exp GEQ exp        			{yTRACE("binary_op -> >=");}
   ;
 constructor 
-  :
+  : type LBRACKET arguments RBRACKET    		{yTRACE("constructor -> type ( arguments )");}	
   ;
 function
-  :
+  : function_name LBRACKET arguments_opt RBRACKET       {yTRACE("function -> function_name ( arguments_opt )");}
   ;
 function_name
-  :
+  : DP3        				{yTRACE("function_name -> dp3");}
+  | LIT        				{yTRACE("function_name -> lit");}
+  | RSQ        				{yTRACE("function_name -> rsq");}
   ;
 arguments_opt
-  :
+  : arguments				{yTRACE("arguments_opt -> arguments");}
+  | /*empty*/				{yTRACE("arguments_opt -> empty");}
   ;
 arguments
-  :
+  : arguments COMMA exp			{yTRACE("arguments -> arguments , exp");}
+  | exp					{yTRACE("arguments -> exp");}
   ;
 // declaration
 //   : type IDENTIFIER COLON {yTRACE($$);}
