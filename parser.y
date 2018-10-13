@@ -198,7 +198,7 @@ type
   |   VEC2				  { yTRACE("type -> vec2"); }
   |   VEC3				  { yTRACE("type -> vec3"); }
   |   VEC4				  { yTRACE("type -> vec4"); }
-  ;				  { yTRACE(); }
+  ;				  
 exp
   :  
   | constructor				  { yTRACE("exp -> constructor"); }
