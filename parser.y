@@ -187,58 +187,54 @@ else_statement
   |   /* empty */                         { yTRACE("else_statement -> empty"); }
   ;
 type
-  :   INT_ID				  { yTRACE("type -> int"); }
+  :   INT_ID				{ yTRACE("type -> int"); }
   |   IVEC2				  { yTRACE("type -> ivec2"); }
   |   IVEC3				  { yTRACE("type -> ivec3"); }
   |   IVEC4				  { yTRACE("type -> ivec4"); }
-  |   BOOL_ID				  { yTRACE("type -> bool"); }
+  |   BOOL_ID				{ yTRACE("type -> bool"); }
   |   BVEC2				  { yTRACE("type -> bvec2"); }
   |   BVEC3				  { yTRACE("type -> bvec3"); }
   |   BVEC4				  { yTRACE("type -> bvec4"); }
-  |   FLOAT_ID				  { yTRACE("type -> float"); }
+  |   FLOAT_ID		  { yTRACE("type -> float"); }
   |   VEC2				  { yTRACE("type -> vec2"); }
   |   VEC3				  { yTRACE("type -> vec3"); }
   |   VEC4				  { yTRACE("type -> vec4"); }
   ;				  
 exp
   :  
-  | constructor				  { yTRACE("exp -> constructor"); }
-  | function				  { yTRACE("exp -> function"); }
+  | constructor			{ yTRACE("exp -> constructor"); }
+  | function				{ yTRACE("exp -> function"); }
   | INT				  	  { yTRACE("exp -> integer_literal"); }
-  | FLOAT				  { yTRACE("exp -> float_literal"); }
-  | '-' exp {} //this would be negative
+  | FLOAT				    { yTRACE("exp -> float_literal"); }
+  | '-' exp         {} //this would be negative
   | T 				  	  { yTRACE("exp -> true"); }
-  | F				  	  { yTRACE("exp -> false"); }
-  | variable				  { yTRACE("exp -> variable"); }
-  | unary_op exp			  { yTRACE("exp -> unary_op ex"); }
-  | exp binary_op exp			  { yTRACE("exp -> exp binary_op exp"); }
+  | F				  	    { yTRACE("exp -> false"); }
+  | variable				          { yTRACE("exp -> variable"); }
+  | unary_op exp			        { yTRACE("exp -> unary_op ex"); }
   | LBRACKET exp RBRACKET		  { yTRACE("exp -> ( exp )"); }
+  | exp ADD exp             {yTRACE("binary_op -> exp + exp");}
+  | exp SUB exp             {yTRACE("binary_op -> exp - exp");}
+  | exp MULT exp            {yTRACE("binary_op -> exp * exp");}
+  | exp DIV exp             {yTRACE("binary_op -> exp / exp");}
+  | exp EXP exp             {yTRACE("binary_op -> exp ^ exp");} //not in handout
+  | exp AND exp             {yTRACE("binary_op -> exp && exp");}
+  | exp OR exp              {yTRACE("binary_op -> exp || exp");}
+  | exp EQ exp              {yTRACE("binary_op -> exp == exp");}
+  | exp NEQ exp             {yTRACE("binary_op -> exp != exp");}
+  | exp LESS exp            {yTRACE("binary_op -> exp < exp");}
+  | exp LEQ exp             {yTRACE("binary_op -> exp <= exp");}
+  | exp GREATER exp         {yTRACE("binary_op -> exp > exp");}
+  | exp GEQ exp             {yTRACE("binary_op -> exp >= exp");}
+  | exp EQUAL exp           {yTRACE("binary_op -> exp = exp");}
   ;
 variable
-  : IDENTIFIER		  		  { yTRACE("variable -> identifier"); }
-  | IDENTIFIER INT		  	  { yTRACE("variable -> identifier[integer_literal]"); }
+  : IDENTIFIER		  		      { yTRACE("variable -> identifier"); }
+  | IDENTIFIER INT		  	    { yTRACE("variable -> identifier[integer_literal]"); }
   ;
 unary_op
   : EXCLAM		  		{ yTRACE("unary_op -> !"); }
   //| SUB		  			{ yTRACE("unary_op -> -"); }
   ; 
-binary_op
-  :
-  | exp ADD exp        			{yTRACE("binary_op -> exp + exp");}
-  | exp SUB exp        			{yTRACE("binary_op -> exp - exp");}
-  | exp MULT exp       			{yTRACE("binary_op -> exp * exp");}
-  | exp DIV exp        			{yTRACE("binary_op -> exp / exp");}
-  | exp EXP exp        			{yTRACE("binary_op -> exp ^ exp");} //not in handout
-  | exp AND exp        			{yTRACE("binary_op -> exp && exp");}
-  | exp OR exp         			{yTRACE("binary_op -> exp || exp");}
-  | exp EQ exp         			{yTRACE("binary_op -> exp == exp");}
-  | exp NEQ exp        			{yTRACE("binary_op -> exp != exp");}
-  | exp LESS exp       			{yTRACE("binary_op -> exp < exp");}
-  | exp LEQ exp        			{yTRACE("binary_op -> exp <= exp");}
-  | exp GREATER exp    			{yTRACE("binary_op -> exp > exp");}
-  | exp GEQ exp        			{yTRACE("binary_op -> exp >= exp");}
-  | exp EQUAL exp        		{yTRACE("binary_op -> exp = exp");}
-  ;
 constructor 
   : type LBRACKET arguments RBRACKET    		{yTRACE("constructor -> type ( arguments )");}	
   ;
@@ -256,30 +252,8 @@ arguments_opt
   ;
 arguments
   : arguments COMMA exp			{yTRACE("arguments -> arguments , exp");}
-  | exp					{yTRACE("arguments -> exp");}
+  | exp					             {yTRACE("arguments -> exp");}
   ;
-// declaration
-//   : type IDENTIFIER COLON {yTRACE($$);}
-//   | type IDENTIFIER EQ exp COLON {yTRACE($$ = =$1)}
-//   | CONST type IDENTIFIER EQ exp COLON {yTRACE()}
-
-// statement:
-//     COLON
-//   | variable EQ exp COLON {yTRACE($$ = $1 = $3;);}
-//   | IF '(' exp ')' statement ELSE statement {yTRACE($$ = $1);}
-//   | WHILE '(' exp ')' statement
-//   | scope 
-// tokens
-//   :  tokens token  
-//   |      
-//   ;
-// // TODO: replace myToken with the token the you defined.
-// token
-//   :      
-//   | TRUE      
-//   | FALSE
-//   | ID                   
-//   ;
 %%
 
 
