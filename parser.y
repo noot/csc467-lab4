@@ -156,7 +156,7 @@ extern int yyval;      /* text that is matched by scanner */
  *    1. Add code to rules for construction of AST.
  ***********************************************************************/
 program
-  :   scope                               { yTRACE("program -> scope"); }       
+  :   scope                               { printf("starting parser"); yTRACE("program -> scope"); }       
   ;
 scope
   :   LCURL declarations statements RCURL { yTRACE("scope -> { declarations statements }"); }
@@ -171,12 +171,12 @@ statements
   ;
 declaration
   :   type IDENTIFIER COLON               { yTRACE("declaration -> type identifier ;"); }
-  |   type IDENTIFIER EQ exp COLON        { yTRACE("declaration -> type idenfifier = exp ;"); }
-  |   CONST type IDENTIFIER EQ exp COLON  { yTRACE("declaration -> const type identifier = exp ;"); }
+  |   type IDENTIFIER EQUAL exp COLON        { yTRACE("declaration -> type idenfifier = exp ;"); }
+  |   CONST type IDENTIFIER EQUAL exp COLON  { yTRACE("declaration -> const type identifier = exp ;"); }
   |   /* empty */                         { yTRACE("declaration -> empty"); }
   ;
 statement
-  :   variable EQ exp COLON               { yTRACE("statement -> variable = exp ;"); } 
+  :   variable EQUAL exp COLON               { yTRACE("statement -> variable = exp ;"); } 
   |   IF LBRACKET exp RBRACKET statement else_statement   { yTRACE("statement -> if ( exp ) statement else_statement"); }
   |   WHILE LBRACKET exp RBRACKET statement               { yTRACE("statement -> while ( exp ) statement"); }
   |   COLON                                { yTRACE("statement -> ;"); }
@@ -225,7 +225,6 @@ exp
   | exp LEQ exp             {yTRACE("binary_op -> exp <= exp");}
   | exp GREATER exp         {yTRACE("binary_op -> exp > exp");}
   | exp GEQ exp             {yTRACE("binary_op -> exp >= exp");}
-  | exp EQUAL exp           {yTRACE("binary_op -> exp = exp");}
   ;
 variable
   : IDENTIFIER		  		      { yTRACE("variable -> identifier"); }
