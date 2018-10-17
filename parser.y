@@ -4,7 +4,7 @@
  * 
  *   Phase 2: Implement context free grammar for source language, and
  *            parse tracing functionality.
- *   Phase 3: Construct the AST for the source language program.
+ *   Phase 3: Construct the AST for the source landguage program.
  ***********************************************************************/
 
 /***********************************************************************

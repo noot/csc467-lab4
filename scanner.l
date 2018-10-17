@@ -81,7 +81,7 @@ WS          	[ \t\n]
 								}
 							}
 
-[0-9]+[a-zA-z_]+/{WS} 	{ yERROR("identifier cannot start with a number");}	
+[0-9]+[a-zA-z_]+ 	{ yERROR("identifier cannot start with a number");}	
 
 
 "gl_FragColor"/{WS} 		{yTRACE(GL_FRAGCOLOR); return GL_FRAGCOLOR;}	
@@ -110,15 +110,15 @@ int/{WS}			{ yTRACE(INT_ID); return INT_ID;}
 float/{WS}			{ yTRACE(FLOAT_ID); return FLOAT_ID;}
 bool/{WS}			{ yTRACE(BOOL_ID); return BOOL_ID;}
 
-vec2/{WS}			{ yTRACE(VEC2); return VEC2; }
-vec3/{WS}			{ yTRACE(VEC3); return VEC3; }
-vec4/{WS}			{ yTRACE(VEC4); return VEC4; }
-ivec2/{WS} 			{ yTRACE(IVEC2); return IVEC2; }
-ivec3/{WS}			{ yTRACE(IVEC3); return IVEC3; }
-ivec4/{WS}			{ yTRACE(IVEC4); return IVEC4; }
-bvec2/{WS}			{ yTRACE(BVEC2); return BVEC2; }
-bvec3/{WS}			{ yTRACE(BVEC3); return BVEC3; }
-bvec4/{WS}			{ yTRACE(BVEC4); return BVEC4; }
+'vec2'			{ yTRACE(VEC2); return VEC2; }
+'vec3'			{ yTRACE(VEC3); return VEC3; }
+'vec4'			{ yTRACE(VEC4); return VEC4; }
+'ivec2' 			{ yTRACE(IVEC2); return IVEC2; }
+'ivec3'			{ yTRACE(IVEC3); return IVEC3; }
+'ivec4'			{ yTRACE(IVEC4); return IVEC4; }
+'bvec2'			{ yTRACE(BVEC2); return BVEC2; }
+'bvec3'			{ yTRACE(BVEC3); return BVEC3; }
+'bvec4'			{ yTRACE(BVEC4); return BVEC4; }
 
 "++" 				{ yTRACE(INC); return INC; }
 "--"				{ yTRACE(DEC); return DEC; }
