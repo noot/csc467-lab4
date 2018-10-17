@@ -156,7 +156,7 @@ extern int yyval;      /* text that is matched by scanner */
  *    1. Add code to rules for construction of AST.
  ***********************************************************************/
 program
-  :   scope                               { printf("starting parser"); yTRACE("program -> scope"); }       
+  :   scope                               { yTRACE("program -> scope"); }       
   ;
 scope
   :   LCURL declarations statements RCURL { yTRACE("scope -> { declarations statements }"); }
