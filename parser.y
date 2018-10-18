@@ -71,9 +71,9 @@ extern int yyval;      /* text that is matched by scanner */
 %token <name> ELSE
 %token <name> WHILE 
 
-%token <name> INT_ID
-%token <name> FLOAT_ID
-%token <name> BOOL_ID
+%token <name> INT_T
+%token <name> FLOAT_T
+%token <name> BOOL_T
 
 %token <name> VEC2
 %token <name> VEC3
@@ -137,7 +137,7 @@ extern int yyval;      /* text that is matched by scanner */
 %left AND
 %left EQ NEQ LESS LEQ GREATER GEQ //no precendence
 %left ADD SUB
-%left MULT DIV
+%left MUL DIV
 %right EXP
 //the !?
 %left '['']''('')'
@@ -187,15 +187,15 @@ else_statement
   |   /* empty */                         { yTRACE("else_statement -> empty"); }
   ;
 type
-  :   INT_ID				{ yTRACE("type -> int"); }
+  :   INT_T				  { yTRACE("type -> int"); }
   |   IVEC2				  { yTRACE("type -> ivec2"); }
   |   IVEC3				  { yTRACE("type -> ivec3"); }
   |   IVEC4				  { yTRACE("type -> ivec4"); }
-  |   BOOL_ID				{ yTRACE("type -> bool"); }
+  |   BOOL_T				{ yTRACE("type -> bool"); }
   |   BVEC2				  { yTRACE("type -> bvec2"); }
   |   BVEC3				  { yTRACE("type -> bvec3"); }
   |   BVEC4				  { yTRACE("type -> bvec4"); }
-  |   FLOAT_ID		  { yTRACE("type -> float"); }
+  |   FLOAT_T		    { yTRACE("type -> float"); }
   |   VEC2				  { yTRACE("type -> vec2"); }
   |   VEC3				  { yTRACE("type -> vec3"); }
   |   VEC4				  { yTRACE("type -> vec4"); }
@@ -214,7 +214,7 @@ exp
   | LBRACKET exp RBRACKET		  { yTRACE("exp -> ( exp )"); }
   | exp ADD exp             {yTRACE("binary_op -> exp + exp");}
   | exp SUB exp             {yTRACE("binary_op -> exp - exp");}
-  | exp MULT exp            {yTRACE("binary_op -> exp * exp");}
+  | exp MUL exp            {yTRACE("binary_op -> exp * exp");}
   | exp DIV exp             {yTRACE("binary_op -> exp / exp");}
   | exp EXP exp             {yTRACE("binary_op -> exp ^ exp");} //not in handout
   | exp AND exp             {yTRACE("binary_op -> exp && exp");}
@@ -228,7 +228,7 @@ exp
   ;
 variable
   : IDENTIFIER		  		      { yTRACE("variable -> identifier"); }
-  | IDENTIFIER INT		  	    { yTRACE("variable -> identifier[integer_literal]"); }
+  | IDENTIFIER LSQUARE INT RSQUARE	  	    { yTRACE("variable -> identifier[integer_literal]"); }
   ;
 unary_op
   : EXCLAM		  		{ yTRACE("unary_op -> !"); }

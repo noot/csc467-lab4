@@ -106,9 +106,9 @@ WS          	[ \t\n]
 'else'				{ yTRACE(ELSE); return ELSE; }
 'while' 			{ yTRACE(WHILE); return WHILE; }
 
-int/{WS}			{ yTRACE(INT_ID); return INT_ID;}
-float/{WS}			{ yTRACE(FLOAT_ID); return FLOAT_ID;}
-bool/{WS}			{ yTRACE(BOOL_ID); return BOOL_ID;}
+"int"/{WS}			{ yTRACE(INT_T); return INT_T;}
+"float"/{WS}			{ yTRACE(FLOAT_T); return FLOAT_T;}
+"bool"/{WS}			{ yTRACE(BOOL_T); return BOOL_T;}
 
 'vec2'			{ yTRACE(VEC2); return VEC2; }
 'vec3'			{ yTRACE(VEC3); return VEC3; }
