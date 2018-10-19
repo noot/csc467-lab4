@@ -74,7 +74,6 @@ extern int yyval;      /* text that is matched by scanner */
 %token <name> INT_T
 %token <name> FLOAT_T
 %token <name> BOOL_T
-
 %token <name> VEC2
 %token <name> VEC3
 %token <name> VEC4
@@ -214,10 +213,10 @@ exp
   | LBRACKET exp RBRACKET		  { yTRACE("exp -> ( exp )"); }
   | exp ADD exp             {yTRACE("binary_op -> exp + exp");}
   | exp SUB exp             {yTRACE("binary_op -> exp - exp");}
-  | exp MUL exp            {yTRACE("binary_op -> exp * exp");}
+  | exp MUL exp             {yTRACE("binary_op -> exp * exp");}
   | exp DIV exp             {yTRACE("binary_op -> exp / exp");}
   | exp EXP exp             {yTRACE("binary_op -> exp ^ exp");} //not in handout
-  | exp AND exp             {yTRACE("binary_op -> exp && exp");}
+  | exp AND exp             {yTRACE("binary_op -> exp &7xp");}
   | exp OR exp              {yTRACE("binary_op -> exp || exp");}
   | exp EQ exp              {yTRACE("binary_op -> exp == exp");}
   | exp NEQ exp             {yTRACE("binary_op -> exp != exp");}
