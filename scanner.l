@@ -72,18 +72,6 @@ WS          	[ \t\n]
 														}
 													}
 
-
-[a-zA-Z_][a-zA-Z0-9_]* 		{ 	if (yyleng > 32) {
-									yERROR("identifier exceeds maximum length");
-								} else {
-									yylval.name = yytext;
-									yTRACE(IDENTIFIER); return IDENTIFIER;
-								}
-							}
-
-[0-9]+[a-zA-z_]+ 	{ yERROR("identifier cannot start with a number");}	
-
-
 "gl_FragColor"/{WS} 		{yTRACE(GL_FRAGCOLOR); return GL_FRAGCOLOR;}	
 "gl_FragDepth"/{WS}  		{yTRACE(GL_FRAGDEPTH); return GL_FRAGDEPTH;}
 "gl_FragCoord"/{WS}  		{yTRACE(GL_FRAGCOORD); return GL_FRAGCOORD;}
@@ -149,6 +137,16 @@ const/{WS}			{ yTRACE(CONST); return CONST;}
 "}"					{ yTRACE(RCURL); return RCURL; }
 "["					{ yTRACE(LSQUARE); return LSQUARE; }
 "]"					{ yTRACE(RSQUARE); return RSQUARE; }
+
+[a-zA-Z_][a-zA-Z0-9_]* 		{ 	if (yyleng > 32) {
+									yERROR("identifier exceeds maximum length");
+								} else {
+									yylval.name = yytext;
+									yTRACE(IDENTIFIER); return IDENTIFIER;
+								}
+							}
+
+[0-9]+[a-zA-z_]+ 	{ yERROR("identifier cannot start with a number");}	
 
 .         			{ yERROR("invalid token");} 
 
