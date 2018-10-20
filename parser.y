@@ -205,7 +205,6 @@ exp
   | function				{ yTRACE("exp -> function"); }
   | INT				  	  { yTRACE("exp -> integer_literal"); }
   | FLOAT				    { yTRACE("exp -> float_literal"); }
-  | '-' exp         {} //this would be negative
   | T 				  	  { yTRACE("exp -> true"); }
   | F				  	    { yTRACE("exp -> false"); }
   | variable				          { yTRACE("exp -> variable"); }
@@ -231,7 +230,7 @@ variable
   ;
 unary_op
   : EXCLAM		  		{ yTRACE("unary_op -> !"); }
-  //| SUB		  			{ yTRACE("unary_op -> -"); }
+  | SUB		  			{ yTRACE("unary_op -> -"); }
   ; 
 constructor 
   : type LBRACKET arguments RBRACKET    		{yTRACE("constructor -> type ( arguments )");}	

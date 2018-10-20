@@ -1,5 +1,5 @@
 {
 	int num = 5;
+	int noot = -3;
 	num = 10;
-	int noo
 }
