@@ -22,7 +22,7 @@ int yyline = 1;
 %option noyywrap
 
 WS          	[ \t\n]
-
+DELIM		[ \t\n\(\)\[\]\{\},;\+\-|*\/\^=!\<\?]|&&|"||"|==|!=|"<"=|">"=
 %%
 
 [\n] 			{
@@ -86,9 +86,9 @@ WS          	[ \t\n]
 "env2"/{WS}  				{yTRACE(ENV2); return ENV2;}
 "env3"/{WS}  				{yTRACE(ENV3); return ENV3;}
 
-'dp3'				{ yTRACE(DP3); return DP3; }
-'rsq'				{ yTRACE(RSQ); return RSQ; }
-'lit'				{ yTRACE(LIT); return LIT; }
+dp3/{DELIM}				{ yTRACE(DP3); return DP3; }
+rsq/{DELIM}				{ yTRACE(RSQ); return RSQ; }
+lit/{DELIM}				{ yTRACE(LIT); return LIT; }
 
 'if'				{ yTRACE(IF); return IF; }
 'else'				{ yTRACE(ELSE); return ELSE; }
