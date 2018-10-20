@@ -1,0 +1,13 @@
+{
+	{
+		int i;
+		i = 3;
+	}
+	{
+		bool i;
+		i = true;
+	}
+	{
+		float f = 1.7;
+	}
+}

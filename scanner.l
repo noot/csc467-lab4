@@ -98,15 +98,15 @@ lit/{DELIM}				{ yTRACE(LIT); return LIT; }
 "float"/{WS}			{ yTRACE(FLOAT_T); return FLOAT_T;}
 "bool"/{WS}			{ yTRACE(BOOL_T); return BOOL_T;}
 
-'vec2'			{ yTRACE(VEC2); return VEC2; }
-'vec3'			{ yTRACE(VEC3); return VEC3; }
-'vec4'			{ yTRACE(VEC4); return VEC4; }
-'ivec2' 			{ yTRACE(IVEC2); return IVEC2; }
-'ivec3'			{ yTRACE(IVEC3); return IVEC3; }
-'ivec4'			{ yTRACE(IVEC4); return IVEC4; }
-'bvec2'			{ yTRACE(BVEC2); return BVEC2; }
-'bvec3'			{ yTRACE(BVEC3); return BVEC3; }
-'bvec4'			{ yTRACE(BVEC4); return BVEC4; }
+vec2			{ yTRACE(VEC2); return VEC2; }
+vec3			{ yTRACE(VEC3); return VEC3; }
+vec4			{ yTRACE(VEC4); return VEC4; }
+ivec2 			{ yTRACE(IVEC2); return IVEC2; }
+ivec3			{ yTRACE(IVEC3); return IVEC3; }
+ivec4			{ yTRACE(IVEC4); return IVEC4; }
+bvec2			{ yTRACE(BVEC2); return BVEC2; }
+bvec3			{ yTRACE(BVEC3); return BVEC3; }
+bvec4			{ yTRACE(BVEC4); return BVEC4; }
 
 "++" 				{ yTRACE(INC); return INC; }
 "--"				{ yTRACE(DEC); return DEC; }

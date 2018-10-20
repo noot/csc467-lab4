@@ -1,0 +1,3 @@
+{
+	ivec2 temp = ivec2(0,1);
+}
