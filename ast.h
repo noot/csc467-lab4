@@ -31,7 +31,7 @@ typedef enum {
 
   EXP_NODE              = (1 << 2),
   VAR_NODE              = (1 << 2) | (1 << 3),
-  UNARY_OP_NODE  = (1 << 2) | (1 << 4),
+  UNARY_OP_NODE         = (1 << 2) | (1 << 4),
   CONSTRUCTOR_NODE      = (1 << 2) | (1 << 5),
   FUNCTION_NODE         = (1 << 2) | (1 << 6),
   FUNCTION_NAME_NODE    = (1 << 2) | (1 << 7), // don't know if we need this
@@ -44,8 +44,6 @@ typedef enum {
   TYPE_NODE             = (1 << 2) | (1 << 13),
   BOOL_NODE             = (1 << 2) | (1 << 14),
 
-  //IF_STATEMENT_NODE     = (1 << 1) | (1 << 11),
-  //WHILE_STATEMENT_NODE  = (1 << 1) | (1 << 12),
   ASSIGNMENT_NODE       = (1 << 1) | (1 << 15),
   NESTED_SCOPE_NODE     = (1 << 1) | (1 << 16)
 } node_kind;

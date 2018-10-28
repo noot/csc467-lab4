@@ -27,8 +27,8 @@ node *ast_allocate(node_kind kind, ...) {
       ast->scope.statements = va_arg(args, node *);
       break;
     case DECLARATIONS_NODE:
-      ast->scope.declarations = va_arg(args, node *);
-      ast->scope.declaration = va_arg(args, node *);
+      ast->declarations.declarations = va_arg(args, node *);
+      ast->declarations.declaration = va_arg(args, node *);
       break;
     case STATEMENTS_NODE:
     case DECLARATION_NODE:
@@ -41,7 +41,7 @@ node *ast_allocate(node_kind kind, ...) {
     case FLOAT_NODE:
     case BOOL_NODE:
     case VAR_NODE:
-    
+
     case UNARY_OP_NODE:
     case CONSTRUCTOR_NODE:
     case FUNCTION_NODE:
