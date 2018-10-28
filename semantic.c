@@ -44,6 +44,7 @@ void semantic_check() {
 
 	}
 }
+int semantic_check() {
 
 //implicit type conversions:
 void implicit_type_check() {
