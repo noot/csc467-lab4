@@ -1,5 +1,5 @@
 #include <stdio.h>
 
-void semantic_check() {
+int semantic_check() {
 
 }
