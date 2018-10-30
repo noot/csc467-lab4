@@ -15,19 +15,51 @@
 
 //pseudo-code
 //traverse through AST
-//if kind(node) == statement 
+//if kind(node) == statement ]
 
-void semantic_check() {
+void stack_{
+
+}
+
+void semantic_check(*node) {
 	switch (kind(*node)) {
 		case(scope_node):
 		case(declarations):
+			//pop onto stack
+			//go to node on the left and right
+			//can't have more than one declaration in same scope
+			//needs access to symbol table
+			//correct types need to be declared
 		case(statements):
+			//call semantic_check(*nodeLeft)
+			//call semantic_check(*nodeRight)
+			//add node to stack
 		case(declaration):
+			if (exists_in_scope(*node)) {
+				printf("Error, already exists in this scope");
+			}
+			if (assign_predefined(*node)) {
+				printf("Error you cannot assign to these predefined read only variables");
+			}
+			//note: declaration node will have an id
+			//call semantic_check(*nodeLeft)
+			//call semantic_check(*nodeRight)
+			//add node to stack
 		case(statement):
-		case(else_statement):
+			//check assignment error
+			if (incorrect_assignment(node)) {
+				printf("Error, must assign value of same type");
+			}
+			//call semantic_check(*nodeLeft)
+			//call semantic_check(*nodeRight)
+			//add node to stack
+		case(else_statement):check_condition();
 		case(exp):
+			//call semantic_check(*nodeLeft)
+			//call semantic_check(*nodeRight)
+			//add node to stack
 		case(var):
-		case(unary_op):
+		case(unary_op): 
 		case(binary_op): check_operator();
 		case(constructor):
 		case(function):
@@ -57,6 +89,12 @@ check_operator(*node) {
 	//remove from stack
 	switch (operatorType) {
 		case(SUB):					//arithmetic
+			if ((node.right.type == int && node.left.type == int) || (node.right.type == float && node.left.type == float)) {
+				//
+			}
+			else {
+				//error
+			}
 		case(ADD):					//arithmetic
 		case(MULT):					//arithmetic
 		case(DIV):					//arithmetic
@@ -72,6 +110,19 @@ check_operator(*node) {
 		case(NEQ):					//comparison
 
 	}
+}
+
+check_conditions() {
+	if (*cond_expression.type == bool) {
+		//continue
+	}
+	else {
+		//error
+		printf("Conditional expression must be of type bool");
+	}
+}
+
+check_function_calls() {
 }
 
 
