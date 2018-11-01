@@ -1,4 +1,6 @@
 #include <stdio.h>
+
+
 void check_var_scope(node) {
 	if node.name not in symbol_table{
 		printf("Error you cannot declare variable more than once in same scope");
@@ -28,6 +30,18 @@ void check_function(node) {
 	}
 	else {
 		printf("Error: Function name not recognized");
+	}
+}
+
+char* check_function_name(node) {
+	if (node.name == 'rsq') {
+		return 'rsq';
+	}
+	else if (node.name == 'dp3') {
+		return 'dp3';
+	}
+	else if (node.name == 'lit') {
+		return 'lit';
 	}
 }
 void implicit_type_check(id_node, exp_node) {
@@ -72,36 +86,36 @@ void check_operator(*node) {
 		}
 	}
 
-void semantic_check(*node) {
-	switch (kind(*node)) {
-	case(scope_node): exit_scope();
-	case(declarations): break;
-	case(statements): break;
-	case(declaration):
-		if (exists_in_scope(*node.id)) {
-			printf("Error, declaration already exists in this scope");
-		}
-		if (!assign_predefined(*node.id)) {
-			printf("Error you cannot assign to these predefined read only variables");
-		}
-		if (node.is_const) {
-			if (node.exp.type != int && node.exp.type != bool && node.exp.type && float) {
-				printf("Error: you cannot assign an expression to a const variable");
+	void semantic_check(*node) {
+		switch (kind(*node)) {
+		case(scope_node): exit_scope();
+		case(declarations): break;
+		case(statements): break;
+		case(declaration):
+			if (exists_in_scope(*node.id)) {
+				printf("Error, declaration already exists in this scope");
 			}
+			if (!assign_predefined(*node.id)) {
+				printf("Error you cannot assign to these predefined read only variables");
+			}
+			if (node.is_const) {
+				if (node.exp.type != int && node.exp.type != bool && node.exp.type && float) {
+					printf("Error: you cannot assign an expression to a const variable");
+				}
+			}
+		case(statement):
+			if (incorrect_assignment(node)) {
+				printf("Error, must assign value of same type");
+			}
+			implicit_type_check(node.id, node.exp);
+		case(else_statement):
+			if (condition_exp.type != bool) {
+				printf("Error: the conditional expression must be of type boolean");
+			}
+		case(var):check_var_scope(node);
+		case(binary_op): check_operator(node);
+			//case(constructor): check_constructor();
+		case(function): check_function(node);
+		case(function_name): check_function_name(node);
 		}
-	case(statement):
-		if (incorrect_assignment(node)) {
-			printf("Error, must assign value of same type");
-		}
-		implicit_type_check(node.id,node.exp);
-	case(else_statement):
-		if (condition_exp.type != bool) {
-			printf("Error: the conditional expression must be of type boolean");
-		}
-	case(var):check_var_scope();
-	case(binary_op): check_operator();
-	case(constructor): check_constructor();
-	case(function): check_function();
-	case(function_name): check_func_name();
 	}
-}
