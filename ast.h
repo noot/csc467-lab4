@@ -32,9 +32,9 @@ typedef enum {
   EXP_NODE              = (1 << 2),
   VAR_NODE              = (1 << 2) | (1 << 3),
   UNARY_OP_NODE         = (1 << 2) | (1 << 4),
-  CONSTRUCTOR_NODE      = (1 << 2) | (1 << 5),
-  FUNCTION_NODE         = (1 << 2) | (1 << 6),
-  FUNCTION_NAME_NODE    = (1 << 2) | (1 << 7), // don't know if we need this
+  BINARY_OP_NODE        = (1 << 2) | (1 << 5),
+  CONSTRUCTOR_NODE      = (1 << 2) | (1 << 6),
+  FUNCTION_NODE         = (1 << 2) | (1 << 7),
   ARGUMENTS_OPT_NODE    = (1 << 2) | (1 << 8),
   ARGUMENTS_NODE        = (1 << 2) | (1 << 9),
 
@@ -50,10 +50,13 @@ typedef enum {
 
 struct node_ {
 
-  // an example of tagging each node with a type
   node_kind kind;
-
+  
   union {
+    int int_v;
+    float float_v;
+    bool bool_v;
+    
     struct { 
       node *declarations;
       node *statements;
@@ -77,24 +80,40 @@ struct node_ {
     } declaration;
 
     struct {
-
+      bool is_if;
+      node *variable;
+      node *exp;
+      node *statement;
+      node *else_statement;
     } statement;
 
     struct {
-
+      node *statement;
     } else_statement;
 
     struct {
-
-    } type;
+      bool is_const;
+      int type_name;
+      bool vec;
+      int int_val;
+      bool bool_val;
+    } type;   
 
     struct {
-
+      node *variable;
     } exp;
 
     struct {
-
+      char *id;
+      bool is_vec;
+      int idx;
     } variable;
+
+    struct {
+      int op;
+      node *left;
+      node *right;
+    } binary_expr;
 
     struct {
       int op;
@@ -102,29 +121,23 @@ struct node_ {
     } unary_expr;
 
     struct {
-
+      node *type;
+      node *args;
     } constructor;
 
     struct {
-
+      int function_name;
+      node *args;
     } function;
 
     struct {
-
-    } function_name;
-
-    struct {
-
+      node *args;
     } arguments_opt;
 
     struct {
-
+      node *args;
+      node *exp;
     } arguments;
-    // struct {
-    //   int op;
-    //   node *left;
-    //   node *right;
-    // } binary_expr;
   };
 };
 
