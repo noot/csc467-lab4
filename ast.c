@@ -152,14 +152,40 @@ void ast_print(node * ast) {
 	// n->right = NULL;
 }
 
-void ast_visit(node *curr) {
+void ast_visit(int depth, node *curr, func pre, func post) {
   printf("visiting ast...");
   if (NULL == curr) return;
+
+  depth++;
+  if(pre) pre(curr, depth);
   switch(curr->kind) {
     case SCOPE_NODE:
+      if(curr->scope.declarations) ast_visit(depth, curr->scope.declarations, pre, post);
+      if(curr->scope.statements) ast_visit(depth, curr->scope.statements, pre, post);
+    case DECLARATIONS_NODE:
+    case STATEMENTS_NODE:
     case DECLARATION_NODE:
+    case STATEMENT_NODE:
+    case ELSE_STATEMENT_NODE:
+    case EXP_NODE:
+    case VAR_NODE:
+    case UNARY_OP_NODE:
+    case BINARY_OP_NODE:
+    case CONSTRUCTOR_NODE:
+    case FUNCTION_NODE:
+    case ARGUMENTS_OPT_NODE:
+    case ARGUMENTS_NODE:
+    case INT_NODE:
+    case FLOAT_NODE:
+    case BOOL_NODE:
+    case TYPE_NODE:
+    case NESTED_SCOPE_NODE:
 
     default:
       break;
   }
+  if(post) post(curr, depth);
+  depth--;
+
+  printf("finished visiting ast");
 }

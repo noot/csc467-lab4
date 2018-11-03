@@ -15,7 +15,8 @@
 
 // Forward declarations
 struct node_;
-typedef struct node_ node;
+typedef struct node_ node; 
+typedef void (*func)(node *, int);
 extern node *ast;
 
 typedef enum {
@@ -40,11 +41,11 @@ typedef enum {
 
   INT_NODE              = (1 << 2) | (1 << 10), 
   FLOAT_NODE            = (1 << 2) | (1 << 11),
-  IDENT_NODE            = (1 << 2) | (1 << 12),
+  //IDENT_NODE            = (1 << 2) | (1 << 12),
   TYPE_NODE             = (1 << 2) | (1 << 13),
   BOOL_NODE             = (1 << 2) | (1 << 14),
 
-  ASSIGNMENT_NODE       = (1 << 1) | (1 << 15),
+  //ASSIGNMENT_NODE       = (1 << 1) | (1 << 15),
   NESTED_SCOPE_NODE     = (1 << 1) | (1 << 16)
 } node_kind;
 
