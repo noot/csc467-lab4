@@ -61,10 +61,64 @@ node *ast_allocate(node_kind kind, ...) {
   return ast;
 }
 
+//do preorder traversal for generating symbol tree
+void traverse_ast(node *ast, bool enterScope) {
+	switch (node.kind) {
+	case(scope_node):
+		traverse_ast(node->scope_node,enterScope);
+	case(declarations):
+		traverse_ast(node->declarations, enterScope);
+	case(statements):
+		traverse_ast(node->statements, enterScope);
+	case(declaration):
+		traverse_ast(node->statement, enterScope);
+	case(statement):
+		traverse_ast(scope_node, enterScope);
+	case(else_statement):check_condition();
+	case(exp):
+	case(var):check_var_scope();
+	case(unary_op):
+	case(binary_op): 
+		traverse_ast(node->binary_op.right, enterScope);
+		traverse_ast(node->binary_op.left, enterScope);
+	case(constructor): check_constructor();
+	case(function): check_function();
+	case(function_name): check_func_name();
+	case(arguments_opt):
+	case(arguments):
+	case(int_node):
+	case(float_node):
+	case(indent):
+	case(type):
+	case(bool_node):
+	case(assignment):
+	case(nested_scope):
+	}
+
+	
+}
+
 void ast_free(node *ast) {
 
 }
 
+//do post order traversal 
 void ast_print(node * ast) {
+	struct node
+	{
+		int data;
+		struct node* left;
+		struct node* right;
+	};
+
+	struct node* newNode(int data)
+	{
+		struct node* node = (struct node*)
+			malloc(sizeof(struct node));
+		node->data = data;
+		node->left = NULL;
+		node->right = NULL;
+
+		return(node);
 
 }
