@@ -26,33 +26,105 @@ node *ast_allocate(node_kind kind, ...) {
       ast->scope.declarations = va_arg(args, node *);
       ast->scope.statements = va_arg(args, node *);
       break;
+
     case DECLARATIONS_NODE:
       ast->declarations.declarations = va_arg(args, node *);
       ast->declarations.declaration = va_arg(args, node *);
       break;
+
     case STATEMENTS_NODE:
+      ast->statements.statements = va_arg(args, node *);
+      ast->statements.statement = va_arg(args, node *);
+      break;
+
     case DECLARATION_NODE:
+      ast->declaration.is_const = va_arg(args, bool);
+      ast->declaration.id = va_arg(args, char *);
+      ast->declaration.type = va_arg(args, node *);
+      ast->declaration.exp = va_arg(args, node *);
+      break;
+
+    // might need to break up statement grammar into assignment,
+    // if statement, nested scope
     case STATEMENT_NODE:
+      ast->statement.is_if = va_arg(args, bool);
+      ast->statement.variable = va_arg(args, node *);
+      ast->statement.exp = va_arg(args, node *);
+      ast->statement.statement = va_arg(args, node *);
+      ast->statement.else_statement = va_arg(args, node *);
+      break;
+
     case ELSE_STATEMENT_NODE:
+      ast->else_statement.statement = va_arg(args, node *);
+      break;
+
     case TYPE_NODE:
+      ast->type.type_name = va_arg(args, int);
+      ast->type.vec = va_arg(args, int); // how to do this?
+      break;
+
+    // expressions
     case EXP_NODE:
+      ast->exp.variable = va_arg(args, node *);
+      break;
 
     case INT_NODE:
+      ast->type.is_const = false;
+      ast->type.type_name = INT_T;
+      ast->type.vec = false;
+      ast->type.int_val = va_arg(args, int);
+      break;
+
     case FLOAT_NODE:
+      ast->type.is_const = false;
+      ast->type.type_name = FLOAT_T;
+      ast->type.vec = false;
+      ast->type.int_val = va_arg(args, int);
+      break;
+
     case BOOL_NODE:
+      ast->type.is_const = false;
+      ast->type.type_name = BOOL_T;
+      ast->type.vec = false;
+      ast->type.bool_val = va_arg(args, bool);
+      break;
+
     case VAR_NODE:
+      ast->variable.id = va_arg(args, char *);
+      ast->variable.is_vec = va_arg(args, bool);
+      ast->variable.idx = va_arg(args, int);
+      break;
+
+    case BINARY_OP_NODE:
+      ast->binary_expr.op = va_arg(args, int);
+      ast->binary_expr.left = va_arg(args, node *);
+      ast->binary_expr.right = va_arg(args, node *);
+      break;
 
     case UNARY_OP_NODE:
+      ast->unary_expr.op = va_arg(args, int);
+      ast->unary_expr.right = va_arg(args, node *);
+      break;
+
     case CONSTRUCTOR_NODE:
+      ast->constructor.type = va_arg(args, node *);
+      ast->constructor.args = va_arg(args, node *);
+      break;
+
     case FUNCTION_NODE:
-    case FUNCTION_NAME_NODE:
+      ast->function.function_name = va_arg(args, int);
+      ast->function.args = va_arg(args, node *);
+      break;
+
     case ARGUMENTS_OPT_NODE:
+      ast->arguments_opt.args = va_arg(args, node *);
+      break;
+
     case ARGUMENTS_NODE:
-    // case BINARY_EXPRESSION_NODE:
-    //   ast->binary_expr.op = va_arg(args, int);
-    //   ast->binary_expr.left = va_arg(args, node *);
-    //   ast->binary_expr.right = va_arg(args, node *);
-    //   break;
+      ast->arguments.args = va_arg(args, node *);
+      ast->arguments.exp = va_arg(args, node *);
+      break;
+
     default: break;
   }
 
