@@ -158,32 +158,78 @@ void ast_visit(int depth, node *curr, func pre, func post) {
 
   depth++;
   if(pre) pre(curr, depth);
+
+  // in the traversal, we recursively check if each node contains another node,
+  // if so, visit that node.
   switch(curr->kind) {
     case SCOPE_NODE:
       if(curr->scope.declarations) ast_visit(depth, curr->scope.declarations, pre, post);
       if(curr->scope.statements) ast_visit(depth, curr->scope.statements, pre, post);
+      break;
+
     case DECLARATIONS_NODE:
+      if(curr->declarations.declarations) ast_visit(depth, curr->declarations.declarations, pre, post); 
+      if(curr->declarations.declaration) ast_visit(depth, curr->declarations.declaration, pre, post);
+      break;
+
     case STATEMENTS_NODE:
+      if(curr->statements.statements) ast_visit(depth, curr->statements.statements, pre, post); 
+      if(curr->statements.statement) ast_visit(depth, curr->statements.statement, pre, post); 
+      break;
+
     case DECLARATION_NODE:
+      if(curr->declaration.type) ast_visit(depth, curr->declaration.type, pre, post); 
+      if(curr->declaration.exp) ast_visit(depth, curr->declaration.exp, pre, post); 
+      break;
+
     case STATEMENT_NODE:
+      if(curr->statement.variable) ast_visit(depth, curr->statement.variable, pre, post); 
+      if(curr->statement.exp) ast_visit(depth, curr->statement.exp, pre, post); 
+      if(curr->statement.statement) ast_visit(depth, curr->statement.statement, pre, post); 
+      if(curr->statement.else_statement) ast_visit(depth, curr->statement.else_statement, pre, post); 
+      break;
+
     case ELSE_STATEMENT_NODE:
+      if(curr->else_statement.statement) ast_visit(depth, curr->else_statement.statement, pre, post); 
+      break;
+
     case EXP_NODE:
-    case VAR_NODE:
+      if(curr->exp.variable) ast_visit(depth, curr->exp.variable, pre, post); 
+      break;
+
     case UNARY_OP_NODE:
+      if(curr->unary_expr.right) ast_visit(depth, curr->unary_expr.right, pre, post); 
+      break;
+
     case BINARY_OP_NODE:
+      if(curr->binary_expr.right) ast_visit(depth, curr->binary_expr.right, pre, post); 
+      if(curr->binary_expr.left) ast_visit(depth, curr->binary_expr.left, pre, post); 
+      break;
+
     case CONSTRUCTOR_NODE:
+      if(curr->constructor.type) ast_visit(depth, curr->constructor.type, pre, post); 
+      if(curr->constructor.args) ast_visit(depth, curr->constructor.args, pre, post); 
+      break;
+
     case FUNCTION_NODE:
+      if(curr->function.args) ast_visit(depth, curr->function.args, pre, post); 
+      break;
+
     case ARGUMENTS_OPT_NODE:
+      if(curr->arguments_opt.args) ast_visit(depth, curr->arguments_opt.args, pre, post); 
+      break;
+
     case ARGUMENTS_NODE:
-    case INT_NODE:
-    case FLOAT_NODE:
-    case BOOL_NODE:
-    case TYPE_NODE:
+      if(curr->arguments.args) ast_visit(depth, curr->arguments.args, pre, post); 
+      if(curr->arguments.exp) ast_visit(depth, curr->arguments.exp, pre, post); 
+      break;
+
     case NESTED_SCOPE_NODE:
 
     default:
       break;
   }
+
   if(post) post(curr, depth);
   depth--;
 
