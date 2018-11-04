@@ -16,6 +16,7 @@
 
 #include <string.h>
 #include "common.h"
+#include "ast.h"
 //#include "ast.h"
 //#include "symbol.h"
 //#include "semantic.h"
@@ -155,10 +156,11 @@ extern int yyval;      /* text that is matched by scanner */
  *    1. Add code to rules for construction of AST.
  ***********************************************************************/
 program
-  :   scope                               { yTRACE("program -> scope"); }       
+  :   scope                               { yTRACE("program -> scope"); }     
   ;
 scope
-  :   LCURL declarations statements RCURL { yTRACE("scope -> { declarations statements }"); }
+  :   LCURL declarations statements RCURL { yTRACE("scope -> { declarations statements }");
+                                            ast = ast_allocate(SCOPE_NODE, DECLARATIONS_NODE, STATEMENTS_NODE); }
   ;
 declarations
   :   declarations declaration            { yTRACE("declarations -> declarations declaration"); }
