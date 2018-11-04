@@ -133,25 +133,6 @@ node *ast_allocate(node_kind kind, ...) {
   return ast;
 }
 
-void ast_free(node *ast) {
-
-}
-
-//do post order traversal 
-void ast_print(node * ast) {
-	// struct node
-	// {
-	// 	int data;
-	// 	node* left;
-	// 	node* right;
-	// };
-
-	// node *n = (struct node*)malloc(sizeof(struct node));
-	// n->data = data;
-	// n->left = NULL;
-	// n->right = NULL;
-}
-
 void ast_visit(int depth, node *curr, func pre, func post) {
   printf("visiting ast...");
   if (NULL == curr) return;
@@ -234,4 +215,96 @@ void ast_visit(int depth, node *curr, func pre, func post) {
   depth--;
 
   printf("finished visiting ast");
+}
+
+void ast_free(node *ast) {
+
+}
+
+void _ast_print(node *curr, int i) {
+  switch(curr->kind) {
+    case SCOPE_NODE:
+      fprintf(dumpFile, "\tSCOPE");
+      break;
+
+    case DECLARATIONS_NODE:
+      fprintf(dumpFile, "\tDECLARATIONS");
+      break;
+
+    case STATEMENTS_NODE:
+      fprintf(dumpFile, "\tSTATEMENTS");
+      break;
+
+    case DECLARATION_NODE:
+      fprintf(dumpFile, "\tDECLARATION %s", curr->declaration.id);
+      break;
+
+    case STATEMENT_NODE:
+      fprintf(dumpFile, "\tSTATEMENT");
+      break;
+
+    case ELSE_STATEMENT_NODE:
+      fprintf(dumpFile, "\tELSE STATEMENT");
+      break;
+
+    case EXP_NODE:
+      fprintf(dumpFile, "\tEXPRESSION");
+      break;
+
+    case UNARY_OP_NODE:
+      fprintf(dumpFile, "\tUNARY OP &s", curr->unary_expr.op);
+      break;
+
+    case BINARY_OP_NODE:
+      fprintf(dumpFile, "\tBINARY OP &s", curr->binary_expr.op);  
+      break;
+
+    case CONSTRUCTOR_NODE:
+      fprintf(dumpFile, "\tCONSTRUCTOR");
+      break;
+
+    case FUNCTION_NODE:
+      fprintf(dumpFile, "\tFUNCTION %d", curr->function.function_name);
+      break;
+
+    case ARGUMENTS_OPT_NODE:
+      fprintf(dumpFile, "\tARGUMENTS_OPT");
+      break;
+
+    case ARGUMENTS_NODE:
+      fprintf(dumpFile, "\tARGUMENTS");
+      break;
+
+    case NESTED_SCOPE_NODE:
+      fprintf(dumpFile, "\t\t");
+      break;
+
+    case VAR_NODE:
+      fprintf(dumpFile, "\t\tVARIABLE %s", curr->variable.id);
+      break;
+
+    case TYPE_NODE:
+      fprintf(dumpFile, "\t\tTYPE %d", curr->type.type_name);
+      break;
+
+    case INT_NODE:
+      fprintf(dumpFile, "\t\tINT %d", curr->int_v);
+      break;
+
+    case FLOAT_NODE:
+      fprintf(dumpFile, "\t\tFLOAT %d", curr->float_v);
+      break;
+
+    case BOOL_NODE:
+      fprintf(dumpFile, "\t\tBOOL %d", curr->bool_v);
+      break;
+
+    default:
+      break;
+  }
+}
+
+//do post order traversal 
+void ast_print(node *ast) {
+  ast_visit(0, ast, &_ast_print, NULL);
 }
