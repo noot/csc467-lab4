@@ -74,14 +74,14 @@ struct node_ {
     } statements;
 
     struct {
-      bool is_const;
+      int is_const;
       char *id;
       node *type;
       node *exp;
     } declaration;
 
     struct {
-      bool is_if;
+      int is_if;
       node *variable;
       node *exp;
       node *statement;
@@ -93,9 +93,9 @@ struct node_ {
     } else_statement;
 
     struct {
-      bool is_const;
+      int is_const;
       int type_name;
-      bool vec;
+      int vec; //bool
       int int_val;
       bool bool_val;
     } type;   
@@ -106,7 +106,7 @@ struct node_ {
 
     struct {
       char *id;
-      bool is_vec;
+      int is_vec;
       int idx;
     } variable;
 
