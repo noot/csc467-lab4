@@ -259,6 +259,32 @@ void ast_sementic_check(node* current, int x) {
 		case IDENT_NODE: break; //TODO
 		case VAR_NODE: 
 			//check if it exists in symbol table first
+			symbol_table_entry *findVar;
+			findVar = exists_in_symbol_table(current->var_node.id);
+
+			if(findVar!= NULL){
+				//if value is const then you cannot re-assign to it
+				if (findVar.is_const = 1 && current->var_node.id != findVar.id){ //this depends on how we're storing the entries
+					fprintf(errorFile, "Error: you cannot assign a new value to a const variable");	
+				}
+
+				//if it has been initialized
+				if (findVar.init = 1){
+					findVar->type.is_const = 0;
+					findVar->type.type_code = current->var_node.id->type.type_code;
+				}
+
+				//if it hasn't been initialized
+				else{
+					findVar->type.is_const = 0;
+					findVar->type.type_code = current->var_node.id->type.type_code;
+				}
+
+			}
+
+			else{
+				fprintf(errorFile, "Error: this variable has not been declared");
+			}
 
 			//make sure you are not using predefined variables
 			if(!predefined_variables(node* current)){
