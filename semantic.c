@@ -22,6 +22,7 @@ void ast_scope_generator(node *cur, int x) { //Done pre-post.
 }
 
 
+//checking that we're not assigning to predefined read only variables 
 bool assign_predefined(node* curr) {
 	if (strcmp(curr->declaration.id, "gl_TexCoord") == 0 || strcmp(curr->declaration.id, "gl_Color") == 0 || strcmp(curr->declaration.id, "gl_Secondary") == 0 || 
 		strcmp(curr->declaration.id, "gl_FogFragCoord") == 0 || strcmp(curr->declaration.id, "gl_Light_Half") == 0 || strcmp(curr->declaration.id, "gl_Light_Ambient") == 0 ||
@@ -36,7 +37,8 @@ bool assign_predefined(node* curr) {
 
 
 
-bool check_function(node* current) {
+//checking function and function arguments
+bool check_function(node* current) { //do too many arguments case
 	
 	
 	//pointer to the arguments of the function
@@ -167,6 +169,7 @@ bool check_function(node* current) {
 	return true;
 }
 
+//checking function names
 char* check_function_name(node* current) {
 	if (current->func.name == 'rsq') {
 		return 'rsq';
@@ -176,6 +179,43 @@ char* check_function_name(node* current) {
 	}
 	else if (current->func.name == 'lit') {
 		return 'lit';
+	}
+}
+
+
+//checking for predefined variables
+bool predefined_variables(node * current){
+	curr = current->var_node.id;
+	if (strcmp(curr->declaration.id, "gl_TexCoord") == 0 || strcmp(curr->declaration.id, "gl_Color") == 0 || strcmp(curr->declaration.id, "gl_Secondary") == 0 || 
+	strcmp(curr->declaration.id, "gl_FogFragCoord") == 0){
+		curr->type.type_code = VEC_T;
+		curr->type.vec = 4;
+		curr->type.const = 0;
+	}
+	
+	else if (strcmp(curr->declaration.id, "gl_Light_Half") == 0 || strcmp(curr->declaration.id, "gl_Light_Ambient") == 0 ||
+	strcmp(curr->declaration.id, "gl_Material_Shininess") == 0 || strcmp(curr->declaration.id, "env1") == 0 || strcmp(curr->declaration.id, "env2") == 0 || 
+	strcmp(curr->declaration.id, "env3") == 0){
+		curr->type.type_code = VEC_T;
+		curr->type.vec = 4;
+		curr->type.const = 1;
+	}
+
+
+	else if (strcmp(curr->declaration.id, "gl_FragColor") == 0 || strcmp(curr->declaration.id, "gl_FragDepth") == 0 || 
+	strcmp(curr->declaration.id, "gl_FragCoord")){
+		curr->type.const = 1;
+		if (strcmp(curr->declaration.id, "gl_FragDepth") == 0){
+			curr->type.type_code = BOOL_T;
+			curr->type.vec = 1;
+
+		}
+		else{
+			curr->type.type_code = VEC_T;
+			curr->type.vec = 4;
+		}
+
+		return false;
 	}
 }
 
@@ -189,12 +229,12 @@ void ast_sementic_check(node* current, int x) {
 	node_kind kind = current->kind;
 
 	switch (kind) {
-	case UNKNOWN: break;
-	case SCOPE_NODE: scope_exit(); break;
-	case DECLARATIONS_NODE: break; //break
-	case STATEMENTS_NODE: break; //break
-	case UNARY_EXPRESION_NODE: break;
-	case BINARY_EXPRESSION_NODE:
+		case UNKNOWN: break;
+		case SCOPE_NODE: scope_exit(); break;
+		case DECLARATIONS_NODE: break; //break
+		case STATEMENTS_NODE: break; //break
+		case UNARY_EXPRESION_NODE: break; //TODO
+		case BINARY_EXPRESSION_NODE: //TOFINISH
 		switch (current->binary_expr.op) {
 		case('+')://arithmetic
 			if ((current->binary_expr.right->type.type_code != INT_T && current->binary_expr.left->type.type_code != INT_T) && (current->binary_expr.right->type.type_code != FLOAT_T && current->binary_expr.left->type.type_code != FLOAT_T)) {
@@ -205,32 +245,54 @@ void ast_sementic_check(node* current, int x) {
 				fprintf(errorFile, "Error: both sides of expression must be of type boolean");
 				break;
 			}
-			}
+		}
 		case INT_NODE:
 			current->type.type_code = INT_T;
+			current->type.vec = 1;
+			current->type.is_const = 1;
 			break;
 		case FLOAT_NODE:
 			current->type.type_code = FLOAT_T;
+			current->type.vec = 1;
+			current->type.is_const = 1;
 			break; 
-		case IDENT_NODE: break; 
-		case VAR_NODE: break;
+		case IDENT_NODE: break; //TODO
+		case VAR_NODE: 
+			//check if it exists in symbol table first
+
+			//make sure you are not using predefined variables
+			if(!predefined_variables(node* current)){
+				fprintf(errorFile, "Error you cannot use predefined variables as variable names");
+				break; 			
+			}
+				
+
 		case FUNCTION_NODE: if (!check_function_name(node* current)) break;
-		case CONSTRUCTOR_NODE: break;
-		case ARGUMENTS_NODE: break;
-		case TYPE_NODE: break;
+		case CONSTRUCTOR_NODE: break; //TODO
+		case ARGUMENTS_NODE: break; //TODO
+		case TYPE_NODE: break; //TODO?
 		case BOOL_NODE:
 			current->type.type_code = BOOL_T;
+			current->type.vec = 1;
+			current->type.is_const = 1;
 			break;
-		case IF_STATEMENT_NODE: break;
+		case IF_STATEMENT_NODE: 
+			if (!(current->condition_expr->type.type_code == BOOL_T && current->condition_expr->type.vec == 1)){ //can't be bvec
+				fprintf(errorFile, "Error: conditional expression must be of type boolean");	
+				break;		
+			}
+
+
 		case ASSIGNMENT_NODE:
 			symbol_table_entry* findVar;
 			if (current->assignment.variable->type.type_code != current->exp_var_node.var_node->type.type_code){
 				fprintf(errorFile, "Error: both sides of assignment must be of same type");
 			}
 
-		case NESTED_SCOPE_NODE: break;
-		case NESTED_EXPRESSION_NODE: break;
-		case EXP_VAR_NODE: break;
+		case NESTED_SCOPE_NODE: break; //TODO
+		case NESTED_EXPRESSION_NODE: break; //TODO
+		case EXP_VAR_NODE: //TODO 
+			break; 
 		case DECLARATION_NODE:
 			if (symbol_exists_in_this_scope(current->declaration.id)) {
 				fprintf(errorFile, "Error, declaration already exists in this scope");
