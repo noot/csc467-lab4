@@ -297,8 +297,54 @@ void ast_sementic_check(node* current, int x) {
 				
 
 		case FUNCTION_NODE: if (!check_function_name(node* current)) break;
-		case CONSTRUCTOR_NODE: break; //TODO
-		case ARGUMENTS_NODE: break; //TODO
+		case CONSTRUCTOR_NODE: 
+			//check that the type of the contructor matches the type of the arguments
+			node *next_arg = current->args;
+			while(next_arg->args.args){
+				if (current->ctor.type_node != next_args.expr->type.type_code){
+					fprintf(errorFile, "Error: incorrect type for constructor");
+					break;
+				}
+				else{
+					next_args = next_args->args.args;
+				}
+			}
+
+			break; //TODO
+		case ARGUMENTS_NODE: 
+			//arguments must all be of same type
+			node *next_arg = current->args.args;
+
+			if (next_arg==NULL){
+				fprintf(errorFile, "Error: not enough arguments");
+			}
+
+			node* type_exp1 = next_arg->type.type_code;
+			next_arg = next_arg->args.args;
+			if (next_arg!=NULL){
+				node *type_exp2 = next_arg->type.type_code; ;
+			}
+			else{
+				if (*type_exp1 != *type_exp2){
+					fprintf(errorFile, "arguments have to be of same type");
+				}
+			}
+
+			next_arg = next_arg->args.args;
+			if (next_arg != NULL){
+				node *type_exp3 = next_arg->type.type_code;;
+			}
+			next_arg = next_arg->args.args;
+			if (next_arg!=NULL){
+				node *type_exp4 = next_arg->type.type_code;;
+			}
+			next_arg = next_arg->args.args;
+			if (next_arg!=NULL){
+				fprintf(errorFile, "Error: too many arguments");
+			}
+		
+			//arguments must be of expected type
+			break; //TODO
 		case TYPE_NODE: break; //TODO?
 		case BOOL_NODE:
 			current->type.type_code = BOOL_T;
