@@ -11,9 +11,6 @@
 #define DEBUG_UNARY 0
 #define DEBUG_ASSIGNMENT 0
 
-bool assign_predefined(node* curr);
-bool check_function(node* current);
-bool predefined_variables(node* current);
 
 void ast_check_semantics() {
 	if (ast == NULL) {
@@ -59,13 +56,19 @@ void ast_sementic_check(node* current, int x) {
 			int right = current->binary_expr.right->type.type_code;
 			int op = current->binary_expr.op;
 
-			if (left != BOOL_T && right!=BOOL_T){
-				if (op == EQ){
-					fprintf(errorFile,"Error: Expecting boolean on both sides\n");
+			//fprintf(errorFile,"Val left:%d Val right:%d\n",left,right);
+
+			if (op == EQ || op == NEQ || op == ){
+				if (left == right){
+					current->type.type_code = right;
+				}	
+				else{
+					fprintf(errorFile,"Error: Expecting same type on both sides\n");
+					break;
 				}
 			}
+		}
 			
-			break;} //TOFINISH
 		case INT_NODE:{
 			current->type.type_code = INT_T;
 			current->type.vec = 1;
@@ -92,7 +95,7 @@ void ast_sementic_check(node* current, int x) {
 				fprintf(errorFile, "Error: conditional expression must be of type boolean\n");	
 				break;		
 			}
-}
+		}
 		case ASSIGNMENT_NODE:{break;}
 		case NESTED_SCOPE_NODE: {break;} //TODO
 		case NESTED_EXPRESSION_NODE: {break;} //TODO
@@ -104,3 +107,4 @@ void ast_sementic_check(node* current, int x) {
 	
 }
   
+
