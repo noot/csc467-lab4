@@ -38,7 +38,7 @@ node *ast_allocate(node_kind kind, ...) {
       break;
 
     case DECLARATION_NODE:
-      ast->declaration.is_const = va_arg(args, bool);
+      ast->declaration.is_const = va_arg(args, int);
       ast->declaration.id = va_arg(args, char *);
       ast->declaration.type = va_arg(args, node *);
       ast->declaration.exp = va_arg(args, node *);
@@ -47,7 +47,7 @@ node *ast_allocate(node_kind kind, ...) {
     // might need to break up statement grammar into assignment,
     // if statement, nested scope
     case STATEMENT_NODE:
-      ast->statement.is_if = va_arg(args, bool);
+      ast->statement.is_if = va_arg(args, int);
       ast->statement.variable = va_arg(args, node *);
       ast->statement.exp = va_arg(args, node *);
       ast->statement.statement = va_arg(args, node *);
@@ -86,12 +86,12 @@ node *ast_allocate(node_kind kind, ...) {
       ast->type.is_const = false;
       ast->type.type_name = BOOL_T;
       ast->type.vec = false;
-      ast->type.bool_val = va_arg(args, bool);
+      ast->type.bool_val = va_arg(args, int);
       break;
 
     case VAR_NODE:
       ast->variable.id = va_arg(args, char *);
-      ast->variable.is_vec = va_arg(args, bool);
+      ast->variable.is_vec = va_arg(args, int);
       ast->variable.idx = va_arg(args, int);
       break;
 
@@ -292,7 +292,7 @@ void _ast_print(node *curr, int i) {
       break;
 
     case FLOAT_NODE:
-      fprintf(dumpFile, "\t\tFLOAT %d", curr->float_v);
+      fprintf(dumpFile, "\t\tFLOAT %f", curr->float_v);
       break;
 
     case BOOL_NODE:
