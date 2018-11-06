@@ -2,6 +2,19 @@
 #include "semantic.h"
 #include "ast.h"
 
+#define DEBUG_FUNCTION 1
+#define DEBUG_DECLARATION 0
+#define DEBUG_CONSTRUCTOR 0
+#define DEBUG_BINARY 0
+#define DEBUG_VAR_NODE 0
+#define	DEBUG_ARGUMENTS 0
+#define DEBUG_UNARY 0
+#define DEBUG_ASSIGNMENT 0
+
+bool assign_predefined(node* curr);
+bool check_function(node* current);
+bool predefined_variables(node* current);
+
 void ast_check_semantics() {
 	if (ast == NULL) {
 		errorOccurred = 1;
@@ -86,13 +99,13 @@ bool check_function(node* current) { //do too many arguments case
 			fprintf(errorFile, "First argument is of incorrect type");	
 			return false;	
 		}
-		else if (next_arg->type.type_code == VEC_T && next_arg->type.vec == 4)){
+		else if (next_arg->type.type_code == VEC_T && next_arg->type.vec == 4){
 			next_arg = next_arg->args.args;
 			if (next_arg == NULL){
 				fprintf(errorFile, "Input argument cannot be void");	
 				return false;	
 			}
-			if (!next_arg->type.type_code == VEC_T && next_arg->type.vec == 4)) {
+			if (!next_arg->type.type_code == VEC_T && next_arg->type.vec == 4) {
 				fprintf(errorFile, "Second argument is of incorrect type");	
 				return false;
 			}
@@ -108,7 +121,7 @@ bool check_function(node* current) { //do too many arguments case
 			fprintf(errorFile, "First argument is of incorrect type");		
 			return false;
 		}
-		else if (next_arg->type.type_code == VEC_T && next_arg->type.vec == 3)){
+		else if (next_arg->type.type_code == VEC_T && next_arg->type.vec == 3){
 			next_arg = next_arg->args.args;
 			if (next_arg == NULL){
 				fprintf(errorFile, "Input argument cannot be void");	
@@ -125,7 +138,7 @@ bool check_function(node* current) { //do too many arguments case
 			fprintf(errorFile, "First argument is of incorrect type");	
 			return false;	
 		}
-		else if (next_arg->type.type_code == IVEC_T) && next_arg->type.vec == 4)){
+		else if (next_arg->type.type_code == IVEC_T && next_arg->type.vec == 4){
 			next_arg = next_arg->args.args;
 			if (next_arg == NULL){
 				fprintf(errorFile, "Input argument cannot be void");
@@ -142,7 +155,7 @@ bool check_function(node* current) { //do too many arguments case
 			fprintf(errorFile, "First argument is of incorrect type");
 			return false;		
 		}
-		else if (next_arg->type.type_code == IVEC_T) && next_arg->type.vec == 3)){
+		else if (next_arg->type.type_code == IVEC_T && next_arg->type.vec == 3){
 			next_arg = next_arg->args.args;
 			if (next_arg == NULL){
 				fprintf(errorFile, "Input argument cannot be void");
@@ -157,7 +170,7 @@ bool check_function(node* current) { //do too many arguments case
 
 
 	else if (current->func.name == 'lit') {
-		if (!(next_arg->type.type_code == VEC_T && next_arg->type.type_vec==4)) {
+		if (!(next_arg->type.type_code == VEC_T && next_arg->type.vec==4)) {
 			fprintf(errorFile,"Error: LIT function only takes in arguments of type vec4");
 			return false;
 		}
@@ -169,28 +182,16 @@ bool check_function(node* current) { //do too many arguments case
 	return true;
 }
 
-//checking function names
-char* check_function_name(node* current) {
-	if (current->func.name == 'rsq') {
-		return 'rsq';
-	}
-	else if (current->func.name == 'dp3') {
-		return 'dp3';
-	}
-	else if (current->func.name == 'lit') {
-		return 'lit';
-	}
-}
-
 
 //checking for predefined variables
-bool predefined_variables(node * current){
+bool predefined_variables(node* current){
 	curr = current->var_node.id;
 	if (strcmp(curr->declaration.id, "gl_TexCoord") == 0 || strcmp(curr->declaration.id, "gl_Color") == 0 || strcmp(curr->declaration.id, "gl_Secondary") == 0 || 
 	strcmp(curr->declaration.id, "gl_FogFragCoord") == 0){
 		curr->type.type_code = VEC_T;
 		curr->type.vec = 4;
-		curr->type.const = 0;
+		curr->type.is_const = 0;
+		return false;
 	}
 	
 	else if (strcmp(curr->declaration.id, "gl_Light_Half") == 0 || strcmp(curr->declaration.id, "gl_Light_Ambient") == 0 ||
@@ -198,13 +199,14 @@ bool predefined_variables(node * current){
 	strcmp(curr->declaration.id, "env3") == 0){
 		curr->type.type_code = VEC_T;
 		curr->type.vec = 4;
-		curr->type.const = 1;
+		curr->type.is_const = 1;
+		return false;
 	}
 
 
 	else if (strcmp(curr->declaration.id, "gl_FragColor") == 0 || strcmp(curr->declaration.id, "gl_FragDepth") == 0 || 
-	strcmp(curr->declaration.id, "gl_FragCoord")){
-		curr->type.const = 1;
+	strcmp(curr->declaration.id, "gl_FragCoord") == 0){
+		curr->type.is_const = 1;
 		if (strcmp(curr->declaration.id, "gl_FragDepth") == 0){
 			curr->type.type_code = BOOL_T;
 			curr->type.vec = 1;
@@ -217,6 +219,7 @@ bool predefined_variables(node * current){
 
 		return false;
 	}
+	return true;
 }
 
 void ast_sementic_check(node* current, int x) {
@@ -233,18 +236,18 @@ void ast_sementic_check(node* current, int x) {
 		case SCOPE_NODE: scope_exit(); break;
 		case DECLARATIONS_NODE: break; //break
 		case STATEMENTS_NODE: break; //break
-		case UNARY_EXPRESION_NODE: break; //TODO
-		case BINARY_EXPRESSION_NODE: //TOFINISH
+		case UNARY_EXPRESION_NODE: if(!DEBUG_UNARY) break; //TODO
+		case BINARY_EXPRESSION_NODE: if(!DEBUG_BINARY) break; //TOFINISH
 		switch (current->binary_expr.op) {
-		case('+')://arithmetic
-			if ((current->binary_expr.right->type.type_code != INT_T && current->binary_expr.left->type.type_code != INT_T) && (current->binary_expr.right->type.type_code != FLOAT_T && current->binary_expr.left->type.type_code != FLOAT_T)) {
-				fprintf(errorFile, "Error: both sides of expression must be of same type");
-				break;
-		case(NEQ):					//logical
-			if (current->binary_expr.right->type.type_code != BOOL_T && current->binary_expr.left->type.type_code != BOOL_T) {
-				fprintf(errorFile, "Error: both sides of expression must be of type boolean");
-				break;
-			}
+			case('+')://arithmetic
+				if ((current->binary_expr.right->type.type_code != INT_T && current->binary_expr.left->type.type_code != INT_T) && (current->binary_expr.right->type.type_code != FLOAT_T && current->binary_expr.left->type.type_code != FLOAT_T)) {
+					fprintf(errorFile, "Error: both sides of expression must be of same type");
+					break; }
+			case(NEQ):					//logical
+				if (current->binary_expr.right->type.type_code != BOOL_T && current->binary_expr.left->type.type_code != BOOL_T) {
+					fprintf(errorFile, "Error: both sides of expression must be of type boolean");
+					break;
+				}
 		}
 		case INT_NODE:
 			current->type.type_code = INT_T;
@@ -258,6 +261,7 @@ void ast_sementic_check(node* current, int x) {
 			break; 
 		//case IDENT_NODE: break; //not needed I think
 		case VAR_NODE: 
+			if(!DEBUG_VAR_NODE) break; 
 			//check if it exists in symbol table first
 			symbol_table_entry *findVar;
 			findVar = exists_in_symbol_table(current->var_node.id);
@@ -296,8 +300,10 @@ void ast_sementic_check(node* current, int x) {
 			}
 				
 
-		case FUNCTION_NODE: if (!check_function_name(node* current)) break;
-		case CONSTRUCTOR_NODE: 
+		case FUNCTION_NODE: 
+			if(!DEBUG_FUNCTION) break; 
+			if (!check_function_name(node* current)) break;
+		case CONSTRUCTOR_NODE: if(!DEBUG_CONSTRUCTOR) break; 
 			//check that the type of the contructor matches the type of the arguments
 			node *next_arg = current->args;
 			while(next_arg->args.args){
@@ -310,8 +316,8 @@ void ast_sementic_check(node* current, int x) {
 				}
 			}
 
-			break; //TODO
 		case ARGUMENTS_NODE: 
+			if(!DEBUG_ARGUMENTS)break; 
 			//arguments must all be of same type
 			node *next_arg = current->args.args;
 
@@ -341,10 +347,11 @@ void ast_sementic_check(node* current, int x) {
 			next_arg = next_arg->args.args;
 			if (next_arg!=NULL){
 				fprintf(errorFile, "Error: too many arguments");
+				break;
 			}
 		
 			//arguments must be of expected type
-			break; //TODO
+
 		case TYPE_NODE: break; //TODO?
 		case BOOL_NODE:
 			current->type.type_code = BOOL_T;
@@ -359,6 +366,7 @@ void ast_sementic_check(node* current, int x) {
 
 
 		case ASSIGNMENT_NODE:
+			if(!DEBUG_ASSIGNMENT) break; 
 			symbol_table_entry* findVar;
 			if (current->assignment.variable->type.type_code != current->exp_var_node.var_node->type.type_code){
 				fprintf(errorFile, "Error: both sides of assignment must be of same type");
@@ -368,11 +376,11 @@ void ast_sementic_check(node* current, int x) {
 		case NESTED_EXPRESSION_NODE: break; //TODO
 		case EXP_VAR_NODE: //TODO 
 			break; 
-		case DECLARATION_NODE:
+		case DECLARATION_NODE: if(!DEBUG_DECLARATION) break; 
 			if (symbol_exists_in_this_scope(current->declaration.id)) {
 				fprintf(errorFile, "Error, declaration already exists in this scope");
 			}
-			if (!assign_predefined(current)) {
+			if (!assign_predefined(&current)) {
 				fprintf(errorFile, "Error you cannot assign to these predefined read only variables\n");
 				break;
 			}
@@ -393,7 +401,8 @@ void ast_sementic_check(node* current, int x) {
 			entry.id = current->declaration.id;
 
 		default: break;
-		}
 	}
+	
 }
+  
 
