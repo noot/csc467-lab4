@@ -95,7 +95,7 @@ struct node_ {
     struct {
       int is_const;
       int type_name;
-      int vec; //bool
+      int vec; 
       int int_val;
       bool bool_val;
     } type;   

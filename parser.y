@@ -17,8 +17,7 @@
 #include <string.h>
 #include "common.h"
 #include "ast.h"
-//#include "ast.h"
-//#include "symbol.h"
+#include "symbol.h"
 //#include "semantic.h"
 #define YYERROR_VERBOSE
 #define yTRACE(x)    { if (traceParser) fprintf(traceFile, "%s\n", x); }
@@ -27,7 +26,6 @@ void yyerror(const char* s);    /* what to do in case of error            */
 int yylex();              /* procedure for calling lexical analyzer */
 extern int yyline;        /* variable holding current line number   */
 extern int yyval;      /* text that is matched by scanner */
-
 %}
 
 /***********************************************************************
@@ -58,6 +56,7 @@ extern int yyval;      /* text that is matched by scanner */
   float fval;
   bool bval;
   char* name;
+  node *ast_t;
 }
 
 %token <name> IDENTIFIER
@@ -132,6 +131,23 @@ extern int yyval;      /* text that is matched by scanner */
 %token <name> LSQUARE
 %token <name> RSQUARE
 
+%type <ast_t> program
+%type <ast_t> scope
+%type <ast_t> declarations
+%type <ast_t> declaration
+%type <ast_t> statements
+%type <ast_t> statement
+%type <ast_t> type
+%type <ast_t> exp
+%type <ast_t> else_statement
+%type <ast_t> variable
+%type <ast_t> unary_op
+%type <ast_t> binary_op
+%type <ast_t> constructor
+%type <ast_t> function
+%type <ast_t> arguments_opt
+%type <ast_t> arguments
+
 //precedence rules
 %left OR
 %left AND
@@ -156,39 +172,53 @@ extern int yyval;      /* text that is matched by scanner */
  *    1. Add code to rules for construction of AST.
  ***********************************************************************/
 program
-  :   scope                               { yTRACE("program -> scope"); }     
+  :   scope                               { yTRACE("program -> scope");
+                                            //ast = (node *)malloc(sizeof(node));
+                                            //$$ = ast_allocate($1); 
+                                            ast = $1;
+                                          }     
   ;
 scope
   :   LCURL declarations statements RCURL { yTRACE("scope -> { declarations statements }");
-                                            ast = ast_allocate(SCOPE_NODE, DECLARATIONS_NODE, STATEMENTS_NODE); }
+                                            $$ = ast_allocate(SCOPE_NODE, $2, $3); }
   ;
 declarations
-  :   declarations declaration            { yTRACE("declarations -> declarations declaration"); }
+  :   declarations declaration            { yTRACE("declarations -> declarations declaration"); 
+                                            $$ = ast_allocate(DECLARATIONS_NODE, $1, $2);}
   |   /* empty */                         { yTRACE("declarations -> empty"); }                                              
   ; 
 statements
-  :   statements statement                { yTRACE("statements -> statements statement"); }
+  :   statements statement                { yTRACE("statements -> statements statement"); 
+                                            $$ = ast_allocate(STATEMENTS_NODE, $1, $2);}
   |   /* empty */                         { yTRACE("statements -> empty"); }
   ;
 declaration
-  :   type IDENTIFIER COLON               { yTRACE("declaration -> type identifier ;"); }
-  |   type IDENTIFIER EQUAL exp COLON        { yTRACE("declaration -> type idenfifier = exp ;"); }
-  |   CONST type IDENTIFIER EQUAL exp COLON  { yTRACE("declaration -> const type identifier = exp ;"); }
+  :   type IDENTIFIER COLON               { yTRACE("declaration -> type identifier ;"); 
+                                            $$ = ast_allocate(DECLARATION_NODE, $1);}
+  |   type IDENTIFIER EQUAL exp COLON        { yTRACE("declaration -> type idenfifier = exp ;");
+                                                $$ = ast_allocate(DECLARATION_NODE, $1, $4); }
+  |   CONST type IDENTIFIER EQUAL exp COLON  { yTRACE("declaration -> const type identifier = exp ;");
+                                                $$ = ast_allocate(DECLARATION_NODE, $2, $5); }
   |   /* empty */                         { yTRACE("declaration -> empty"); }
   ;
 statement
-  :   variable EQUAL exp COLON               { yTRACE("statement -> variable = exp ;"); } 
-  |   IF LBRACKET exp RBRACKET statement else_statement   { yTRACE("statement -> if ( exp ) statement else_statement"); }
-  |   WHILE LBRACKET exp RBRACKET statement               { yTRACE("statement -> while ( exp ) statement"); }
+  :   variable EQUAL exp COLON               { yTRACE("statement -> variable = exp ;");
+                                                $$ = ast_allocate(STATEMENT_NODE, $1, $3); } 
+  |   IF LBRACKET exp RBRACKET statement else_statement   { yTRACE("statement -> if ( exp ) statement else_statement");
+                                                            $$ = ast_allocate(STATEMENT_NODE, $3. $5, $6); }
+  |   WHILE LBRACKET exp RBRACKET statement               { yTRACE("statement -> while ( exp ) statement"); 
+                                                            $$ = ast_allocate(STATEMENT_NODE, $3, $5);}
   |   COLON                                { yTRACE("statement -> ;"); }
   |   scope
   ;
 else_statement
-  :   ELSE statement                      { yTRACE("else_statement -> else statement"); }
+  :   ELSE statement                      { yTRACE("else_statement -> else statement");
+                                            $$ = ast_allocate(ELSE_STATEMENT_NODE, $1); }
   |   /* empty */                         { yTRACE("else_statement -> empty"); }
   ;
 type
-  :   INT_T				  { yTRACE("type -> int"); }
+  :   INT_T				  { yTRACE("type -> int"); 
+                      $$ = ast_allocate(TYPE_NODE, )}
   |   IVEC2				  { yTRACE("type -> ivec2"); }
   |   IVEC3				  { yTRACE("type -> ivec3"); }
   |   IVEC4				  { yTRACE("type -> ivec4"); }
