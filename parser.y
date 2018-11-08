@@ -214,7 +214,8 @@ statement
   |   WHILE LBRACKET exp RBRACKET statement               { yTRACE("statement -> while ( exp ) statement"); 
                                                             $$ = ast_allocate(STATEMENT_NODE, $3, $5);}
   |   COLON                                { yTRACE("statement -> ;"); }
-  |   scope
+  |   scope                                { yTRACE("statement -> scope");
+                                             $$ = ast_allocate(NESTED_SCOPE_NODE, $1); }                      
   ;
 else_statement
   :   ELSE statement                      { yTRACE("else_statement -> else statement");

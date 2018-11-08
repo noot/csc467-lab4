@@ -138,7 +138,9 @@ struct node_ {
     struct {
       node *args;
       node *exp;
-    } arguments;
+    } arguments; 
+
+    node *nested_scope;
   };
 };
 

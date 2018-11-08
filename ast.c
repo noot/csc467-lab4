@@ -125,6 +125,9 @@ node *ast_allocate(node_kind kind, ...) {
       ast->arguments.exp = va_arg(args, node *);
       break;
 
+    case NESTED_SCOPE_NODE:
+      ast->nested_scope = va_arg(args, node *);
+
     default: break;
   }
 
