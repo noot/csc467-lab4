@@ -37,7 +37,23 @@ void ast_sementic_check(node* current, int x) {
 		case DECLARATIONS_NODE: {fprintf(errorFile,"Reached declarations node\n");break; } //break
 		case STATEMENTS_NODE: {fprintf(errorFile,"Reached statements node\n");break;} //break
 		case UNARY_EXPRESION_NODE: {
-		fprintf(errorFile,"Reached unary");		
+			fprintf(errorFile,"Reached unary");	
+			int right = current->unary_expr.right->type.type_code;
+			int op = current->unary_expr.op;
+			if (op == '!' ){
+				if (right!=BOOL_T){
+					fprintf(errorFile,"Error: unary expression ! expects a boolean type");
+				}
+				
+			}
+			else{
+				if (right == BOOL_T){
+					fprintf(errorFile,"Error: unary expression - expects an arithmetic type");				
+				}
+			}
+
+			current->type.type_code = right;
+			current->type.vec = current->unary_expr.right->type.vec;
 		break;} 
 		case BINARY_EXPRESSION_NODE: {
 			fprintf(errorFile,"Reached binary node\n");
@@ -344,6 +360,19 @@ void ast_sementic_check(node* current, int x) {
 				}
 			
 			}
+
+			if (strcmp(current->assignment.variable->var_node.id, "gl_TexCoord") == 0 || strcmp(current->assignment.variable->var_node.id, "gl_Color") == 0 || strcmp(current->assignment.variable->var_node.id, "gl_Secondary") == 0 || 
+				strcmp(current->assignment.variable->var_node.id, "gl_FogFragCoord") == 0 || strcmp(current->assignment.variable->var_node.id, "gl_Light_Half") == 0 || strcmp(current->assignment.variable->var_node.id, "gl_Light_Ambient") == 0 ||
+				strcmp(current->assignment.variable->var_node.id, "gl_Material_Shininess") == 0 || strcmp(current->assignment.variable->var_node.id, "env1") == 0 || strcmp(current->assignment.variable->var_node.id, "env2") == 0 || 
+				strcmp(current->assignment.variable->var_node.id, "env3") == 0 ){
+				fprintf(errorFile, "Error you cannot assign to these predefined read only variables\n");
+				break;
+			}
+
+			if (strcmp(current->assignment.expr->var_node.id,"gl_FragColor") ==0 || strcmp(current->assignment.expr->var_node.id,"gl_FragDepth") == 0|| strcmp(current->assignment.expr->var_node.id, "gl_FragCoord")	==0)	{
+				fprintf(errorFile, "Error you cannot read these write only variables\n");
+			}
+
 			break;
 		}
 		case NESTED_SCOPE_NODE: {fprintf(errorFile,"Reached nested_scope\n");break;} //TODO
@@ -363,7 +392,16 @@ void ast_sementic_check(node* current, int x) {
 			current->type.vec = current->exp_var_node.var_node->type.vec; 
 			break; }
 		case DECLARATION_NODE:{		
-			fprintf(errorFile,"Reached declaration\n");		
+			fprintf(errorFile,"Reached declaration\n");
+
+			if (strcmp(current->declaration.id, "gl_TexCoord") == 0 || strcmp(current->declaration.id, "gl_Color") == 0 || strcmp(current->declaration.id, "gl_Secondary") == 0 || 
+				strcmp(current->declaration.id, "gl_FogFragCoord") == 0 || strcmp(current->declaration.id, "gl_Light_Half") == 0 || strcmp(current->declaration.id, "gl_Light_Ambient") == 0 ||
+				strcmp(current->declaration.id, "gl_Material_Shininess") == 0 || strcmp(current->declaration.id, "env1") == 0 || strcmp(current->declaration.id, "env2") == 0 || 
+				strcmp(current->declaration.id, "env3") == 0 ){
+				fprintf(errorFile, "Error you cannot assign to these predefined read only variables\n");
+				break;
+			}
+		
 			symbol_table_entry new_entry;
 
 			new_entry.id = current->declaration.id;
