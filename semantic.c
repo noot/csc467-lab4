@@ -151,7 +151,7 @@ void ast_sementic_check(node* current, int x) {
 			curr = current->var_node.id;
 			if (strcmp(curr, "gl_TexCoord") == 0 || strcmp(curr, "gl_Color") == 0 || strcmp(curr, "gl_Secondary") == 0 || 
 			strcmp(curr, "gl_FogFragCoord") == 0){
-				current->type.type_code = VEC_T;
+				current->type.type_code = VEC4_T;
 				current->type.vec = 4;
 				current->type.is_const = 0;
 				fprintf(errorFile, "Error you cannot use predefined variables as variable names");
@@ -161,7 +161,7 @@ void ast_sementic_check(node* current, int x) {
 			else if (strcmp(curr, "gl_Light_Half") == 0 || strcmp(curr, "gl_Light_Ambient") == 0 ||
 			strcmp(curr, "gl_Material_Shininess") == 0 || strcmp(curr, "env1") == 0 || strcmp(curr, "env2") == 0 || 
 			strcmp(curr, "env3") == 0){
-				current->type.type_code = VEC_T;
+				current->type.type_code = VEC4_T;
 				current->type.vec = 4;
 				current->type.is_const = 1;
 				fprintf(errorFile, "Error you cannot use predefined variables as variable names");
@@ -178,7 +178,7 @@ void ast_sementic_check(node* current, int x) {
 
 				}
 				else{
-					current->type.type_code = VEC_T;
+					current->type.type_code = VEC4_T;
 					current->type.vec = 4;
 				}
 
@@ -225,17 +225,17 @@ void ast_sementic_check(node* current, int x) {
 					fprintf(errorFile, "Input argument cannot be void\n");	
 					break;
 				}
-				if (!(next_arg->type.type_code == VEC_T && next_arg->type.vec == 4)){
+				if (!(next_arg->type.type_code == VEC4_T && next_arg->type.vec == 4)){
 					fprintf(errorFile, "First argument is of incorrect type\n");	
 					break;
 				}
-				else if (next_arg->type.type_code == VEC_T && next_arg->type.vec == 4){
+				else if (next_arg->type.type_code == VEC4_T && next_arg->type.vec == 4){
 					next_arg = next_arg->args.args;
 					if (next_arg == NULL){
 						fprintf(errorFile, "Input argument cannot be void\n");	
 						break;
 					}
-					if (!(next_arg->type.type_code == VEC_T && next_arg->type.vec == 4)) {
+					if (!(next_arg->type.type_code == VEC4_T && next_arg->type.vec == 4)) {
 						fprintf(errorFile, "Second argument is of incorrect type\n");	
 						break;
 					}
@@ -247,51 +247,51 @@ void ast_sementic_check(node* current, int x) {
 					fprintf(errorFile, "Input argument cannot be void\n");		
 					break;
 				}
-				if (!(next_arg->type.type_code == VEC_T && next_arg->type.vec == 3)){
+				if (!(next_arg->type.type_code == VEC3_T && next_arg->type.vec == 3)){
 					fprintf(errorFile, "First argument is of incorrect type\n");		
 					break;
 				}
-				else if (next_arg->type.type_code == VEC_T && next_arg->type.vec == 3){
+				else if (next_arg->type.type_code == VEC3_T && next_arg->type.vec == 3){
 					next_arg = next_arg->args.args;
 					if (next_arg == NULL){
 						fprintf(errorFile, "Input argument cannot be void\n");	
 						break;
 					}
-					if (!(next_arg->type.type_code == VEC_T && next_arg->type.vec == 3)) {
+					if (!(next_arg->type.type_code == VEC3_T && next_arg->type.vec == 3)) {
 						fprintf(errorFile, "Second argument is of incorrect type\n");
 						break;
 					}
 	
 				}
 				//other vector type case:ivec4
-				if (!(next_arg->type.type_code == IVEC_T && next_arg->type.vec == 4)){
+				if (!(next_arg->type.type_code == IVEC4_T && next_arg->type.vec == 4)){
 					fprintf(errorFile, "First argument is of incorrect type\n");	
 					break;
 				}
-				else if (next_arg->type.type_code == IVEC_T && next_arg->type.vec == 4){
+				else if (next_arg->type.type_code == IVEC4_T && next_arg->type.vec == 4){
 					next_arg = next_arg->args.args;
 					if (next_arg == NULL){
 						fprintf(errorFile, "Input argument cannot be void\n");
 						break;
 					}
-					if (!(next_arg->type.type_code == IVEC_T && next_arg->type.vec == 4)) {
+					if (!(next_arg->type.type_code == IVEC4_T && next_arg->type.vec == 4)) {
 						fprintf(errorFile, "Second argument is of incorrect type\n");
 						break;
 					}
 	
 				}
-				//last vector type case: ivec4
-				if (!(next_arg->type.type_code == IVEC_T && next_arg->type.vec == 3)){
+				//last vector type case: ivec3
+				if (!(next_arg->type.type_code == IVEC3_T && next_arg->type.vec == 3)){
 					fprintf(errorFile, "First argument is of incorrect type\n");
 					break;
 				}
-				else if (next_arg->type.type_code == IVEC_T && next_arg->type.vec == 3){
+				else if (next_arg->type.type_code == IVEC3_T && next_arg->type.vec == 3){
 					next_arg = next_arg->args.args;
 					if (next_arg == NULL){
 						fprintf(errorFile, "Input argument cannot be void\n");
 						break;
 					}
-					if (!(next_arg->type.type_code == IVEC_T && next_arg->type.vec == 3)) {
+					if (!(next_arg->type.type_code == IVEC3_T && next_arg->type.vec == 3)) {
 						fprintf(errorFile, "Second argument is of incorrect type\n");
 						break;
 					}
@@ -300,7 +300,7 @@ void ast_sementic_check(node* current, int x) {
 			}
 
 			else if (current->func.name == 1) { //lit
-				if (!(next_arg->type.type_code == VEC_T && next_arg->type.vec==4)) {
+				if (!(next_arg->type.type_code == VEC4_T && next_arg->type.vec==4)) {
 					fprintf(errorFile,"Error: LIT function only takes in arguments of type vec4\n");
 					break;
 				}
