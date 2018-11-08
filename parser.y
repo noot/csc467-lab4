@@ -56,7 +56,7 @@ extern int yyval;      /* text that is matched by scanner */
   float fval;
   bool bval;
   char* name;
-  node *ast_t;
+  node* ast_t;
 }
 
 %token <name> IDENTIFIER
