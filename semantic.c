@@ -120,12 +120,6 @@ void ast_sementic_check(node* current, int x) {
 
 			if(findVar!= NULL){
 				fprintf(errorFile, "this has been declared already\n");	
-				//if value is const then you cannot re-assign to it
-				//if (findVar->is_const == 1 && (current->var_node.id != findVar->id)){ //this depends on how we're storing the entries
-				//	fprintf(errorFile, "Error: you cannot assign a new value to a const variable\n");	
-				//	break;
-				//}
-
 				//if it has been initialized
 				if (findVar->is_init == 0){
 					fprintf(errorFile, "Error this variable hasn't been initialized"); //does it have to be initialized?
@@ -134,18 +128,43 @@ void ast_sementic_check(node* current, int x) {
 				}
 
 			}
-
+			
 			else{
-				fprintf(errorFile, "Error: this variable has not been declared");
+				if ((!strcmp(current->var_node.id, "gl_TexCoord") == 0) && (!strcmp(current->var_node.id, "gl_Color") == 0) && !strcmp(current->var_node.id, "gl_Secondary") == 0 && 
+					!strcmp(current->var_node.id, "gl_FogFragCoord") == 0 && !strcmp(current->var_node.id, "gl_Light_Half") == 0 && !strcmp(current->var_node.id, "gl_Light_Ambient") == 0 &&
+					!strcmp(current->var_node.id, "gl_Material_Shininess") == 0 && !strcmp(current->var_node.id, "env1") == 0 && !strcmp(current->var_node.id, "env2") == 0 && 
+					!strcmp(current->var_node.id, "env3") == 0 && !strcmp(current->var_node.id, "gl_FragColor") == 0 && !strcmp(current->var_node.id, "gl_FragDepth") == 0 && 
+					!strcmp(current->var_node.id, "gl_FragCoord") == 0){
+					fprintf(errorFile, "Error: this variable has not been declared...\n");
+					break;
+				}
 				break;
 			}
-
-			
-
 			current->type.is_const = findVar->is_const;
 			current->type.type_code = findVar->type_code;
 
+			if((findVar->type_code == BOOL_T || findVar->type_code == FLOAT_T || findVar->type_code == INT_T) && findVar->vec == 2){
+				int max_index = findVar->vec;
+				if (current->var_node.index >= max_index){
+					fprintf(errorFile, "Error: Index exceeds bounds");
+					break;
+				}
+			}
 
+			if((findVar->type_code == BOOL_T || findVar->type_code == FLOAT_T || findVar->type_code == INT_T) && findVar->vec == 3){
+				int max_index = findVar->vec;
+				if (current->var_node.index >= max_index){
+					fprintf(errorFile, "Error: Index exceeds bounds");
+					break;
+				}
+			}
+			if((findVar->type_code == BOOL_T || findVar->type_code == FLOAT_T || findVar->type_code == INT_T) && findVar->vec == 4){
+				int max_index = findVar->vec;
+				if (current->var_node.index >= max_index){
+					fprintf(errorFile, "Error: Index exceeds bounds");
+					break;
+				}
+			}
 			//make sure you are not using predefined variables
 			char* curr;
 			curr = current->var_node.id;
@@ -185,6 +204,8 @@ void ast_sementic_check(node* current, int x) {
 				fprintf(errorFile, "Error you cannot use predefined variables as variable names");
 				break; 	
 			}
+
+			
 			break;
 		}
 				
@@ -300,7 +321,7 @@ void ast_sementic_check(node* current, int x) {
 			}
 
 			else if (current->func.name == 1) { //lit
-				if (!(next_arg->type.type_code == VEC4_T && next_arg->type.vec==4)) {
+				if (!(next_arg->type.type_code == VEC4_T && next_arg->type.vec == 4)) {
 					fprintf(errorFile,"Error: LIT function only takes in arguments of type vec4\n");
 					break;
 				}
@@ -314,8 +335,59 @@ void ast_sementic_check(node* current, int x) {
 
             
 
-        	case CONSTRUCTOR_NODE:{break;} 
-		case ARGUMENTS_NODE:{	
+        	case CONSTRUCTOR_NODE:{
+			    fprintf(errorFile, "Entering constructor node\n");
+		     	int num_args, num_type;
+			    int i = 0;
+			    node* next_arg = current->ctor.args;
+			    if (next_arg == NULL) {
+					fprintf(errorFile, "Error constructor cannot be empty");
+				break;
+			    }
+
+			    switch (current->ctor.type_node->type.type_code) {
+				    case(IVEC4_T): {num_args = 4; num_type = INT_T;break;}
+				    case(IVEC3_T): {num_args = 3; num_type = INT_T;break;}
+				    case(IVEC2_T): {num_args = 2; num_type = INT_T; fprintf(errorFile, "ivec case reached,numer args = %d and num_type = %d \n",num_args,num_type);break;}
+				    case(BVEC4_T): {num_args = 4; num_type = BOOL_T;break;}
+				    case(BVEC3_T): {num_args = 3; num_type = BOOL_T;break;}
+				    case(BVEC2_T): {num_args = 2; num_type = BOOL_T;break;}
+				    case(VEC4_T): {num_args = 4; num_type = FLOAT_T;break;}
+				    case(VEC3_T): {num_args = 3; num_type = FLOAT_T;break;}
+				    case(VEC2_T): {num_args = 2; num_type = FLOAT_T;break;}
+			    }
+
+
+				//259 is integer
+				
+			    do{
+					if (next_arg == NULL) {
+						fprintf(errorFile, "Error: constructor arguments cannot be null\n");
+
+					}
+					fprintf(errorFile, "ivec case reached,numer args = %d and num_type = %d \n",num_args,num_type);
+					fprintf(errorFile, "CTOR arguments type:%d, CTOR type:%d \n",current->ctor.args->type.type_code, num_type);
+
+					if (current->ctor.args->type.type_code != num_type) { //type of constructor itself
+						fprintf(errorFile, "Error: incorrect constructor argument type\n");
+
+					}
+					else{
+						fprintf(errorFile, "This argument type is correct\n");
+
+					}
+					i++;
+					next_arg = next_arg->args.args;
+
+			    }while (i < num_args && next_arg!=NULL);
+
+			    current->type.vec = num_args;
+			    current->type.type_code = num_type;
+			    //current->variable.is_vec = 1;		
+			break;} 
+
+
+		case ARGUMENTS_NODE:{	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			fprintf(errorFile,"Reached arguments node\n");		
 			if (current->args.expr){
 				//arguments must be of expected type  
@@ -328,6 +400,7 @@ void ast_sementic_check(node* current, int x) {
 			else{
 				current->type.is_const = 0; //verify
 				current->type.type_code = -1; //verify
+				fprintf(errorFile,"Type code args: %d\n",current->type.type_code);
 				current->type.vec = 1;
 				break;
 				
@@ -351,14 +424,25 @@ void ast_sementic_check(node* current, int x) {
 
 			symbol_table_entry *findVar;
 			findVar = symbol_find(current->assignment.variable->var_node.id);
+
+
+			if (findVar == NULL){
+				fprintf(errorFile, "Error: this variable has not been declared\n");  //Implicit type conversions
+			}
 			if (findVar->is_init){
 				fprintf(errorFile,"Variable:%d, Expression:%d \n",current->assignment.variable->type.type_code, current->assignment.expr->type.type_code);
 				//if (current->assignment.variable->type.type_code != current->assignment.expr->type.type_code){
 				if (findVar->type_code != current->assignment.expr->type.type_code){
-					fprintf(errorFile, "Error: both sides of assignment must be of same type\n");
+					fprintf(errorFile, "Error: both sides of assignment must be of same type\n");  //Implicit type conversions
 					break;
 				}
 			
+			}
+
+			if (findVar->is_const){
+				if(current->assignment.expr){
+					fprintf(errorFile, "Error: cannot assign to a const variable\n");
+				}
 			}
 
 			if (strcmp(current->assignment.variable->var_node.id, "gl_TexCoord") == 0 || strcmp(current->assignment.variable->var_node.id, "gl_Color") == 0 || strcmp(current->assignment.variable->var_node.id, "gl_Secondary") == 0 || 
@@ -401,7 +485,19 @@ void ast_sementic_check(node* current, int x) {
 				fprintf(errorFile, "Error you cannot assign to these predefined read only variables\n");
 				break;
 			}
-		
+
+			if (symbol_exists_in_this_scope(current->declaration.id)) {
+				fprintf(errorFile, "Error, declaration already exists in this scope\n");
+				break;
+			}
+
+			if (current->declaration.expr) {
+				if (current->declaration.expr->exp_var_node.var_node->type.type_code != current->declaration.type_node->type.type_code) {
+					fprintf(errorFile, "Error: both sides of expression must be of same type\n");
+					break;
+				}
+			}
+
 			symbol_table_entry new_entry;
 
 			new_entry.id = current->declaration.id;
