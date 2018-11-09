@@ -56,7 +56,7 @@ extern int yyval;      /* text that is matched by scanner */
   float fval;
   bool bval;
   char* name;
-  node *ast_t;
+  node* ast_t;
 }
 
 %token <name> IDENTIFIER
@@ -208,9 +208,9 @@ declaration
   ;
 statement
   :   variable EQUAL exp COLON               { yTRACE("statement -> variable = exp ;");
-                                                $$ = ast_allocate(STATEMENT_NODE, $1, $3); } 
+                                                $$ = ast_allocate(ASSIGNMENT_NODE, $1, $3); } 
   |   IF LBRACKET exp RBRACKET statement else_statement   { yTRACE("statement -> if ( exp ) statement else_statement");
-                                                            $$ = ast_allocate(STATEMENT_NODE, $3. $5, $6); }
+                                                            $$ = ast_allocate(STATEMENT_NODE, $3, $5, $6); }
   |   WHILE LBRACKET exp RBRACKET statement               { yTRACE("statement -> while ( exp ) statement"); 
                                                             $$ = ast_allocate(STATEMENT_NODE, $3, $5);}
   |   COLON                                { yTRACE("statement -> ;"); }
@@ -271,68 +271,68 @@ exp
   | exp ADD exp             { yTRACE("binary_op -> exp + exp");
                               $$ = ast_allocate(EXP_NODE, ADD, $1, $3); }
   | exp SUB exp             { yTRACE("binary_op -> exp - exp");
-                              $$ = ast_allocate(EXP_NODE, SUB, $1, $3;) }
+                              $$ = ast_allocate(EXP_NODE, SUB, $1, $3); }
   | exp MUL exp             { yTRACE("binary_op -> exp * exp");
-                              $$ = ast_allocate(EXP_NODE, MUL, $1, $3;) }
+                              $$ = ast_allocate(EXP_NODE, MUL, $1, $3); }
   | exp DIV exp             { yTRACE("binary_op -> exp / exp");
-                              $$ = ast_allocate(EXP_NODE, DIV, $1, $3;) }
+                              $$ = ast_allocate(EXP_NODE, DIV, $1, $3); }
   | exp EXP exp             { yTRACE("binary_op -> exp ^ exp");
-                              $$ = ast_allocate(EXP_NODE, EXP, $1, $3;) } //not in handout
+                              $$ = ast_allocate(EXP_NODE, EXP, $1, $3); } //not in handout
   | exp AND exp             { yTRACE("binary_op -> exp &7xp");
-                              $$ = ast_allocate(EXP_NODE, AND, $1, $3;) }
+                              $$ = ast_allocate(EXP_NODE, AND, $1, $3); }
   | exp OR exp              { yTRACE("binary_op -> exp || exp");
-                              $$ = ast_allocate(EXP_NODE, OR, $1, $3;) }
+                              $$ = ast_allocate(EXP_NODE, OR, $1, $3); }
   | exp EQ exp              { yTRACE("binary_op -> exp == exp");
-                              $$ = ast_allocate(EXP_NODE, EQ, $1, $3;) }
+                              $$ = ast_allocate(EXP_NODE, EQ, $1, $3); }
   | exp NEQ exp             { yTRACE("binary_op -> exp != exp");
-                              $$ = ast_allocate(EXP_NODE, NEQ, $1, $3;) }
+                              $$ = ast_allocate(EXP_NODE, NEQ, $1, $3); }
   | exp LESS exp            { yTRACE("binary_op -> exp < exp");
-                              $$ = ast_allocate(EXP_NODE, LESS, $1, $3;)}
+                              $$ = ast_allocate(EXP_NODE, LESS, $1, $3); }
   | exp LEQ exp             { yTRACE("binary_op -> exp <= exp");
-                              $$ = ast_allocate(EXP_NODE, LEQ, $1, $3;) }
+                              $$ = ast_allocate(EXP_NODE, LEQ, $1, $3); }
   | exp GREATER exp         { yTRACE("binary_op -> exp > exp");
-                              $$ = ast_allocate(EXP_NODE, GREATER, $1, $3;)}
+                              $$ = ast_allocate(EXP_NODE, GREATER, $1, $3); }
   | exp GEQ exp             { yTRACE("binary_op -> exp >= exp");
-                              $$ = ast_allocate(EXP_NODE, GEQ, $1, $3;)}
+                              $$ = ast_allocate(EXP_NODE, GEQ, $1, $3); }
   ;
 variable
   : IDENTIFIER		  		      { yTRACE("variable -> identifier");
-                                $$ = ast_allocate(VAR_NODE, $1) }
+                                $$ = ast_allocate(VAR_NODE, $1); }
   | IDENTIFIER LSQUARE INT RSQUARE	  	    { yTRACE("variable -> identifier[integer_literal]"); 
-                                              $$ = ast_allocate(VAR_NODE, $1, $3;)}
+                                              $$ = ast_allocate(VAR_NODE, $1, $3); }
   ;
 unary_op
   : EXCLAM		  		{ yTRACE("unary_op -> !"); 
-                      $$ = ast_allocate(UNARY_OP_NODE, EXCLAM)}
+                      $$ = ast_allocate(UNARY_OP_NODE, EXCLAM); }
   | SUB		  			{ yTRACE("unary_op -> -");
-                    $$ = ast_allocate(UNARY_OP_NODE, SUB) }
+                    $$ = ast_allocate(UNARY_OP_NODE, SUB); }
   ; 
 constructor 
   : type LBRACKET arguments RBRACKET    		{ yTRACE("constructor -> type ( arguments )");
-                                              $$ = ast_allocate(CONSTRUCTOR_NODE, $1, $3) }	
+                                              $$ = ast_allocate(CONSTRUCTOR_NODE, $1, $3); }	
   ;
 function
   : function_name LBRACKET arguments_opt RBRACKET       { yTRACE("function -> function_name ( arguments_opt )");
-                                                          $$ = ast_allocate(FUNCTION_NODE, $1, $3); }
+                                                          $$ = ast_allocate(FUNCTION_NODE, $3); }
   ;
 function_name
   : DP3        				{ yTRACE("function_name -> dp3");
-                        $$ = ast_allocate(FUNCTION_NODE, DP3) }
+                        /*$$ = ast_allocate(FUNCTION_NODE, $1);*/ }
   | LIT        				{ yTRACE("function_name -> lit");
-                        $$ = ast_allocate(FUNCTION_NODE, LIT) }
+                       /* $$ = ast_allocate(FUNCTION_NODE, $1); */}
   | RSQ        				{ yTRACE("function_name -> rsq");
-                        $$ = ast_allocate(FUNCTION_NODE, RSQ) }
+                        /*$$ = ast_allocate(FUNCTION_NODE, $1); */}
   ;
 arguments_opt
   : arguments				{ yTRACE("arguments_opt -> arguments");
-                      $$ = ast_allocate(ARGUMENTS_OPT_NODE, $1) }
+                      $$ = ast_allocate(ARGUMENTS_OPT_NODE, $1); }
   | /*empty*/				{ yTRACE("arguments_opt -> empty"); }
   ;
 arguments
   : arguments COMMA exp			  { yTRACE("arguments -> arguments , exp");
-                                $$ = ast_allocate(ARGUMENTS_NODE, $1, $3) }
+                                $$ = ast_allocate(ARGUMENTS_NODE, $1, $3); }
   | exp					              { yTRACE("arguments -> exp");
-                                $$ = ast_allocate(ARGUMENTS_NODE, $1) }
+                                $$ = ast_allocate(ARGUMENTS_NODE, $1); }
   ;
 %%
 

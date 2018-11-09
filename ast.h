@@ -45,7 +45,7 @@ typedef enum {
   TYPE_NODE             = (1 << 2) | (1 << 13),
   BOOL_NODE             = (1 << 2) | (1 << 14),
 
-  //ASSIGNMENT_NODE       = (1 << 1) | (1 << 15),
+  ASSIGNMENT_NODE       = (1 << 1) | (1 << 15),
   NESTED_SCOPE_NODE     = (1 << 1) | (1 << 16)
 } node_kind;
 
@@ -91,6 +91,11 @@ struct node_ {
     struct {
       node *statement;
     } else_statement;
+
+    struct {
+      node *variable;
+      node *exp;
+    } assignment;
 
     struct {
       int is_const;
@@ -147,6 +152,7 @@ struct node_ {
 node *ast_allocate(node_kind type, ...);
 void ast_free(node *ast);
 void ast_print(node * ast);
+void ast_visit(int depth, node *curr, func pre, func post);
 int semantic_check(node * ast);
 
 #endif /* AST_H_ */

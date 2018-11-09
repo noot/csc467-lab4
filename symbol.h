@@ -7,6 +7,7 @@ typedef struct _entry {
 	int is_const;
 	int is_vec;
 	int type_name;
+	int is_init;
 	char *id;
 	entry *prev_scope;
 	entry *this_scope;

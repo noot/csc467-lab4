@@ -54,6 +54,11 @@ node *ast_allocate(node_kind kind, ...) {
       ast->statement.else_statement = va_arg(args, node *);
       break;
 
+    case ASSIGNMENT_NODE:
+      ast->assignment.variable = va_arg(args, node *);
+      ast->assignment.exp = va_arg(args, node *);
+      break;
+
     case ELSE_STATEMENT_NODE:
       ast->else_statement.statement = va_arg(args, node *);
       break;
@@ -175,6 +180,11 @@ void ast_visit(int depth, node *curr, func pre, func post) {
 
     case ELSE_STATEMENT_NODE:
       if(curr->else_statement.statement) ast_visit(depth, curr->else_statement.statement, pre, post); 
+      break;
+
+    case ASSIGNMENT_NODE:
+      if(curr->assignment.variable) ast_visit(depth, curr->assignment.variable, pre, post);
+      if(curr->assignment.exp) ast_visit(depth, curr->assignment.exp, pre, post);
       break;
 
     case EXP_NODE:
