@@ -1,8 +1,12 @@
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 #include "semantic.h"
 #include "ast.h"
-
-
+#include "common.h"
+#include "parser.tab.h"
+#include "symbol.h"
 
 /*
 1. Please define the nested scope and assignment nodes because I use them
@@ -17,14 +21,14 @@
 
 void traverse_and_check(){
 	if (ast == NULL){
-		errorOccured = 1;
+		errorOccurred = 1;
 		fprintf(errorFile, "Does not exist");
 		return;
 	}
-	else traverse(ast, &ast_sementic_check);
+	else ast_visit(0, ast, NULL, &ast_semantic_check);
 }
-void ast_semantic_check(node* current) {
 
+void ast_semantic_check(node* current) {
 	if (current == NULL) {
 		errorOccurred = 1;
 		fprintf(errorFile, "Error: Empty tree visited");
@@ -42,7 +46,7 @@ void ast_semantic_check(node* current) {
 
 		case DECLARATIONS_NODE: {fprintf(errorFile,"Reached declarations node\n");break; } //break
 		case STATEMENTS_NODE: {fprintf(errorFile,"Reached statements node\n");break;} //break
-		case UNARY_EXPRESION_NODE: {
+		case UNARY_OP_NODE: {
 			fprintf(errorFile,"Reached unary");	
 			int right = current->unary_expr.right->type.type_name;
 			int op = current->unary_expr.op;
@@ -61,7 +65,7 @@ void ast_semantic_check(node* current) {
 			current->type.type_name = right;
 			current->type.vec = current->unary_expr.right->type.vec;
 		break;} 
-		case BINARY_EXPRESSION_NODE: {
+		case BINARY_OP_NODE: {
 			fprintf(errorFile,"Reached binary node\n");
 			int left = current->binary_expr.left->type.type_name;
 			int right = current->binary_expr.right->type.type_name;
@@ -82,7 +86,7 @@ void ast_semantic_check(node* current) {
 					break;
 				}
 			}
-			else if (op == ADD||op == SUB||op == MULT||DIV||EXP){
+			else if (op == ADD||op == SUB||op == MUL||DIV||EXP){
 				if (left == right){
 					current->type.type_name = left;
 					current->type.vec = 1;
@@ -122,12 +126,12 @@ void ast_semantic_check(node* current) {
 		case VAR_NODE: {
 			//check if it exists in symbol table first
 			_entry *findVar;
-			findVar = find_var(current->var_node.id); //find_var function calls from scope
+			findVar = find_var(current->variable.id); //find_var function calls from scope
 
 			if(findVar!= NULL){
 				fprintf(errorFile, "this has been declared already\n");	
 				//if it has been initialized
-				if (findVar.is_init == 0){
+				if (findVar->is_init == 0){
 					fprintf(errorFile, "Error this variable hasn't been initialized"); //does it have to be initialized?
 					break;
 					
@@ -136,36 +140,36 @@ void ast_semantic_check(node* current) {
 			}
 			
 			else{
-				if ((!strcmp(current->var_node.id, "gl_TexCoord") == 0) && (!strcmp(current->var_node.id, "gl_Color") == 0) && !strcmp(current->var_node.id, "gl_Secondary") == 0 && 
-					!strcmp(current->var_node.id, "gl_FogFragCoord") == 0 && !strcmp(current->var_node.id, "gl_Light_Half") == 0 && !strcmp(current->var_node.id, "gl_Light_Ambient") == 0 &&
-					!strcmp(current->var_node.id, "gl_Material_Shininess") == 0 && !strcmp(current->var_node.id, "env1") == 0 && !strcmp(current->var_node.id, "env2") == 0 && 
-					!strcmp(current->var_node.id, "env3") == 0 && !strcmp(current->var_node.id, "gl_FragColor") == 0 && !strcmp(current->var_node.id, "gl_FragDepth") == 0 && 
-					!strcmp(current->var_node.id, "gl_FragCoord") == 0){
+				if ((!strcmp(current->variable.id, "gl_TexCoord") == 0) && (!strcmp(current->variable.id, "gl_Color") == 0) && !strcmp(current->variable.id, "gl_Secondary") == 0 && 
+					!strcmp(current->variable.id, "gl_FogFragCoord") == 0 && !strcmp(current->variable.id, "gl_Light_Half") == 0 && !strcmp(current->variable.id, "gl_Light_Ambient") == 0 &&
+					!strcmp(current->variable.id, "gl_Material_Shininess") == 0 && !strcmp(current->variable.id, "env1") == 0 && !strcmp(current->variable.id, "env2") == 0 && 
+					!strcmp(current->variable.id, "env3") == 0 && !strcmp(current->variable.id, "gl_FragColor") == 0 && !strcmp(current->variable.id, "gl_FragDepth") == 0 && 
+					!strcmp(current->variable.id, "gl_FragCoord") == 0){
 					fprintf(errorFile, "Error: this variable has not been declared...\n");
 					break;
 				}
 				break;
 			}
-			current->type.is_const = findVar.is_const;
-			current->type.type_name = findVar.type_name;
+			current->type.is_const = findVar->is_const;
+			current->type.type_name = findVar->type_name;
 
-			if((findVar.type_name == BOOL_T || findVar.type_name == FLOAT_T || findVar.type_name == INT_T) && findVar.is_vec == 2){
-				int max_index = findVar.is_vec;
+			if((findVar->type_name == BOOL_T || findVar->type_name == FLOAT_T || findVar->type_name == INT_T) && findVar->is_vec == 2){
+				int max_index = findVar->is_vec;
 				if (current->variable.idx >= max_index){
 					fprintf(errorFile, "Error: Index exceeds bounds");
 					break;
 				}
 			}
 
-			if((findVar.type_name == BOOL_T || findVar.type_name == FLOAT_T || findVar.type_name == INT_T) && findVar.is_vec == 3){
-				int max_index = findVar.is_vec;
+			if((findVar->type_name == BOOL_T || findVar->type_name == FLOAT_T || findVar->type_name == INT_T) && findVar->is_vec == 3){
+				int max_index = findVar->is_vec;
 				if (current->variable.idx >= max_index){
 					fprintf(errorFile, "Error: Index exceeds bounds");
 					break;
 				}
 			}
-			if((findVar.type_name == BOOL_T || findVar.type_name == FLOAT_T || findVar.type_name == INT_T) && findVar.is_vec == 4){
-				int max_index = findVar.is_vec;
+			if((findVar->type_name == BOOL_T || findVar->type_name == FLOAT_T || findVar->type_name == INT_T) && findVar->is_vec == 4){
+				int max_index = findVar->is_vec;
 				if (current->variable.idx >= max_index){
 					fprintf(errorFile, "Error: Index exceeds bounds");
 					break;
@@ -176,7 +180,7 @@ void ast_semantic_check(node* current) {
 			curr = current->variable.id;
 			if (strcmp(curr, "gl_TexCoord") == 0 || strcmp(curr, "gl_Color") == 0 || strcmp(curr, "gl_Secondary") == 0 || 
 			strcmp(curr, "gl_FogFragCoord") == 0){
-				current->type.type_name = VEC4_T;
+				current->type.type_name = VEC4;
 				current->type.vec = 4;
 				current->type.is_const = 0;
 				fprintf(errorFile, "Error you cannot use predefined variables as variable names");
@@ -186,7 +190,7 @@ void ast_semantic_check(node* current) {
 			else if (strcmp(curr, "gl_Light_Half") == 0 || strcmp(curr, "gl_Light_Ambient") == 0 ||
 			strcmp(curr, "gl_Material_Shininess") == 0 || strcmp(curr, "env1") == 0 || strcmp(curr, "env2") == 0 || 
 			strcmp(curr, "env3") == 0){
-				current->type.type_name = VEC4_T;
+				current->type.type_name = VEC4;
 				current->type.vec = 4;
 				current->type.is_const = 1;
 				fprintf(errorFile, "Error you cannot use predefined variables as variable names");
@@ -203,7 +207,7 @@ void ast_semantic_check(node* current) {
 
 				}
 				else{
-					current->type.type_name = VEC4_T;
+					current->type.type_name = VEC4;
 					current->type.vec = 4;
 				}
 
@@ -252,17 +256,17 @@ void ast_semantic_check(node* current) {
 					fprintf(errorFile, "Input argument cannot be void\n");	
 					break;
 				}
-				if (!(next_arg->type.type_name == VEC4_T && next_arg->type.vec == 4)){
+				if (!(next_arg->type.type_name == VEC4 && next_arg->type.vec == 4)){
 					fprintf(errorFile, "First argument is of incorrect type\n");	
 					break;
 				}
-				else if (next_arg->type.type_name == VEC4_T && next_arg->type.vec == 4){
+				else if (next_arg->type.type_name == VEC4 && next_arg->type.vec == 4){
 					next_arg = next_arg->arguments.args;
 					if (next_arg == NULL){
 						fprintf(errorFile, "Input argument cannot be void\n");	
 						break;
 					}
-					if (!(next_arg->type.type_name == VEC4_T && next_arg->type.vec == 4)) {
+					if (!(next_arg->type.type_name == VEC4 && next_arg->type.vec == 4)) {
 						fprintf(errorFile, "Second argument is of incorrect type\n");	
 						break;
 					}
@@ -274,51 +278,51 @@ void ast_semantic_check(node* current) {
 					fprintf(errorFile, "Input argument cannot be void\n");		
 					break;
 				}
-				if (!(next_arg->type.type_name == VEC3_T && next_arg->type.vec == 3)){
+				if (!(next_arg->type.type_name == VEC3 && next_arg->type.vec == 3)){
 					fprintf(errorFile, "First argument is of incorrect type\n");		
 					break;
 				}
-				else if (next_arg->type.type_name == VEC3_T && next_arg->type.vec == 3){
+				else if (next_arg->type.type_name == VEC3 && next_arg->type.vec == 3){
 					next_arg = next_arg->arguments.args;
 					if (next_arg == NULL){
 						fprintf(errorFile, "Input argument cannot be void\n");	
 						break;
 					}
-					if (!(next_arg->type.type_name == VEC3_T && next_arg->type.vec == 3)) {
+					if (!(next_arg->type.type_name == VEC3 && next_arg->type.vec == 3)) {
 						fprintf(errorFile, "Second argument is of incorrect type\n");
 						break;
 					}
 	
 				}
 				//other vector type case:ivec4
-				if (!(next_arg->type.type_name == IVEC4_T && next_arg->type.vec == 4)){
+				if (!(next_arg->type.type_name == IVEC4 && next_arg->type.vec == 4)){
 					fprintf(errorFile, "First argument is of incorrect type\n");	
 					break;
 				}
-				else if (next_arg->type.type_name == IVEC4_T && next_arg->type.vec == 4){
+				else if (next_arg->type.type_name == IVEC4 && next_arg->type.vec == 4){
 					next_arg = next_arg->arguments.args;
 					if (next_arg == NULL){
 						fprintf(errorFile, "Input argument cannot be void\n");
 						break;
 					}
-					if (!(next_arg->type.type_name == IVEC4_T && next_arg->type.vec == 4)) {
+					if (!(next_arg->type.type_name == IVEC4 && next_arg->type.vec == 4)) {
 						fprintf(errorFile, "Second argument is of incorrect type\n");
 						break;
 					}
 	
 				}
 				//last vector type case: ivec3
-				if (!(next_arg->type.type_name == IVEC3_T && next_arg->type.vec == 3)){
+				if (!(next_arg->type.type_name == IVEC3 && next_arg->type.vec == 3)){
 					fprintf(errorFile, "First argument is of incorrect type\n");
 					break;
 				}
-				else if (next_arg->type.type_name == IVEC3_T && next_arg->type.vec == 3){
+				else if (next_arg->type.type_name == IVEC3 && next_arg->type.vec == 3){
 					next_arg = next_arg->arguments.args;
 					if (next_arg == NULL){
 						fprintf(errorFile, "Input argument cannot be void\n");
 						break;
 					}
-					if (!(next_arg->type.type_name == IVEC3_T && next_arg->type.vec == 3)) {
+					if (!(next_arg->type.type_name == IVEC3 && next_arg->type.vec == 3)) {
 						fprintf(errorFile, "Second argument is of incorrect type\n");
 						break;
 					}
@@ -327,7 +331,7 @@ void ast_semantic_check(node* current) {
 			}
 
 			else if (current->function.function_name == 1) { //lit
-				if (!(next_arg->type.type_name == VEC4_T && next_arg->type.vec == 4)) {
+				if (!(next_arg->type.type_name == VEC4 && next_arg->type.vec == 4)) {
 					fprintf(errorFile,"Error: LIT function only takes in arguments of type vec4\n");
 					break;
 				}
@@ -352,15 +356,15 @@ void ast_semantic_check(node* current) {
 			    }
 
 			    switch (current->constructor.type->type.type_name) {
-				    case(IVEC4_T): {num_args = 4; num_type = INT_T;break;}
-				    case(IVEC3_T): {num_args = 3; num_type = INT_T;break;}
-				    case(IVEC2_T): {num_args = 2; num_type = INT_T; fprintf(errorFile, "ivec case reached,numer args = %d and num_type = %d \n",num_args,num_type);break;}
-				    case(BVEC4_T): {num_args = 4; num_type = BOOL_T;break;}
-				    case(BVEC3_T): {num_args = 3; num_type = BOOL_T;break;}
-				    case(BVEC2_T): {num_args = 2; num_type = BOOL_T;break;}
-				    case(VEC4_T): {num_args = 4; num_type = FLOAT_T;break;}
-				    case(VEC3_T): {num_args = 3; num_type = FLOAT_T;break;}
-				    case(VEC2_T): {num_args = 2; num_type = FLOAT_T;break;}
+				    case IVEC4: {num_args = 4; num_type = INT_T;break;}
+				    case IVEC3: {num_args = 3; num_type = INT_T;break;}
+				    case IVEC2: {num_args = 2; num_type = INT_T; fprintf(errorFile, "ivec case reached,numer args = %d and num_type = %d \n",num_args,num_type);break;}
+				    case BVEC4: {num_args = 4; num_type = BOOL_T;break;}
+				    case BVEC3: {num_args = 3; num_type = BOOL_T;break;}
+				    case BVEC2: {num_args = 2; num_type = BOOL_T;break;}
+				    case VEC4: {num_args = 4; num_type = FLOAT_T;break;}
+				    case VEC3: {num_args = 3; num_type = FLOAT_T;break;}
+				    case VEC2: {num_args = 2; num_type = FLOAT_T;break;}
 			    }
 
 
@@ -418,7 +422,7 @@ void ast_semantic_check(node* current) {
 			current->type.vec = 1;
 			current->type.is_const = 1;
 			break;}
-		case IF_STATEMENT_NODE:{
+		case STATEMENT_NODE:{
 
 			//current->statement.is_if = 1;
 			fprintf(errorFile,"Reached if condition\n");		
@@ -467,15 +471,22 @@ void ast_semantic_check(node* current) {
 
 			break;
 		}
-		case NESTED_SCOPE_NODE: {fprintf(errorFile,"Reached nested_scope\n");break;} //TODO
-		case NESTED_EXPRESSION_NODE: {
-			fprintf(errorFile,"Reached nested_exp node\n");
-			current->type.is_const = current->nested_exp.exp->type.is_const;
-		 	current->type.type_name = current->nested_exp.exp->type.type_name;
+		case NESTED_SCOPE_NODE: {
+			fprintf(errorFile, "Reached nested_scope node\n");
+			current->type.is_const = current->nested_scope->type.is_const;
+		 	current->type.type_name = current->nested_scope->type.type_name;
 			fprintf(errorFile,"Type code nested: %d\n",current->type.type_name);
-			current->type.vec = current->nested_exp.exp->type.vec;
-			
+			current->type.vec = current->nested_scope->type.vec;
+			break;
 		} 
+		// case NESTED_EXPRESSION_NODE: {
+		// 	fprintf(errorFile,"Reached nested_scope node\n");
+		// 	current->type.is_const = current->nested_scope->exp->type.is_const;
+		//  	current->type.type_name = current->nested_scope->exp->type.type_name;
+		// 	fprintf(errorFile,"Type code nested: %d\n",current->type.type_name);
+		// 	current->type.vec = current->nested_scope->exp->type.vec;
+		// 	break;
+		// } 
 		case EXP: {
 			fprintf(errorFile,"Reached exp_var node\n");
 			current->type.is_const = current->exp.variable->type.is_const;
@@ -499,21 +510,21 @@ void ast_semantic_check(node* current) {
 				break;
 			}
 
+			entry *new_element = (entry *)malloc(sizeof(entry));
+
 			if (current->declaration.exp) {
 				//it's initialized
-				new_element.is_init = 1;
-				if (current->declaration.exp->exp.variable->type.type_name != current->declaration.type_node->type.type_name) {
+				new_element->is_init = 1;
+				if (current->declaration.exp->exp.variable->type.type_name != current->declaration.type->type.type_name) {
 					fprintf(errorFile, "Error: both sides of expression must be of same type\n");
 					break;
 				}
 			}
 
-			_entry new_element;
-
-			new_element.id = current->declaration.id;
-			new_element.is_const = current->declaration.is_const;
-			new_element.type_name = current->declaration.type_node->type.type_name;
-			new_element.vec = current->declaration.type_node->type.vec;
+			new_element->id = current->declaration.id;
+			new_element->is_const = current->declaration.is_const;
+			new_element->type_name = current->declaration.type->type.type_name;
+			new_element->is_vec = current->declaration.type->type.vec;
 
 			new_entry(new_element); //add it to the symbol table
 		 	break;}
