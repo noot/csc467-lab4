@@ -22,7 +22,7 @@ void exit_scope() {
 
 void new_entry(entry *e) {
 	if(in_scope(e->id) == 1) {
-		break;
+		return;
 	}
 	if(table == NULL) {
 		table = (entry *)malloc(sizeof(entry));
@@ -41,4 +41,16 @@ int in_scope(char *id) {
 		curr = curr->this_scope;
 	}
 	return 0;
+}
+
+entry* find_entry(char *id) {
+	entry *curr = stack;
+	while(curr) {
+		entry *curr_scope = curr;
+		while(curr_scope) {
+			if(strcmp(curr_scope->id, id) == 0) return curr_scope;
+		}
+		curr = curr->next_scope;
+	}
+	return NULL;
 }

@@ -26,6 +26,12 @@ void yyerror(const char* s);    /* what to do in case of error            */
 int yylex();              /* procedure for calling lexical analyzer */
 extern int yyline;        /* variable holding current line number   */
 extern int yyval;      /* text that is matched by scanner */
+
+typedef enum {
+  DP3 = 0,
+  LIT = 1, 
+  RSQ = 2
+} function_name;
 %}
 
 /***********************************************************************
@@ -57,6 +63,7 @@ extern int yyval;      /* text that is matched by scanner */
   bool bval;
   char* name;
   node* ast_t;
+  int func;
 }
 
 %token <name> IDENTIFIER
@@ -99,9 +106,10 @@ extern int yyval;      /* text that is matched by scanner */
 %token <name> ENV3
 %token <name> CONST
 
-%token <name> DP3
-%token <name> LIT
-%token <name> RSQ
+%token <func> FUNC
+// %token DP3
+// %token LIT
+// %token RSQ
 
 %token <name> INC
 %token <name> DEC
@@ -179,7 +187,7 @@ extern int yyval;      /* text that is matched by scanner */
 program
   :   scope                               { yTRACE("program -> scope");
                                             //ast = (node *)malloc(sizeof(node));
-                                            //$$ = ast_allocate($1); 
+                                            //$$ = ast_allocate(SCOPE_NODE); 
                                             ast = $1;
                                           }     
   ;
@@ -199,23 +207,23 @@ statements
   ;
 declaration
   :   type IDENTIFIER COLON               { yTRACE("declaration -> type identifier ;"); 
-                                            $$ = ast_allocate(DECLARATION_NODE, $1);}
+                                            $$ = ast_allocate(DECLARATION_NODE, 0, $2, $1, NULL);}
   |   type IDENTIFIER EQUAL exp COLON        { yTRACE("declaration -> type idenfifier = exp ;");
-                                                $$ = ast_allocate(DECLARATION_NODE, $1, $4); }
+                                                $$ = ast_allocate(DECLARATION_NODE, 0, $2, $1, $4); }
   |   CONST type IDENTIFIER EQUAL exp COLON  { yTRACE("declaration -> const type identifier = exp ;");
-                                                $$ = ast_allocate(DECLARATION_NODE, $2, $5); }
+                                                $$ = ast_allocate(DECLARATION_NODE, 1, $3, $2, $5); }
   |   /* empty */                         { yTRACE("declaration -> empty"); }
   ;
 statement
-  :   variable EQUAL exp COLON               { yTRACE("statement -> variable = exp ;");
-                                                $$ = ast_allocate(ASSIGNMENT_NODE, $1, $3); } 
+  :   variable EQUAL exp COLON                            { yTRACE("statement -> variable = exp ;");
+                                                            $$ = ast_allocate(ASSIGNMENT_NODE, 0, $1, $3, NULL, NULL); } 
   |   IF LBRACKET exp RBRACKET statement else_statement   { yTRACE("statement -> if ( exp ) statement else_statement");
-                                                            $$ = ast_allocate(STATEMENT_NODE, $3, $5, $6); }
-  |   WHILE LBRACKET exp RBRACKET statement               { yTRACE("statement -> while ( exp ) statement"); 
-                                                            $$ = ast_allocate(STATEMENT_NODE, $3, $5);}
-  |   COLON                                { yTRACE("statement -> ;"); }
-  |   scope                                { yTRACE("statement -> scope");
-                                             $$ = ast_allocate(NESTED_SCOPE_NODE, $1); }                      
+                                                            $$ = ast_allocate(STATEMENT_NODE, 1, NULL, $3, $5, $6); }
+  // |   WHILE LBRACKET exp RBRACKET statement               { yTRACE("statement -> while ( exp ) statement"); 
+  //                                                           $$ = ast_allocate(STATEMENT_NODE, $3, $5);}
+  |   COLON                                               { yTRACE("statement -> ;"); }
+  |   scope                                               { yTRACE("statement -> scope");
+                                                            $$ = ast_allocate(NESTED_SCOPE_NODE, 0, NULL, $1, NULL, NULL); }                      
   ;
 else_statement
   :   ELSE statement                      { yTRACE("else_statement -> else statement");
@@ -224,105 +232,104 @@ else_statement
   ;
 type
   :   INT_T				  { yTRACE("type -> int"); 
-                      $$ = ast_allocate(TYPE_NODE, INT_T, $1); }
+                      $$ = ast_allocate(TYPE_NODE, 0, INT_T, 0, $1, 0); }
   |   IVEC2				  { yTRACE("type -> ivec2");
-                      $$ = ast_allocate(TYPE_NODE, IVEC2, $1); }
+                      $$ = ast_allocate(TYPE_NODE, 0, IVEC2, 1, $1, 0); }
   |   IVEC3				  { yTRACE("type -> ivec3");
-                      $$ = ast_allocate(TYPE_NODE, IVEC3, $1); }
+                      $$ = ast_allocate(TYPE_NODE, 0, IVEC3, 1, $1, 0); }
   |   IVEC4				  { yTRACE("type -> ivec4"); 
-                      $$ = ast_allocate(TYPE_NODE, IVEC4, $1); }
+                      $$ = ast_allocate(TYPE_NODE, 0, IVEC4, 1, $1, 0); }
   |   BOOL_T				{ yTRACE("type -> bool"); 
-                      $$ = ast_allocate(TYPE_NODE, BOOL_T, $1); }
+                      $$ = ast_allocate(TYPE_NODE, 0, BOOL_T, 0, 0, $1); }
   |   BVEC2				  { yTRACE("type -> bvec2"); 
-                      $$ = ast_allocate(TYPE_NODE, BVEC2, $1); }
+                      $$ = ast_allocate(TYPE_NODE, 0, BVEC2, 1, 0, $1); }
   |   BVEC3				  { yTRACE("type -> bvec3"); 
-                      $$ = ast_allocate(TYPE_NODE, BVEC3, $1); }
+                      $$ = ast_allocate(TYPE_NODE, 0, BVEC3, 1, 0, $1); }
   |   BVEC4				  { yTRACE("type -> bvec4"); 
-                      $$ = ast_allocate(TYPE_NODE, BVEC4, $1); }
+                      $$ = ast_allocate(TYPE_NODE, 0, BVEC4, 1, 0, $1); }
   |   FLOAT_T		    { yTRACE("type -> float");
-                      $$ = ast_allocate(TYPE_NODE, FLOAT_T, $1); }
+                      $$ = ast_allocate(TYPE_NODE, 0, FLOAT_T, 0, $1, 0); }
   |   VEC2				  { yTRACE("type -> vec2");
-                      $$ = ast_allocate(TYPE_NODE, VEC2, $1); }
+                      $$ = ast_allocate(TYPE_NODE, 0, VEC2, 1, $1, 0); }
   |   VEC3				  { yTRACE("type -> vec3"); 
-                      $$ = ast_allocate(TYPE_NODE, VEC3, $1); }
+                      $$ = ast_allocate(TYPE_NODE, 0, VEC3, 1, $1, 0); }
   |   VEC4				  { yTRACE("type -> vec4");
-                      $$ = ast_allocate(TYPE_NODE, VEC4, $1); }
+                      $$ = ast_allocate(TYPE_NODE, 0, VEC4, 1, $1, 0); }
   ;				  
 exp
   :  
-  | constructor			{ yTRACE("exp -> constructor"); 
-                      $$ = ast_allocate(EXP_NODE, CONSTRUCTOR_NODE, $1); }
-  | function				{ yTRACE("exp -> function");
-                      $$ = ast_allocate(EXP_NODE, FUNCTION_NODE, $1); }
+  | constructor			{ yTRACE("exp -> constructor"); }
+  | function				{ yTRACE("exp -> function");}
   | INT				  	  { yTRACE("exp -> integer_literal"); 
-                      $$ = ast_allocate(EXP_NODE, INT_NODE, $1); }
+                      $$ = ast_allocate(INT_NODE, $1); }
   | FLOAT				    { yTRACE("exp -> float_literal"); 
                       $$ = ast_allocate(EXP_NODE, FLOAT_NODE, $1); }
   | T 				  	  { yTRACE("exp -> true"); 
-                      $$ = ast_allocate(EXP_NODE, BOOL_NODE, $1);}
+                      $$ = ast_allocate(EXP_NODE, BOOL_NODE, 1);}
   | F				  	    { yTRACE("exp -> false"); 
-                      $$ = ast_allocate(EXP_NODE, BOOL_NODE, $1); }
-  | variable				          { yTRACE("exp -> variable"); 
-                                $$ = ast_allocate(EXP_NODE, VAR_NODE, $1);}
-  | unary_op exp			        { yTRACE("exp -> unary_op ex");
-                                $$ = ast_allocate(EXP_NODE, UNARY_OP_NODE, $1, $2); }
+                      $$ = ast_allocate(EXP_NODE, BOOL_NODE, 0); }
+  | variable				          { yTRACE("exp -> variable"); }
+  | EXCLAM exp			        { yTRACE("exp -> unary_op ex");
+                                $$ = ast_allocate(UNARY_OP_NODE, $1, $2); }
+  | SUB exp                 { yTRACE("exp -> unary_op ex");
+                                $$ = ast_allocate(UNARY_OP_NODE, $1, $2); }
   | LBRACKET exp RBRACKET		  { yTRACE("exp -> ( exp )");
-                                $$ = ast_allocate(EXP_NODE, EXP_NODE, $2); }
+                                $$ = ast_allocate(EXP_NODE, $2); }
   | exp ADD exp             { yTRACE("binary_op -> exp + exp");
-                              $$ = ast_allocate(EXP_NODE, ADD, $1, $3); }
+                              $$ = ast_allocate(BINARY_OP_NODE, ADD, $1, $3); }
   | exp SUB exp             { yTRACE("binary_op -> exp - exp");
-                              $$ = ast_allocate(EXP_NODE, SUB, $1, $3); }
+                              $$ = ast_allocate(BINARY_OP_NODE, SUB, $1, $3); }
   | exp MUL exp             { yTRACE("binary_op -> exp * exp");
-                              $$ = ast_allocate(EXP_NODE, MUL, $1, $3); }
+                              $$ = ast_allocate(BINARY_OP_NODE, MUL, $1, $3); }
   | exp DIV exp             { yTRACE("binary_op -> exp / exp");
-                              $$ = ast_allocate(EXP_NODE, DIV, $1, $3); }
+                              $$ = ast_allocate(BINARY_OP_NODE, DIV, $1, $3); }
   | exp EXP exp             { yTRACE("binary_op -> exp ^ exp");
-                              $$ = ast_allocate(EXP_NODE, EXP, $1, $3); } //not in handout
+                              $$ = ast_allocate(BINARY_OP_NODE, EXP, $1, $3); } //not in handout
   | exp AND exp             { yTRACE("binary_op -> exp &7xp");
-                              $$ = ast_allocate(EXP_NODE, AND, $1, $3); }
+                              $$ = ast_allocate(BINARY_OP_NODE, AND, $1, $3); }
   | exp OR exp              { yTRACE("binary_op -> exp || exp");
-                              $$ = ast_allocate(EXP_NODE, OR, $1, $3); }
+                              $$ = ast_allocate(BINARY_OP_NODE, OR, $1, $3); }
   | exp EQ exp              { yTRACE("binary_op -> exp == exp");
-                              $$ = ast_allocate(EXP_NODE, EQ, $1, $3); }
+                              $$ = ast_allocate(BINARY_OP_NODE, EQ, $1, $3); }
   | exp NEQ exp             { yTRACE("binary_op -> exp != exp");
-                              $$ = ast_allocate(EXP_NODE, NEQ, $1, $3); }
+                              $$ = ast_allocate(BINARY_OP_NODE, NEQ, $1, $3); }
   | exp LESS exp            { yTRACE("binary_op -> exp < exp");
-                              $$ = ast_allocate(EXP_NODE, LESS, $1, $3); }
+                              $$ = ast_allocate(BINARY_OP_NODE, LESS, $1, $3); }
   | exp LEQ exp             { yTRACE("binary_op -> exp <= exp");
-                              $$ = ast_allocate(EXP_NODE, LEQ, $1, $3); }
+                              $$ = ast_allocate(BINARY_OP_NODE, LEQ, $1, $3); }
   | exp GREATER exp         { yTRACE("binary_op -> exp > exp");
-                              $$ = ast_allocate(EXP_NODE, GREATER, $1, $3); }
+                              $$ = ast_allocate(BINARY_OP_NODE, GREATER, $1, $3); }
   | exp GEQ exp             { yTRACE("binary_op -> exp >= exp");
-                              $$ = ast_allocate(EXP_NODE, GEQ, $1, $3); }
+                              $$ = ast_allocate(BINARY_OP_NODE, GEQ, $1, $3); }
   ;
 variable
   : IDENTIFIER		  		      { yTRACE("variable -> identifier");
-                                $$ = ast_allocate(VAR_NODE, $1); }
+                                $$ = ast_allocate(VAR_NODE, $1, 0, 0); }
   | IDENTIFIER LSQUARE INT RSQUARE	  	    { yTRACE("variable -> identifier[integer_literal]"); 
-                                              $$ = ast_allocate(VAR_NODE, $1, $3); }
+                                              $$ = ast_allocate(VAR_NODE, $1, $3, 0); }
   ;
-unary_op
-  : EXCLAM		  		{ yTRACE("unary_op -> !"); 
-                      $$ = ast_allocate(UNARY_OP_NODE, EXCLAM); }
-  | SUB		  			{ yTRACE("unary_op -> -");
-                    $$ = ast_allocate(UNARY_OP_NODE, SUB); }
-  ; 
+// unary_op
+//   : EXCLAM		  		{ yTRACE("unary_op -> !"); 
+//                       $$ = ast_allocate(UNARY_OP_NODE, EXCLAM); }
+//   | SUB		  			{ yTRACE("unary_op -> -");
+//                     $$ = ast_allocate(UNARY_OP_NODE, SUB); }
+//   ; 
 constructor 
   : type LBRACKET arguments RBRACKET    		{ yTRACE("constructor -> type ( arguments )");
                                               $$ = ast_allocate(CONSTRUCTOR_NODE, $1, $3); }	
   ;
 function
-  : function_name LBRACKET arguments_opt RBRACKET       { yTRACE("function -> function_name ( arguments_opt )");
-                                                          $$ = ast_allocate(FUNCTION_NODE, $3); }
+  : FUNC LBRACKET arguments_opt RBRACKET       { yTRACE("function -> function_name ( arguments_opt )");
+                                                          $$ = ast_allocate(FUNCTION_NODE, $1, $3); }
   ;
-function_name
-  : DP3        				{ yTRACE("function_name -> dp3");
-                        /*$$ = ast_allocate(FUNCTION_NODE, $1);*/ }
-  | LIT        				{ yTRACE("function_name -> lit");
-                       /* $$ = ast_allocate(FUNCTION_NODE, $1); */}
-  | RSQ        				{ yTRACE("function_name -> rsq");
-                        /*$$ = ast_allocate(FUNCTION_NODE, $1); */}
-  ;
+// function_name
+//   : DP3        				{ yTRACE("function_name -> dp3");
+//                         /*$$ = ast_allocate(FUNCTION_NODE, $1);*/ }
+//   | LIT        				{ yTRACE("function_name -> lit");
+//                        /* $$ = ast_allocate(FUNCTION_NODE, $1); */}
+//   | RSQ        				{ yTRACE("function_name -> rsq");
+//                         /*$$ = ast_allocate(FUNCTION_NODE, $1); */}
+//   ;
 arguments_opt
   : arguments				{ yTRACE("arguments_opt -> arguments");
                       $$ = ast_allocate(ARGUMENTS_OPT_NODE, $1); }
@@ -332,7 +339,7 @@ arguments
   : arguments COMMA exp			  { yTRACE("arguments -> arguments , exp");
                                 $$ = ast_allocate(ARGUMENTS_NODE, $1, $3); }
   | exp					              { yTRACE("arguments -> exp");
-                                $$ = ast_allocate(ARGUMENTS_NODE, $1); }
+                                $$ = ast_allocate(ARGUMENTS_NODE, NULL, $1); }
   ;
 %%
 

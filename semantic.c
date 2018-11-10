@@ -1,12 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
 #include "semantic.h"
-#include "ast.h"
-#include "common.h"
-#include "parser.tab.h"
-#include "symbol.h"
 
 /*
 1. Please define the nested scope and assignment nodes because I use them
@@ -19,16 +14,7 @@
 
 */
 
-void traverse_and_check(){
-	if (ast == NULL){
-		errorOccurred = 1;
-		fprintf(errorFile, "Does not exist");
-		return;
-	}
-	else ast_visit(0, ast, NULL, &ast_semantic_check);
-}
-
-void ast_semantic_check(node* current) {
+void ast_semantic_check(node* current, int i) {
 	if (current == NULL) {
 		errorOccurred = 1;
 		fprintf(errorFile, "Error: Empty tree visited");
@@ -39,8 +25,9 @@ void ast_semantic_check(node* current) {
 	switch (kind) {
 		case UNKNOWN: {break;}
 		case SCOPE_NODE: {
-			if (enterScope){ enter_scope();} //
-			else exit_scope();
+			//enter_scope();
+			//if (enterScope){ enter_scope();} //
+			//else exit_scope();
 			fprintf(errorFile,"Reached scope\n");
 			break;}
 
@@ -126,7 +113,7 @@ void ast_semantic_check(node* current) {
 		case VAR_NODE: {
 			//check if it exists in symbol table first
 			_entry *findVar;
-			findVar = find_var(current->variable.id); //find_var function calls from scope
+			findVar = find_entry(current->variable.id); //find_var function calls from scope
 
 			if(findVar!= NULL){
 				fprintf(errorFile, "this has been declared already\n");	
@@ -435,7 +422,7 @@ void ast_semantic_check(node* current) {
 		case ASSIGNMENT_NODE:{
 
 			_entry *findVar;
-			findVar = find_var(current->assignment.variable->variable.id); //call to find var
+			findVar = find_entry(current->assignment.variable->variable.id); //call to find var
 
 
 			if (findVar == NULL){
@@ -526,10 +513,19 @@ void ast_semantic_check(node* current) {
 			new_element->type_name = current->declaration.type->type.type_name;
 			new_element->is_vec = current->declaration.type->type.vec;
 
-			new_entry(new_element); //add it to the symbol table
+			// new_entry(new_element); //add it to the symbol table
 		 	break;}
 		default: {break;}
 	}
 	
 }
   
+
+void traverse_and_check(){
+	if (ast == NULL){
+		errorOccurred = 1;
+		fprintf(errorFile, "Does not exist");
+		return;
+	}
+	else ast_visit(0, ast, NULL, &ast_semantic_check);
+}

@@ -142,10 +142,11 @@ node *ast_allocate(node_kind kind, ...) {
 }
 
 void ast_visit(int depth, node *curr, func pre, func post) {
-  printf("visiting ast...");
+  //printf("visiting ast...");
   if (NULL == curr) return;
 
   depth++;
+  fprintf(dumpFile, "%d\n", depth);
   if(pre) pre(curr, depth);
 
   // in the traversal, we recursively check if each node contains another node,
@@ -219,6 +220,8 @@ void ast_visit(int depth, node *curr, func pre, func post) {
       break;
 
     case NESTED_SCOPE_NODE:
+      ast_visit(depth, curr->nested_scope, pre, post);
+      break;
 
     default:
       break;
@@ -227,11 +230,15 @@ void ast_visit(int depth, node *curr, func pre, func post) {
   if(post) post(curr, depth);
   depth--;
 
-  printf("finished visiting ast");
+  //printf("finished visiting ast");
+}
+
+void _ast_free(node *ast, int i) {
+  free(ast);
 }
 
 void ast_free(node *ast) {
-
+  ast_visit(0, ast, NULL, &_ast_free);
 }
 
 void _ast_print(node *curr, int i) {
@@ -315,9 +322,11 @@ void _ast_print(node *curr, int i) {
     default:
       break;
   }
+  fprintf(dumpFile, "\n");
 }
 
 //do post order traversal 
 void ast_print(node *ast) {
   ast_visit(0, ast, &_ast_print, NULL);
+  fprintf(dumpFile, "\n");
 }
