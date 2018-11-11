@@ -146,7 +146,7 @@ void ast_visit(int depth, node *curr, func pre, func post) {
   if (NULL == curr) return;
 
   depth++;
-  fprintf(dumpFile, "%d\n", depth);
+  //fprintf(dumpFile, "%d\n", depth);
   if(pre) pre(curr, depth);
 
   // in the traversal, we recursively check if each node contains another node,
@@ -234,6 +234,8 @@ void ast_visit(int depth, node *curr, func pre, func post) {
 }
 
 void _ast_free(node *ast, int i) {
+  //if(ast->kind == DECLARATION_NODE) free(ast->declaration.id);
+  //else if (ast->kind == VAR_NODE) free(ast->variable.id);
   free(ast);
 }
 
@@ -242,81 +244,84 @@ void ast_free(node *ast) {
 }
 
 void _ast_print(node *curr, int i) {
+  for(int j = 1; j < i; j++) fprintf(dumpFile, "\t");
+  fprintf(dumpFile, "( ");
+
   switch(curr->kind) {
     case SCOPE_NODE:
-      fprintf(dumpFile, "\tSCOPE");
+      fprintf(dumpFile, "SCOPE");
       break;
 
     case DECLARATIONS_NODE:
-      fprintf(dumpFile, "\tDECLARATIONS");
+      fprintf(dumpFile, "DECLARATIONS");
       break;
 
     case STATEMENTS_NODE:
-      fprintf(dumpFile, "\tSTATEMENTS");
+      fprintf(dumpFile, "STATEMENTS");
       break;
 
     case DECLARATION_NODE:
-      fprintf(dumpFile, "\tDECLARATION %s", curr->declaration.id);
+      fprintf(dumpFile, "DECLARATION %s", curr->declaration.id);
       break;
 
     case STATEMENT_NODE:
-      fprintf(dumpFile, "\tSTATEMENT");
+      fprintf(dumpFile, "STATEMENT");
       break;
 
     case ELSE_STATEMENT_NODE:
-      fprintf(dumpFile, "\tELSE STATEMENT");
+      fprintf(dumpFile, "ELSE STATEMENT");
       break;
 
     case EXP_NODE:
-      fprintf(dumpFile, "\tEXPRESSION");
+      fprintf(dumpFile, "EXPRESSION");
       break;
 
     case UNARY_OP_NODE:
-      fprintf(dumpFile, "\tUNARY OP &s", curr->unary_expr.op);
+      fprintf(dumpFile, "UNARY OP %s", get_op(curr->unary_expr.op));
       break;
 
     case BINARY_OP_NODE:
-      fprintf(dumpFile, "\tBINARY OP &s", curr->binary_expr.op);  
+      fprintf(dumpFile, "BINARY OP %s", get_op(curr->binary_expr.op));  
       break;
 
     case CONSTRUCTOR_NODE:
-      fprintf(dumpFile, "\tCONSTRUCTOR");
+      fprintf(dumpFile, "CONSTRUCTOR");
       break;
 
     case FUNCTION_NODE:
-      fprintf(dumpFile, "\tFUNCTION %d", curr->function.function_name);
+      fprintf(dumpFile, "FUNCTION %d", curr->function.function_name);
       break;
 
     case ARGUMENTS_OPT_NODE:
-      fprintf(dumpFile, "\tARGUMENTS_OPT");
+      fprintf(dumpFile, "ARGUMENTS_OPT");
       break;
 
     case ARGUMENTS_NODE:
-      fprintf(dumpFile, "\tARGUMENTS");
+      fprintf(dumpFile, "ARGUMENTS");
       break;
 
     case NESTED_SCOPE_NODE:
-      fprintf(dumpFile, "\t\t");
+      fprintf(dumpFile, "");
       break;
 
     case VAR_NODE:
-      fprintf(dumpFile, "\t\tVARIABLE %s", curr->variable.id);
+      fprintf(dumpFile, "VARIABLE %s", curr->variable.id);
       break;
 
     case TYPE_NODE:
-      fprintf(dumpFile, "\t\tTYPE %d", curr->type.type_name);
+      fprintf(dumpFile, "TYPE %d", curr->type.type_name);
       break;
 
     case INT_NODE:
-      fprintf(dumpFile, "\t\tINT %d", curr->int_v);
+      fprintf(dumpFile, "INT %d", curr->int_v);
       break;
 
     case FLOAT_NODE:
-      fprintf(dumpFile, "\t\tFLOAT %f", curr->float_v);
+      fprintf(dumpFile, "FLOAT %f", curr->float_v);
       break;
 
     case BOOL_NODE:
-      fprintf(dumpFile, "\t\tBOOL %d", curr->bool_v);
+      fprintf(dumpFile, "BOOL %d", curr->bool_v);
       break;
 
     default:
@@ -325,8 +330,48 @@ void _ast_print(node *curr, int i) {
   fprintf(dumpFile, "\n");
 }
 
+void _ast_print_post(node *curr, int i) {
+  for(int j = 1; j < i; j++) fprintf(dumpFile, "\t");
+  fprintf(dumpFile, " )\n");
+}
+
 //do post order traversal 
 void ast_print(node *ast) {
-  ast_visit(0, ast, &_ast_print, NULL);
+  ast_visit(0, ast, &_ast_print, &_ast_print_post);
   fprintf(dumpFile, "\n");
+}
+
+char* get_op(int op) {
+  switch(op) {
+    case SUB:
+      return "-";
+    case EXCLAM: 
+      return "!";
+    case ADD:
+      return "+";
+    case MUL:
+      return "*";
+    case DIV:
+      return "/";
+    case AND:
+      return "&&";
+    case OR:
+      return "||";
+    case EQ:
+      return "==";
+    case NEQ:
+      return "!=";
+    case LESS:
+      return "<";
+    case GREATER:
+      return ">";
+    case LEQ:
+      return "<=";
+    case GEQ:
+      return ">=";
+    case EQUAL:
+      return "=";
+    default:
+      return "";
+  }
 }
