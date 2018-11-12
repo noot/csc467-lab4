@@ -7,7 +7,7 @@
 //checking functiontion and functiontion arguments
 /*
 1. Please define the nested scope and assignment nodes because I use them
-1. I call a function called find_var() which takes in a variable id and should return an element of type _entry -->please implement
+1. I call a function called find_entry() which takes in a variable id and should return an element of type _entry -->please implement
 2. I call your function called in_scope() which should return whether or not a variable has already been declared in that scope --> you already implemented
 3. I call your function new_entry() which adds the entry to the symbol table --> you already implemented
 4. I call enter_scope and exit_scope but I don't know how to call them properly --> I'm using a boolean called enterScope but don't know where I should call it from
@@ -67,30 +67,30 @@ void ast_semantic_check(node* current, int i) {
 				    case(BOOL_T): {num_argsL = 1; num_typeL = BOOL_T;break;}
 				    case(FLOAT_T): {num_argsL = 1; num_typeL = FLOAT_T;break;}
 				    case(INT_T): {num_argsL = 1; num_typeL = INT_T;break;}
-				    case(IVEC4_T): {num_argsL = 4; num_typeL = INT_T;break;}
-				    case(IVEC3_T): {num_argsL = 3; num_typeL = INT_T;break;}
-				    case(IVEC2_T): {num_argsL = 2; num_typeL = INT_T;break;}
-				    case(BVEC4_T): {num_argsL = 4; num_typeL = BOOL_T;break;}
-				    case(BVEC3_T): {num_argsL = 3; num_typeL = BOOL_T;break;}
-				    case(BVEC2_T): {num_argsL = 2; num_typeL = BOOL_T;break;}
-				    case(VEC4_T): {num_argsL = 4; num_typeL = FLOAT_T;break;}
-				    case(VEC3_T): {num_argsL = 3; num_typeL = FLOAT_T;break;}
-				    case(VEC2_T): {num_argsL = 2; num_typeL = FLOAT_T;break;}
+				    case(IVEC4): {num_argsL = 4; num_typeL = INT_T;break;}
+				    case(IVEC3): {num_argsL = 3; num_typeL = INT_T;break;}
+				    case(IVEC2): {num_argsL = 2; num_typeL = INT_T;break;}
+				    case(BVEC4): {num_argsL = 4; num_typeL = BOOL_T;break;}
+				    case(BVEC3): {num_argsL = 3; num_typeL = BOOL_T;break;}
+				    case(BVEC2): {num_argsL = 2; num_typeL = BOOL_T;break;}
+				    case(VEC4): {num_argsL = 4; num_typeL = FLOAT_T;break;}
+				    case(VEC3): {num_argsL = 3; num_typeL = FLOAT_T;break;}
+				    case(VEC2): {num_argsL = 2; num_typeL = FLOAT_T;break;}
 			 }
 
 			switch (right) {
 				    case(BOOL_T): {num_argsR = 1; num_typeR = BOOL_T;break;}
 				    case(FLOAT_T): {num_argsR = 1; num_typeR = FLOAT_T;break;}
 				    case(INT_T): {num_argsR = 1; num_typeR = INT_T;break;}
-				    case(IVEC4_T): {num_argsR = 4; num_typeR = INT_T;break;}
-				    case(IVEC3_T): {num_argsR = 3; num_typeR = INT_T;break;}
-				    case(IVEC2_T): {num_argsR = 2; num_typeR = INT_T; break;}
-				    case(BVEC4_T): {num_argsR = 4; num_typeR = BOOL_T;break;}
-				    case(BVEC3_T): {num_argsR = 3; num_typeR = BOOL_T;break;}
-				    case(BVEC2_T): {num_argsR = 2; num_typeR = BOOL_T;break;}
-				    case(VEC4_T): {num_argsR = 4; num_typeR = FLOAT_T;break;}
-				    case(VEC3_T): {num_argsR = 3; num_typeR = FLOAT_T;break;}
-				    case(VEC2_T): {num_argsR = 2; num_typeR = FLOAT_T;break;}
+				    case(IVEC4): {num_argsR = 4; num_typeR = INT_T;break;}
+				    case(IVEC3): {num_argsR = 3; num_typeR = INT_T;break;}
+				    case(IVEC2): {num_argsR = 2; num_typeR = INT_T; break;}
+				    case(BVEC4): {num_argsR = 4; num_typeR = BOOL_T;break;}
+				    case(BVEC3): {num_argsR = 3; num_typeR = BOOL_T;break;}
+				    case(BVEC2): {num_argsR = 2; num_typeR = BOOL_T;break;}
+				    case(VEC4): {num_argsR = 4; num_typeR = FLOAT_T;break;}
+				    case(VEC3): {num_argsR = 3; num_typeR = FLOAT_T;break;}
+				    case(VEC2): {num_argsR = 2; num_typeR = FLOAT_T;break;}
 			 }
 			//fprintf(errorFile,"Type codes of binary expression Val left:%d Val right:%d\n",left,right);
 			if (op == EQ||op == NEQ){
@@ -122,7 +122,7 @@ void ast_semantic_check(node* current, int i) {
 				}
 			}
 
-			else if (op == MULT ){
+			else if (op == MUL ){
 				if (right == left){
 					if (num_argsL > 1 && num_argsR > 1 ){
 						current->type.type_name = left;
@@ -140,7 +140,7 @@ void ast_semantic_check(node* current, int i) {
 				else if (num_typeL == num_typeR){ //base type is same
 					if (num_argsL > 1 && num_argsR >1){ //vector*vector
 						if (num_argsL != num_argsR){
-							fprintf(errorFile,"Error: vectors for multiplication must be of same length");	
+							fprintf(errorFile,"Error: vectors for MULiplication must be of same length");	
 							break;						
 						}
 						current->type.type_name = left;
@@ -170,7 +170,7 @@ void ast_semantic_check(node* current, int i) {
 				}
 
 				else{
-					fprintf(errorFile,"Error: these types are not compatible for multiplication\n");
+					fprintf(errorFile,"Error: these types are not compatible for MULiplication\n");
 					break;	
 				}
 			}
@@ -288,7 +288,7 @@ void ast_semantic_check(node* current, int i) {
 		case VAR_NODE: {
 			//check if it exists in symbol table first
 			_entry *findVar;
-			findVar = find_var(current->variable.id);
+			findVar = find_entry(current->variable.id);
 
 			if(findVar!= NULL){
 				fprintf(errorFile, "Error: this has been declared already\n");	
@@ -346,7 +346,7 @@ void ast_semantic_check(node* current, int i) {
 			curr = current->variable.id;
 			if (strcmp(curr, "gl_TexCoord") == 0 || strcmp(curr, "gl_Color") == 0 || strcmp(curr, "gl_Secondary") == 0 || 
 			strcmp(curr, "gl_FogFragCoord") == 0){
-				current->type.type_name = VEC4_T;
+				current->type.type_name = VEC4;
 				current->type.vec = 4;
 				current->type.is_const = 0;
 				fprintf(errorFile, "Error you cannot use predefined variables as variable names");
@@ -356,7 +356,7 @@ void ast_semantic_check(node* current, int i) {
 			else if (strcmp(curr, "gl_Light_Half") == 0 || strcmp(curr, "gl_Light_Ambient") == 0 ||
 			strcmp(curr, "gl_Material_Shininess") == 0 || strcmp(curr, "env1") == 0 || strcmp(curr, "env2") == 0 || 
 			strcmp(curr, "env3") == 0){
-				current->type.type_name = VEC4_T;
+				current->type.type_name = VEC4;
 				current->type.vec = 4;
 				current->type.is_const = 1;
 				fprintf(errorFile, "Error you cannot use predefined variables as variable names");
@@ -373,7 +373,7 @@ void ast_semantic_check(node* current, int i) {
 
 				}
 				else{
-					current->type.type_name = VEC4_T;
+					current->type.type_name = VEC4;
 					current->type.vec = 4;
 				}
 
@@ -400,7 +400,7 @@ void ast_semantic_check(node* current, int i) {
 	
 
 			//current->type.type_name will be the return type of the functiontion
-			if (current->function.name == 2) { //rsq
+			if (current->function.function_name == 2) { //rsq
 				fprintf(errorFile,"Type of args:%d \n",next_arg->type.type_name);
 				if (!(next_arg->type.type_name == FLOAT_T ||next_arg->type.type_name == INT_T )) {
 					fprintf(errorFile,"Error: Expecting float or integer for first argument\n");
@@ -417,23 +417,23 @@ void ast_semantic_check(node* current, int i) {
 
 			}
 
-			else if (current->function.name == 0) { //dp3
+			else if (current->function.function_name == 0) { //dp3
 				//case:vec4
 				if (next_arg == NULL){
 					fprintf(errorFile, "Input argument cannot be void\n");	
 					break;
 				}
-				if (!(next_arg->type.type_name == VEC4_T && next_arg->type.vec == 4)){
+				if (!(next_arg->type.type_name == VEC4 && next_arg->type.vec == 4)){
 					fprintf(errorFile, "First argument is of incorrect type\n");	
 					break;
 				}
-				else if (next_arg->type.type_name == VEC4_T && next_arg->type.vec == 4){
+				else if (next_arg->type.type_name == VEC4 && next_arg->type.vec == 4){
 					next_arg = next_arg->arguments.args;
 					if (next_arg == NULL){
 						fprintf(errorFile, "Input argument cannot be void\n");	
 						break;
 					}
-					if (!(next_arg->type.type_name == VEC4_T && next_arg->type.vec == 4)) {
+					if (!(next_arg->type.type_name == VEC4 && next_arg->type.vec == 4)) {
 						fprintf(errorFile, "Second argument is of incorrect type\n");	
 						break;
 					}
@@ -446,7 +446,7 @@ void ast_semantic_check(node* current, int i) {
 					break;
 				}
 
-				if (!(next_arg->type.type_name == VEC3_T && next_arg->type.vec == 3)){
+				if (!(next_arg->type.type_name == VEC3 && next_arg->type.vec == 3)){
 					fprintf(errorFile, "First argument is of incorrect type\n");		
 					break;
 				}
@@ -456,7 +456,7 @@ void ast_semantic_check(node* current, int i) {
 						fprintf(errorFile, "Input argument cannot be void\n");	
 						break;
 					}
-					if (!(next_arg->type.type_name == VEC3_T && next_arg->type.vec == 3)) {
+					if (!(next_arg->type.type_name == VEC3 && next_arg->type.vec == 3)) {
 						fprintf(errorFile, "Second argument is of incorrect type\n");
 						break;
 					}
@@ -504,13 +504,13 @@ void ast_semantic_check(node* current, int i) {
 				break;
 			}
 
-			else if (current->function.name == 1) { //lit
-				if (!(next_arg->type.type_name == VEC4_T && next_arg->type.vec == 4)) {
+			else if (current->function.function_name == 1) { //lit
+				if (!(next_arg->type.type_name == VEC4 && next_arg->type.vec == 4)) {
 					fprintf(errorFile,"Error: LIT functiontiontion only takes in arguments of type vec4\n");
 					break;
 				}
 
-				current->type.type_name = VEC4_T;
+				current->type.type_name = VEC4;
 				current->type.type_name = 4;
 				break;
 			}
@@ -529,19 +529,19 @@ void ast_semantic_check(node* current, int i) {
 				break;
 			    }
 
-			    switch (current->constructor.type_node->type.type_name) {
+			    switch (current->constructor.type->type.type_name) {
 				    case(BOOL_T): {num_args = 1; num_type = BOOL_T;break;}
 				    case(FLOAT_T): {num_args = 1; num_type = FLOAT_T;break;}
 				    case(INT_T): {num_args = 1; num_type = INT_T;break;}
-				    case(IVEC4_T): {num_args = 4; num_type = INT_T;break;}
-				    case(IVEC3_T): {num_args = 3; num_type = INT_T;break;}
-				    case(IVEC2_T): {num_args = 2; num_type = INT_T; fprintf(errorFile, "ivec case reached,numer args = %d and num_type = %d \n",num_args,num_type);break;}
-				    case(BVEC4_T): {num_args = 4; num_type = BOOL_T;break;}
-				    case(BVEC3_T): {num_args = 3; num_type = BOOL_T;break;}
-				    case(BVEC2_T): {num_args = 2; num_type = BOOL_T;break;}
-				    case(VEC4_T): {num_args = 4; num_type = FLOAT_T;break;}
-				    case(VEC3_T): {num_args = 3; num_type = FLOAT_T;break;}
-				    case(VEC2_T): {num_args = 2; num_type = FLOAT_T;break;}
+				    case(IVEC4): {num_args = 4; num_type = INT_T;break;}
+				    case(IVEC3): {num_args = 3; num_type = INT_T;break;}
+				    case(IVEC2): {num_args = 2; num_type = INT_T; fprintf(errorFile, "ivec case reached,numer args = %d and num_type = %d \n",num_args,num_type);break;}
+				    case(BVEC4): {num_args = 4; num_type = BOOL_T;break;}
+				    case(BVEC3): {num_args = 3; num_type = BOOL_T;break;}
+				    case(BVEC2): {num_args = 2; num_type = BOOL_T;break;}
+				    case(VEC4): {num_args = 4; num_type = FLOAT_T;break;}
+				    case(VEC3): {num_args = 3; num_type = FLOAT_T;break;}
+				    case(VEC2): {num_args = 2; num_type = FLOAT_T;break;}
 			    }
 				
 			    do{
@@ -568,7 +568,7 @@ void ast_semantic_check(node* current, int i) {
 			    }while (i < num_args && next_arg);
 
 			    current->type.vec = num_args;
-			    current->type.type_name = current->constructor.type_node->type.type_name; //num_type;
+			    current->type.type_name = current->constructor.type->type.type_name; //num_type;
 			    //current->variable.is_vec = 1;		
 			break;} 
 
@@ -611,7 +611,7 @@ void ast_semantic_check(node* current, int i) {
 			}
 			if (findVar->is_init){
 				fprintf(errorFile,"Variable:%d, Expression:%d \n",current->assignment.variable->type.type_name, current->assignment.exp->type.type_name);
-				//if (current->assignment.variable->type.type_name != current->assignment.expr->type.type_name){
+				//if (current->assignment.variable->type.type_name != current->assignment.exp->type.type_name){
 				if (findVar->type_name != current->assignment.exp->type.type_name){
 					fprintf(errorFile, "Error: both sides of assignment must be of same type\n");  //Implicit type conversions
 					break;
@@ -632,38 +632,18 @@ void ast_semantic_check(node* current, int i) {
 				fprintf(errorFile, "Error you cannot assign to these predefined read only variables\n");
 				break;
 			}
-			fprintf(errorFile, "Fine up to here: %d\n",current->assignment.expr);  
 
 
-			//if (strcmp(current->assignment.expr->variable.id,"gl_FragColor") ==0 || strcmp(current->assignment.expr->variable.id,"gl_FragDepth") == 0|| strcmp(current->assignment.expr->variable.id, "gl_FragCoord")	==0)	{
+			//if (strcmp(current->assignment.exp->variable.id,"gl_FragColor") ==0 || strcmp(current->assignment.exp->variable.id,"gl_FragDepth") == 0|| strcmp(current->assignment.exp->variable.id, "gl_FragCoord")	==0)	{
 			//	fprintf(errorFile, "Error you cannot read these write only variables\n");
 			//}
 			break;
 		}
-
-		case NESTED_EXPRESSION_NODE: {
-			current->type.is_const = current->nested_expr.expr->type.is_const;
-		 	current->type.type_name = current->nested_expr.expr->type.type_name;
-			fprintf(errorFile,"Type code nested: %d\n",current->type.type_name);
-			current->type.vec = current->nested_expr.expr->type.vec;
-			
-		} 
 		case EXP: {
 			if (strcmp(current->assignment.exp->variable.id,"gl_FragColor") ==0 || strcmp(current->assignment.exp->variable.id,"gl_FragDepth") == 0|| strcmp(current->assignment.exp->variable.id, "gl_FragCoord")	==0)	{
 				fprintf(errorFile, "Error you cannot read these write only variables\n");
 			}
 
-			break;
-		}
-		// case NESTED_EXPRESSION_NODE: {
-		// 	fprintf(errorFile,"Reached nested_scope node\n");
-		// 	current->type.is_const = current->nested_scope->exp->type.is_const;
-		//  	current->type.type_name = current->nested_scope->exp->type.type_name;
-		// 	fprintf(errorFile,"Type code nested: %d\n",current->type.type_name);
-		// 	current->type.vec = current->nested_scope->exp->type.vec;
-		// 	break;
-		// } 
-		case EXP: {
 			current->type.is_const = current->exp.variable->type.is_const;
 		  	current->type.type_name = current->exp.variable->type.type_name;
 			fprintf(errorFile,"Type code exp_var: %d\n",current->type.type_name);
@@ -709,14 +689,8 @@ void ast_semantic_check(node* current, int i) {
 		default: {break;}
 	}
 	
+}	
 }
   
 
-void traverse_and_check(){
-	if (ast == NULL){
-		errorOccurred = 1;
-		fprintf(errorFile, "Does not exist");
-		return;
-	}
-	else ast_visit(0, ast, NULL, &ast_semantic_check);
-}
+			
