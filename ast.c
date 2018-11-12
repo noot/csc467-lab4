@@ -236,7 +236,7 @@ void ast_visit(int depth, node *curr, func pre, func post) {
 void _ast_free(node *ast, int i) {
   //if(ast->kind == DECLARATION_NODE) free(ast->declaration.id);
   //else if (ast->kind == VAR_NODE) free(ast->variable.id);
-  free(ast);
+  //if(ast) free(ast);
 }
 
 void ast_free(node *ast) {
@@ -245,31 +245,31 @@ void ast_free(node *ast) {
 
 void _ast_print(node *curr, int i) {
   for(int j = 1; j < i; j++) fprintf(dumpFile, "\t");
-  fprintf(dumpFile, "( ");
+  fprintf(dumpFile, "(");
 
   switch(curr->kind) {
     case SCOPE_NODE:
-      fprintf(dumpFile, "SCOPE");
+      fprintf(dumpFile, "SCOPE\n");
       break;
 
     case DECLARATIONS_NODE:
-      fprintf(dumpFile, "DECLARATIONS");
+      fprintf(dumpFile, "DECLARATIONS\n");
       break;
 
     case STATEMENTS_NODE:
-      fprintf(dumpFile, "STATEMENTS");
+      fprintf(dumpFile, "STATEMENTS\n");
       break;
 
     case DECLARATION_NODE:
-      fprintf(dumpFile, "DECLARATION %s", curr->declaration.id);
+      fprintf(dumpFile, "DECLARATION %s\n", strsep(&curr->declaration.id, "\n"));
       break;
 
     case STATEMENT_NODE:
-      fprintf(dumpFile, "STATEMENT");
+      fprintf(dumpFile, "STATEMENT\n");
       break;
 
     case ELSE_STATEMENT_NODE:
-      fprintf(dumpFile, "ELSE STATEMENT");
+      fprintf(dumpFile, "ELSE STATEMENT\n");
       break;
 
     case EXP_NODE:
@@ -289,7 +289,7 @@ void _ast_print(node *curr, int i) {
       break;
 
     case FUNCTION_NODE:
-      fprintf(dumpFile, "FUNCTION %d", curr->function.function_name);
+      fprintf(dumpFile, "FUNCTION %s", get_func(curr->function.function_name));
       break;
 
     case ARGUMENTS_OPT_NODE:
@@ -301,7 +301,7 @@ void _ast_print(node *curr, int i) {
       break;
 
     case NESTED_SCOPE_NODE:
-      fprintf(dumpFile, "");
+      fprintf(dumpFile, "NESTED_SCOPE_NODE");
       break;
 
     case VAR_NODE:
@@ -309,7 +309,7 @@ void _ast_print(node *curr, int i) {
       break;
 
     case TYPE_NODE:
-      fprintf(dumpFile, "TYPE %d", curr->type.type_name);
+      fprintf(dumpFile, "TYPE %s", get_type(curr->type.type_name));
       break;
 
     case INT_NODE:
@@ -327,15 +327,16 @@ void _ast_print(node *curr, int i) {
     default:
       break;
   }
-  fprintf(dumpFile, "\n");
+  //fprintf(dumpFile, "\n");
 }
 
 void _ast_print_post(node *curr, int i) {
-  for(int j = 1; j < i; j++) fprintf(dumpFile, "\t");
-  fprintf(dumpFile, " )\n");
+  if(curr->kind != TYPE_NODE && curr->kind != VAR_NODE && curr->kind != INT_NODE &&
+     curr->kind != FLOAT_NODE && curr->kind != BOOL_NODE) for(int j = 1; j < i; j++) fprintf(dumpFile, "\t");
+  fprintf(dumpFile, ")\n");
 }
 
-//do post order traversal 
+//do post order traversal
 void ast_print(node *ast) {
   ast_visit(0, ast, &_ast_print, &_ast_print_post);
   fprintf(dumpFile, "\n");
@@ -374,4 +375,30 @@ char* get_op(int op) {
     default:
       return "";
   }
+}
+
+char* get_type(int type) {
+  switch(type) {
+    case 0:
+      return "int";
+    case 1:
+      return "float";
+    case 2:
+      return "bool";
+    default:
+      return "unknown_type";
+    }
+}
+
+char* get_func(int func) {
+  switch(func) {
+    case 0:
+      return "dp3";
+    case 1:
+      return "lit";
+    case 2:
+      return "rsq";
+    default:
+      return "unknown_func";
+    }
 }
