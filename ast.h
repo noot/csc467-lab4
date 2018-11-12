@@ -168,7 +168,7 @@ void _ast_print_post(node *curr, int i);
 void ast_visit(int depth, node *curr, func pre, func post);
 int semantic_check(node * ast);
 char* get_op(int op);
-char* get_type(int type);
+char* get_type(int type, int vec);
 char* get_func(int func);
 
 #endif /* AST_H_ */

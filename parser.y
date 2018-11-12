@@ -17,8 +17,8 @@
 #include <string.h>
 #include "common.h"
 #include "ast.h"
-#include "symbol.h"
-//#include "semantic.h"
+//#include "symbol.h"
+#include "semantic.h"
 #define YYERROR_VERBOSE
 #define yTRACE(x)    { if (traceParser) fprintf(traceFile, "%s\n", x); }
 
@@ -223,7 +223,7 @@ statement
   //                                                           $$ = ast_allocate(STATEMENT_NODE, $3, $5);}
   |   COLON                                               { yTRACE("statement -> ;"); }
   |   scope                                               { yTRACE("statement -> scope");
-                                                            $$ = ast_allocate(NESTED_SCOPE_NODE, 0, NULL, $1, NULL, NULL); }                      
+                                                            $$ = ast_allocate(NESTED_SCOPE_NODE, $1); }                      
   ;
 else_statement
   :   ELSE statement                      { yTRACE("else_statement -> else statement");

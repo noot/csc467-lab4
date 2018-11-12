@@ -309,7 +309,7 @@ void _ast_print(node *curr, int i) {
       break;
 
     case TYPE_NODE:
-      fprintf(dumpFile, "TYPE %s", get_type(curr->type.type_name));
+      fprintf(dumpFile, "TYPE %s", get_type(curr->type.type_name, curr->type.vec));
       break;
 
     case INT_NODE:
@@ -377,14 +377,17 @@ char* get_op(int op) {
   }
 }
 
-char* get_type(int type) {
+char* get_type(int type, int vec) {
   switch(type) {
     case 0:
-      return "int";
+      if (vec == 275) return "ivec";
+      else return "int";
     case 1:
-      return "float";
+      if (vec == 275) return "vec";
+      else return "float";
     case 2:
-      return "bool";
+      if (vec == 275) return "bvec";
+      else return "bool";
     default:
       return "unknown_type";
     }
