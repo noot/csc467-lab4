@@ -247,6 +247,8 @@ void _ast_print(node *curr, int i) {
   for(int j = 1; j < i; j++) fprintf(dumpFile, "\t");
   fprintf(dumpFile, "(");
 
+  if(!curr) return;
+
   switch(curr->kind) {
     case SCOPE_NODE:
       fprintf(dumpFile, "SCOPE\n");
@@ -305,7 +307,7 @@ void _ast_print(node *curr, int i) {
       break;
 
     case VAR_NODE:
-      fprintf(dumpFile, "VARIABLE %s", curr->variable.id);
+      fprintf(dumpFile, "VARIABLE %s", strsep(&curr->variable.id, "\n"));
       break;
 
     case TYPE_NODE:

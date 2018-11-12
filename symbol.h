@@ -3,7 +3,7 @@
 struct _entry;
 typedef struct _entry entry;
 
-typedef struct _entry {
+struct _entry {
 	int is_const;
 	int is_vec;
 	int type_name;

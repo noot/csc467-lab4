@@ -6,8 +6,9 @@
 
 #include "common.h"
 #include "ast.h"
-#include "symbol.h"
+//#include "symbol.h"
 #include "parser.tab.h"
+#include "semantic.h"
 #include <string.h>
 #include <stdlib.h>
 #include <cmath>

@@ -13,7 +13,6 @@
 4. I call enter_scope and exit_scope but I don't know how to call them properly --> I'm using a boolean called enterScope but don't know where I should call it from
 5. I try to pass your my function to traverse
 6. Please check the function traverse_and_check, I don't know if I implemented it right
->>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 
 */
 
@@ -562,8 +561,7 @@ void ast_semantic_check(node* current, int i) {
 
 					}
 					i++;
-					next_arg = next_arg->arguments.args
-;
+					next_arg = next_arg->arguments.args;
 
 			    }while (i < num_args && next_arg);
 
