@@ -164,7 +164,9 @@ struct node_ {
 node *ast_allocate(node_kind type, ...);
 void ast_free(node *ast);
 void ast_print(node * ast);
+void _ast_print_post(node *curr, int i);
 void ast_visit(int depth, node *curr, func pre, func post);
 int semantic_check(node * ast);
+char* get_op(int op);
 
 #endif /* AST_H_ */
