@@ -54,6 +54,11 @@ node *ast_allocate(node_kind kind, ...) {
       ast->statement.else_statement = va_arg(args, node *);
       break;
 
+    case ASSIGNMENT_NODE:
+      ast->assignment.variable = va_arg(args, node *);
+      ast->assignment.exp = va_arg(args, node *);
+      break;
+
     case ELSE_STATEMENT_NODE:
       ast->else_statement.statement = va_arg(args, node *);
       break;
@@ -125,6 +130,9 @@ node *ast_allocate(node_kind kind, ...) {
       ast->arguments.exp = va_arg(args, node *);
       break;
 
+    case NESTED_SCOPE_NODE:
+      ast->nested_scope = va_arg(args, node *);
+
     default: break;
   }
 
@@ -134,10 +142,11 @@ node *ast_allocate(node_kind kind, ...) {
 }
 
 void ast_visit(int depth, node *curr, func pre, func post) {
-  printf("visiting ast...");
+  //printf("visiting ast...");
   if (NULL == curr) return;
 
   depth++;
+  fprintf(dumpFile, "%d\n", depth);
   if(pre) pre(curr, depth);
 
   // in the traversal, we recursively check if each node contains another node,
@@ -174,6 +183,11 @@ void ast_visit(int depth, node *curr, func pre, func post) {
       if(curr->else_statement.statement) ast_visit(depth, curr->else_statement.statement, pre, post); 
       break;
 
+    case ASSIGNMENT_NODE:
+      if(curr->assignment.variable) ast_visit(depth, curr->assignment.variable, pre, post);
+      if(curr->assignment.exp) ast_visit(depth, curr->assignment.exp, pre, post);
+      break;
+
     case EXP_NODE:
       if(curr->exp.variable) ast_visit(depth, curr->exp.variable, pre, post); 
       break;
@@ -206,6 +220,8 @@ void ast_visit(int depth, node *curr, func pre, func post) {
       break;
 
     case NESTED_SCOPE_NODE:
+      ast_visit(depth, curr->nested_scope, pre, post);
+      break;
 
     default:
       break;
@@ -214,11 +230,15 @@ void ast_visit(int depth, node *curr, func pre, func post) {
   if(post) post(curr, depth);
   depth--;
 
-  printf("finished visiting ast");
+  //printf("finished visiting ast");
+}
+
+void _ast_free(node *ast, int i) {
+  free(ast);
 }
 
 void ast_free(node *ast) {
-
+  ast_visit(0, ast, NULL, &_ast_free);
 }
 
 void _ast_print(node *curr, int i) {
@@ -302,9 +322,11 @@ void _ast_print(node *curr, int i) {
     default:
       break;
   }
+  fprintf(dumpFile, "\n");
 }
 
 //do post order traversal 
 void ast_print(node *ast) {
   ast_visit(0, ast, &_ast_print, NULL);
+  fprintf(dumpFile, "\n");
 }

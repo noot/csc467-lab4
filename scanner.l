@@ -5,6 +5,8 @@
 
 
 #include "common.h"
+#include "ast.h"
+#include "symbol.h"
 #include "parser.tab.h"
 #include <string.h>
 #include <stdlib.h>
@@ -86,9 +88,9 @@ DELIM		[ \t\n\(\)\[\]\{\},;\+\-|*\/\^=!\<\?]|&&|"||"|==|!=|"<"=|">"=
 "env2"/{WS}  				{yTRACE(ENV2); return ENV2;}
 "env3"/{WS}  				{yTRACE(ENV3); return ENV3;}
 
-dp3/{DELIM}				{ yTRACE(DP3); return DP3; }
-rsq/{DELIM}				{ yTRACE(RSQ); return RSQ; }
-lit/{DELIM}				{ yTRACE(LIT); return LIT; }
+dp3/{DELIM}				{ yTRACE(FUNC); return FUNC; }
+rsq/{DELIM}				{ yTRACE(FUNC); return FUNC; }
+lit/{DELIM}				{ yTRACE(FUNC); return FUNC; }
 
 'if'				{ yTRACE(IF); return IF; }
 'else'				{ yTRACE(ELSE); return ELSE; }

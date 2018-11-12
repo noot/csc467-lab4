@@ -1,7 +1,9 @@
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "semantic.h"
-#include "ast.h"
 
+<<<<<<< HEAD
 void ast_check_semantics() {
 	if (ast == NULL) {
 		errorOccurred = 1;
@@ -21,9 +23,20 @@ void ast_scope_generator(node *cur, int x) { //Done pre-post.
 	}
 }
 //checking functiontion and functiontion arguments
+=======
+/*
+1. Please define the nested scope and assignment nodes because I use them
+1. I call a function called find_var() which takes in a variable id and should return an element of type _entry -->please implement
+2. I call your function called in_scope() which should return whether or not a variable has already been declared in that scope --> you already implemented
+3. I call your function new_entry() which adds the entry to the symbol table --> you already implemented
+4. I call enter_scope and exit_scope but I don't know how to call them properly --> I'm using a boolean called enterScope but don't know where I should call it from
+5. I try to pass your my function to traverse
+6. Please check the function traverse_and_check, I don't know if I implemented it right
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 
-void ast_sementic_check(node* current, int x) {
+*/
 
+void ast_semantic_check(node* current, int i) {
 	if (current == NULL) {
 		errorOccurred = 1;
 		fprintf(errorFile, "Error: Empty tree visited");
@@ -33,6 +46,7 @@ void ast_sementic_check(node* current, int x) {
 
 	switch (kind) {
 		case UNKNOWN: {break;}
+<<<<<<< HEAD
 		case SCOPE_NODE: {exit_scope();break;}
 		case DECLARATIONS_NODE: {break; } //break
 		case STATEMENTS_NODE: {break;} //break
@@ -41,6 +55,21 @@ void ast_sementic_check(node* current, int x) {
 			int op = current->unary_expr.op;
 
 
+=======
+		case SCOPE_NODE: {
+			//enter_scope();
+			//if (enterScope){ enter_scope();} //
+			//else exit_scope();
+			fprintf(errorFile,"Reached scope\n");
+			break;}
+
+		case DECLARATIONS_NODE: {fprintf(errorFile,"Reached declarations node\n");break; } //break
+		case STATEMENTS_NODE: {fprintf(errorFile,"Reached statements node\n");break;} //break
+		case UNARY_OP_NODE: {
+			fprintf(errorFile,"Reached unary");	
+			int right = current->unary_expr.right->type.type_name;
+			int op = current->unary_expr.op;
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 			if (op == EXCLAM ){
 				if (right!=BOOL_T){
 					fprintf(errorFile,"Error: unary expression ! expects a boolean type");
@@ -56,7 +85,8 @@ void ast_sementic_check(node* current, int x) {
 			current->type.type_name = right;
 			current->type.vec = current->unary_expr.right->type.vec;
 		break;} 
-		case BINARY_EXPRESSION_NODE: {
+
+		case BINARY_OP_NODE: {
 			int left = current->binary_expr.left->type.type_name;
 			int right = current->binary_expr.right->type.type_name;
 			int op = current->binary_expr.op;
@@ -199,12 +229,31 @@ void ast_sementic_check(node* current, int x) {
 						fprintf(errorFile,"Error: Vector must be of same length\n");	
 						break;					
 					}
+
+					current->type.type_name = BOOL_T;
+					current->type.vec = 1;
+					fprintf(errorFile,"Assigning type code of boolean: %d\n",current->type.type_name);
+					break;//this wasn't there before and was causing problems!!! remember to break!!!
+				}	
+				else{
+					fprintf(errorFile,"Error: Expecting same type on both sides\n");
+					//current->type.type_name = -1;
+					break;
+				}
+			}
+			else if (op == ADD||op == SUB||op == MUL||DIV||EXP){
+				if (left == right){
+					current->type.type_name = left;
+					current->type.vec = 1;
+					fprintf(errorFile,"Assigning type code of left side: %d\n",current->type.type_name);
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 				}
 				else{
 					fprintf(errorFile,"Error: Expecting same type on both sides\n");
 					break;
 				}
 			}
+<<<<<<< HEAD
 
 
 			else if (op == DIV || op == EXP){
@@ -219,11 +268,19 @@ void ast_sementic_check(node* current, int x) {
 			}
 			else if (op == GEQ || op == LEQ || op == GREATER || op == LESS){
 				if ((num_argsL != 1 && num_argsR != 1) || num_argsL != 1 || num_argsR !=1){
+=======
+			else if (op == GEQ || op == LEQ || op == LESS || op == GREATER){
+				if (current->binary_expr.left->type.vec != 1){
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 					fprintf(errorFile, "Error: you cannot use these operators with vectors");
 					break;
 				}
 				if (left == right){
+<<<<<<< HEAD
 					current->type.type_name = BOOL_T;
+=======
+					current->type.type_name = left;
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 					current->type.vec = 1;
 					break;
 				}
@@ -259,11 +316,19 @@ void ast_sementic_check(node* current, int x) {
 		}
 			
 		case INT_NODE:{
+<<<<<<< HEAD
+=======
+			fprintf(errorFile,"Reached int node\n");
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 			current->type.type_name = INT_T;
 			current->type.vec = 1;
 			current->type.is_const = 1;
 			break;}
 		case FLOAT_NODE:{
+<<<<<<< HEAD
+=======
+			fprintf(errorFile,"Reached float node\n");
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 			current->type.type_name = FLOAT_T;
 			current->type.vec = 1;
 			current->type.is_const = 1;
@@ -271,10 +336,17 @@ void ast_sementic_check(node* current, int x) {
 		case VAR_NODE: {
 			//check if it exists in symbol table first
 			_entry *findVar;
+<<<<<<< HEAD
 			findVar = find_var(current->variable.id);
 
 			if(findVar!= NULL){
 				fprintf(errorFile, "Error: this has been declared already\n");	
+=======
+			findVar = find_entry(current->variable.id); //find_var function calls from scope
+
+			if(findVar!= NULL){
+				fprintf(errorFile, "this has been declared already\n");	
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 				//if it has been initialized
 				if (findVar->is_init == 0){
 					fprintf(errorFile, "Error this variable hasn't been initialized"); //does it have to be initialized?
@@ -325,7 +397,11 @@ void ast_sementic_check(node* current, int x) {
 			curr = current->variable.id;
 			if (strcmp(curr, "gl_TexCoord") == 0 || strcmp(curr, "gl_Color") == 0 || strcmp(curr, "gl_Secondary") == 0 || 
 			strcmp(curr, "gl_FogFragCoord") == 0){
+<<<<<<< HEAD
 				current->type.type_name = VEC4_T;
+=======
+				current->type.type_name = VEC4;
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 				current->type.vec = 4;
 				current->type.is_const = 0;
 				fprintf(errorFile, "Error you cannot use predefined variables as variable names");
@@ -335,7 +411,11 @@ void ast_sementic_check(node* current, int x) {
 			else if (strcmp(curr, "gl_Light_Half") == 0 || strcmp(curr, "gl_Light_Ambient") == 0 ||
 			strcmp(curr, "gl_Material_Shininess") == 0 || strcmp(curr, "env1") == 0 || strcmp(curr, "env2") == 0 || 
 			strcmp(curr, "env3") == 0){
+<<<<<<< HEAD
 				current->type.type_name = VEC4_T;
+=======
+				current->type.type_name = VEC4;
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 				current->type.vec = 4;
 				current->type.is_const = 1;
 				fprintf(errorFile, "Error you cannot use predefined variables as variable names");
@@ -352,7 +432,11 @@ void ast_sementic_check(node* current, int x) {
 
 				}
 				else{
+<<<<<<< HEAD
 					current->type.type_name = VEC4_T;
+=======
+					current->type.type_name = VEC4;
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 					current->type.vec = 4;
 				}
 
@@ -366,7 +450,11 @@ void ast_sementic_check(node* current, int x) {
 				
 
 		case FUNCTION_NODE:{
+<<<<<<< HEAD
 			//pointer to the arguments of the functiontion
+=======
+			//pointer to the arguments of the function
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 			node* next_arg = current->function.args;
 
 			//if no arguments, return error
@@ -378,8 +466,13 @@ void ast_sementic_check(node* current, int x) {
 			//get next arguments
 			next_arg = next_arg->arguments.args;
 	
+<<<<<<< HEAD
 			//current->type.type_name will be the return type of the functiontion
 			if (current->function.name == 2) { //rsq
+=======
+			//current->type.type_name will be the return type of the function
+			if (current->function.function_name == 2) { //rsq
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 				fprintf(errorFile,"Type of args:%d \n",next_arg->type.type_name);
 				if (!(next_arg->type.type_name == FLOAT_T ||next_arg->type.type_name == INT_T )) {
 					fprintf(errorFile,"Error: Expecting float or integer for first argument\n");
@@ -397,24 +490,40 @@ void ast_sementic_check(node* current, int x) {
 			}
 
 	
+<<<<<<< HEAD
 			else if (current->function.name == 0) { //dp3
+=======
+			else if (current->function.function_name == 0) { //dp3
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 
 				//case:vec4
 				if (next_arg == NULL){
 					fprintf(errorFile, "Input argument cannot be void\n");	
 					break;
 				}
+<<<<<<< HEAD
 				if (!(next_arg->type.type_name == VEC4_T && next_arg->type.vec == 4)){
 					fprintf(errorFile, "First argument is of incorrect type\n");	
 					break;
 				}
 				else if (next_arg->type.type_name == VEC4_T && next_arg->type.vec == 4){
+=======
+				if (!(next_arg->type.type_name == VEC4 && next_arg->type.vec == 4)){
+					fprintf(errorFile, "First argument is of incorrect type\n");	
+					break;
+				}
+				else if (next_arg->type.type_name == VEC4 && next_arg->type.vec == 4){
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 					next_arg = next_arg->arguments.args;
 					if (next_arg == NULL){
 						fprintf(errorFile, "Input argument cannot be void\n");	
 						break;
 					}
+<<<<<<< HEAD
 					if (!(next_arg->type.type_name == VEC4_T && next_arg->type.vec == 4)) {
+=======
+					if (!(next_arg->type.type_name == VEC4 && next_arg->type.vec == 4)) {
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 						fprintf(errorFile, "Second argument is of incorrect type\n");	
 						break;
 					}
@@ -426,51 +535,87 @@ void ast_sementic_check(node* current, int x) {
 					fprintf(errorFile, "Input argument cannot be void\n");		
 					break;
 				}
+<<<<<<< HEAD
 				if (!(next_arg->type.type_name == VEC3_T && next_arg->type.vec == 3)){
 					fprintf(errorFile, "First argument is of incorrect type\n");		
 					break;
 				}
 				else if (next_arg->type.type_name == VEC3_T && next_arg->type.vec == 3){
+=======
+				if (!(next_arg->type.type_name == VEC3 && next_arg->type.vec == 3)){
+					fprintf(errorFile, "First argument is of incorrect type\n");		
+					break;
+				}
+				else if (next_arg->type.type_name == VEC3 && next_arg->type.vec == 3){
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 					next_arg = next_arg->arguments.args;
 					if (next_arg == NULL){
 						fprintf(errorFile, "Input argument cannot be void\n");	
 						break;
 					}
+<<<<<<< HEAD
 					if (!(next_arg->type.type_name == VEC3_T && next_arg->type.vec == 3)) {
+=======
+					if (!(next_arg->type.type_name == VEC3 && next_arg->type.vec == 3)) {
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 						fprintf(errorFile, "Second argument is of incorrect type\n");
 						break;
 					}
 	
 				}
 				//other vector type case:ivec4
+<<<<<<< HEAD
 				if (!(next_arg->type.type_name == IVEC4_T && next_arg->type.vec == 4)){
 					fprintf(errorFile, "First argument is of incorrect type\n");	
 					break;
 				}
 				else if (next_arg->type.type_name == IVEC4_T && next_arg->type.vec == 4){
+=======
+				if (!(next_arg->type.type_name == IVEC4 && next_arg->type.vec == 4)){
+					fprintf(errorFile, "First argument is of incorrect type\n");	
+					break;
+				}
+				else if (next_arg->type.type_name == IVEC4 && next_arg->type.vec == 4){
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 					next_arg = next_arg->arguments.args;
 					if (next_arg == NULL){
 						fprintf(errorFile, "Input argument cannot be void\n");
 						break;
 					}
+<<<<<<< HEAD
 					if (!(next_arg->type.type_name == IVEC4_T && next_arg->type.vec == 4)) {
+=======
+					if (!(next_arg->type.type_name == IVEC4 && next_arg->type.vec == 4)) {
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 						fprintf(errorFile, "Second argument is of incorrect type\n");
 						break;
 					}
 	
 				}
 				//last vector type case: ivec3
+<<<<<<< HEAD
 				if (!(next_arg->type.type_name == IVEC3_T && next_arg->type.vec == 3)){
 					fprintf(errorFile, "First argument is of incorrect type\n");
 					break;
 				}
 				else if (next_arg->type.type_name == IVEC3_T && next_arg->type.vec == 3){
+=======
+				if (!(next_arg->type.type_name == IVEC3 && next_arg->type.vec == 3)){
+					fprintf(errorFile, "First argument is of incorrect type\n");
+					break;
+				}
+				else if (next_arg->type.type_name == IVEC3 && next_arg->type.vec == 3){
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 					next_arg = next_arg->arguments.args;
 					if (next_arg == NULL){
 						fprintf(errorFile, "Input argument cannot be void\n");
 						break;
 					}
+<<<<<<< HEAD
 					if (!(next_arg->type.type_name == IVEC3_T && next_arg->type.vec == 3)) {
+=======
+					if (!(next_arg->type.type_name == IVEC3 && next_arg->type.vec == 3)) {
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 						fprintf(errorFile, "Second argument is of incorrect type\n");
 						break;
 					}
@@ -481,9 +626,15 @@ void ast_sementic_check(node* current, int x) {
 				break;
 			}
 
+<<<<<<< HEAD
 			else if (current->function.name == 1) { //lit
 				if (!(next_arg->type.type_name == VEC4_T && next_arg->type.vec == 4)) {
 					fprintf(errorFile,"Error: LIT functiontiontion only takes in arguments of type vec4\n");
+=======
+			else if (current->function.function_name == 1) { //lit
+				if (!(next_arg->type.type_name == VEC4 && next_arg->type.vec == 4)) {
+					fprintf(errorFile,"Error: LIT function only takes in arguments of type vec4\n");
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 					break;
 				}
 
@@ -502,6 +653,7 @@ void ast_sementic_check(node* current, int x) {
 
         	case CONSTRUCTOR_NODE:{
 			    fprintf(errorFile, "Entering constructor node\n");
+<<<<<<< HEAD
 		     	    int num_args, num_type;
 			    int i = 0;
 			    node* next_arg = current->constructor.args;
@@ -523,12 +675,33 @@ void ast_sementic_check(node* current, int x) {
 				    case(VEC4_T): {num_args = 4; num_type = FLOAT_T;break;}
 				    case(VEC3_T): {num_args = 3; num_type = FLOAT_T;break;}
 				    case(VEC2_T): {num_args = 2; num_type = FLOAT_T;break;}
+=======
+		     	int num_args, num_type;
+			    int i = 0;
+			    node* next_arg = current->constructor.args;
+			    if (next_arg == NULL) {
+					fprintf(errorFile, "Error constructor cannot be empty");
+				break;
+			    }
+
+			    switch (current->constructor.type->type.type_name) {
+				    case IVEC4: {num_args = 4; num_type = INT_T;break;}
+				    case IVEC3: {num_args = 3; num_type = INT_T;break;}
+				    case IVEC2: {num_args = 2; num_type = INT_T; fprintf(errorFile, "ivec case reached,numer args = %d and num_type = %d \n",num_args,num_type);break;}
+				    case BVEC4: {num_args = 4; num_type = BOOL_T;break;}
+				    case BVEC3: {num_args = 3; num_type = BOOL_T;break;}
+				    case BVEC2: {num_args = 2; num_type = BOOL_T;break;}
+				    case VEC4: {num_args = 4; num_type = FLOAT_T;break;}
+				    case VEC3: {num_args = 3; num_type = FLOAT_T;break;}
+				    case VEC2: {num_args = 2; num_type = FLOAT_T;break;}
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 			    }
 
 
 				//259 is integer
 				
 			    do{
+<<<<<<< HEAD
 					if (next_arg == NULL || next_arg->arguments.args == NULL) {
 						fprintf(errorFile, "Error: construconstructor arguments cannot be null\n");
 						break;
@@ -539,6 +712,17 @@ void ast_sementic_check(node* current, int x) {
 
 					if (next_arg->arguments.args->type.type_name!= num_type) { //type of construconstructor itself
 						fprintf(errorFile, "Error: incorrect construconstructor argument type\n");
+=======
+					if (next_arg == NULL) {
+						fprintf(errorFile, "Error: constructor arguments cannot be null\n");
+
+					}
+					fprintf(errorFile, "ivec case reached,numer args = %d and num_type = %d \n",num_args,num_type);
+					fprintf(errorFile, "CTOR arguments type:%d, CTOR type:%d \n",current->constructor.args->type.type_name, num_type);
+
+					if (current->constructor.args->type.type_name != num_type) { //type of constructor itself
+						fprintf(errorFile, "Error: incorrect constructor argument type\n");
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 
 					}
 					else{
@@ -546,6 +730,7 @@ void ast_sementic_check(node* current, int x) {
 
 					}
 					i++;
+<<<<<<< HEAD
 					next_arg = next_arg->arguments.args
 ;
 
@@ -553,11 +738,24 @@ void ast_sementic_check(node* current, int x) {
 
 			    current->type.vec = num_args;
 			    current->type.type_name = current->constructor.type_node->type.type_name; //num_type;
+=======
+					next_arg = next_arg->arguments.args;
+
+			    }while (i < num_args && next_arg!=NULL);
+
+			    current->type.vec = num_args;
+			    current->type.type_name = num_type;
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 			    //current->variable.is_vec = 1;		
 			break;} 
 
 
+<<<<<<< HEAD
 		case ARGUMENTS_NODE:{	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+=======
+		case ARGUMENTS_NODE:{	
+			fprintf(errorFile,"Reached arguments node\n");		
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 			if (current->arguments.exp){
 				//arguments must be of expected type  
 				current->type.is_const = current->arguments.exp->type.is_const;	
@@ -576,13 +774,26 @@ void ast_sementic_check(node* current, int x) {
 			}
 		}
 		case BOOL_NODE:{
+<<<<<<< HEAD
+=======
+			fprintf(errorFile,"Reached bool node\n");
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 			current->type.type_name = BOOL_T;
 			current->type.vec = 1;
 			current->type.is_const = 1;
 			break;}
+<<<<<<< HEAD
 		case IF_STATEMENT_NODE:{
 			fprintf(errorFile,"Type code of conditional expression: %d\n",current->if_stmt.condition_expr->type.type_name);
 			if (!(current->statement.statement->type.type_name == BOOL_T && current->statement.statement->type.vec == 1)){ //can't be bvec //double check this one
+=======
+		case STATEMENT_NODE:{
+
+			//current->statement.is_if = 1;
+			fprintf(errorFile,"Reached if condition\n");		
+			fprintf(errorFile,"Type code of conditional expression: %d\n",current->statement.exp->type.type_name);
+			if (!(current->statement.exp->type.type_name == BOOL_T && current->statement.exp->type.vec == 1)){ //can't be bvec
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 				fprintf(errorFile, "Error: conditional expression must be of type boolean\n");	
 				break;		
 			}
@@ -592,6 +803,7 @@ void ast_sementic_check(node* current, int x) {
 			_entry *findVar;
 			findVar = find_var(current->assignment.variable->variable.id);
 
+<<<<<<< HEAD
 
 			if (findVar == NULL){
 				fprintf(errorFile, "Error: this variable has not been declared\n");  //Implicit type conversions
@@ -602,6 +814,19 @@ void ast_sementic_check(node* current, int x) {
 				fprintf(errorFile,"findVar: %d \n",findVar->type_name);
 				//if (current->assignment.variable->type.type_name != current->assignment.expr->type.type_name){
 				if (findVar->type_name != current->assignment.expr->type.type_name){
+=======
+			_entry *findVar;
+			findVar = find_entry(current->assignment.variable->variable.id); //call to find var
+
+
+			if (findVar == NULL){
+				fprintf(errorFile, "Error: this variable has not been declared\n");  //Implicit type conversions
+			}
+			if (findVar->is_init){
+				fprintf(errorFile,"Variable:%d, Expression:%d \n",current->assignment.variable->type.type_name, current->assignment.exp->type.type_name);
+				//if (current->assignment.variable->type.type_name != current->assignment.expr->type.type_name){
+				if (findVar->type_name != current->assignment.exp->type.type_name){
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 					fprintf(errorFile, "Error: both sides of assignment must be of same type\n");  //Implicit type conversions
 					break;
 				}
@@ -614,6 +839,15 @@ void ast_sementic_check(node* current, int x) {
 				}
 			}
 
+<<<<<<< HEAD
+=======
+			if (findVar->is_const){
+				if(current->assignment.exp){
+					fprintf(errorFile, "Error: cannot assign to a const variable\n");
+				}
+			}
+
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 			if (strcmp(current->assignment.variable->variable.id, "gl_TexCoord") == 0 || strcmp(current->assignment.variable->variable.id, "gl_Color") == 0 || strcmp(current->assignment.variable->variable.id, "gl_Secondary") == 0 || 
 				strcmp(current->assignment.variable->variable.id, "gl_FogFragCoord") == 0 || strcmp(current->assignment.variable->variable.id, "gl_Light_Half") == 0 || strcmp(current->assignment.variable->variable.id, "gl_Light_Ambient") == 0 ||
 				strcmp(current->assignment.variable->variable.id, "gl_Material_Shininess") == 0 || strcmp(current->assignment.variable->variable.id, "env1") == 0 || strcmp(current->assignment.variable->variable.id, "env2") == 0 || 
@@ -623,6 +857,7 @@ void ast_sementic_check(node* current, int x) {
 			}
 			fprintf(errorFile, "Fine up to here: %d\n",current->assignment.expr);  
 
+<<<<<<< HEAD
 			//if (strcmp(current->assignment.expr->variable.id,"gl_FragColor") ==0 || strcmp(current->assignment.expr->variable.id,"gl_FragDepth") == 0|| strcmp(current->assignment.expr->variable.id, "gl_FragCoord")	==0)	{
 			//	fprintf(errorFile, "Error you cannot read these write only variables\n");
 			//}
@@ -637,6 +872,32 @@ void ast_sementic_check(node* current, int x) {
 			
 		} 
 		case EXP: {
+=======
+			if (strcmp(current->assignment.exp->variable.id,"gl_FragColor") ==0 || strcmp(current->assignment.exp->variable.id,"gl_FragDepth") == 0|| strcmp(current->assignment.exp->variable.id, "gl_FragCoord")	==0)	{
+				fprintf(errorFile, "Error you cannot read these write only variables\n");
+			}
+
+			break;
+		}
+		case NESTED_SCOPE_NODE: {
+			fprintf(errorFile, "Reached nested_scope node\n");
+			current->type.is_const = current->nested_scope->type.is_const;
+		 	current->type.type_name = current->nested_scope->type.type_name;
+			fprintf(errorFile,"Type code nested: %d\n",current->type.type_name);
+			current->type.vec = current->nested_scope->type.vec;
+			break;
+		} 
+		// case NESTED_EXPRESSION_NODE: {
+		// 	fprintf(errorFile,"Reached nested_scope node\n");
+		// 	current->type.is_const = current->nested_scope->exp->type.is_const;
+		//  	current->type.type_name = current->nested_scope->exp->type.type_name;
+		// 	fprintf(errorFile,"Type code nested: %d\n",current->type.type_name);
+		// 	current->type.vec = current->nested_scope->exp->type.vec;
+		// 	break;
+		// } 
+		case EXP: {
+			fprintf(errorFile,"Reached exp_var node\n");
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 			current->type.is_const = current->exp.variable->type.is_const;
 		  	current->type.type_name = current->exp.variable->type.type_name;
 			fprintf(errorFile,"Type code exp_var: %d\n",current->type.type_name);
@@ -652,18 +913,32 @@ void ast_sementic_check(node* current, int x) {
 				break;
 			}
 
+<<<<<<< HEAD
 			if (in_scope(current->declaration.id)) {
+=======
+			if (in_scope(current->declaration.id)) { //call functiont that tells me whether it is already in that scope
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 				fprintf(errorFile, "Error, declaration already exists in this scope\n");
 				break;
 			}
 
+<<<<<<< HEAD
 			if (current->declaration.expr) {
 				fprintf(errorFile,"Variable:%d, Expression:%d \n",current->declaration.type_node->type.type_name, current->declaration.exp->type.type_name);
 				if (current->declaration.exp->type.type_name != current->declaration.type_node->type.type_name) {
+=======
+			entry *new_element = (entry *)malloc(sizeof(entry));
+
+			if (current->declaration.exp) {
+				//it's initialized
+				new_element->is_init = 1;
+				if (current->declaration.exp->exp.variable->type.type_name != current->declaration.type->type.type_name) {
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 					fprintf(errorFile, "Error: both sides of expression must be of same type\n");
 					break;
 				}
 			}
+<<<<<<< HEAD
 
 			_entry new_element;
 
@@ -676,6 +951,15 @@ void ast_sementic_check(node* current, int x) {
 			new_element.is_init = 1;
 
 			new_entry(new_element);
+=======
+
+			new_element->id = current->declaration.id;
+			new_element->is_const = current->declaration.is_const;
+			new_element->type_name = current->declaration.type->type.type_name;
+			new_element->is_vec = current->declaration.type->type.vec;
+
+			// new_entry(new_element); //add it to the symbol table
+>>>>>>> 0ff1f584061c14a53be5b8ba15ca9ede1468a1bd
 		 	break;}
 		default: {break;}
 	}
@@ -683,3 +967,11 @@ void ast_sementic_check(node* current, int x) {
 }
   
 
+void traverse_and_check(){
+	if (ast == NULL){
+		errorOccurred = 1;
+		fprintf(errorFile, "Does not exist");
+		return;
+	}
+	else ast_visit(0, ast, NULL, &ast_semantic_check);
+}
