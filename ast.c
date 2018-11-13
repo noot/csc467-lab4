@@ -6,6 +6,7 @@
 #include "ast.h"
 #include "common.h"
 #include "parser.tab.h"
+#include "semantic.h"
 
 #define DEBUG_PRINT_TREE 0
 
@@ -44,8 +45,6 @@ node *ast_allocate(node_kind kind, ...) {
       ast->declaration.exp = va_arg(args, node *);
       break;
 
-    // might need to break up statement grammar into assignment,
-    // if statement, nested scope
     case STATEMENT_NODE:
       ast->statement.is_if = va_arg(args, int);
       ast->statement.variable = va_arg(args, node *);
@@ -236,7 +235,7 @@ void ast_visit(int depth, node *curr, func pre, func post) {
 void _ast_free(node *ast, int i) {
   //if(ast->kind == DECLARATION_NODE) free(ast->declaration.id);
   //else if (ast->kind == VAR_NODE) free(ast->variable.id);
-  //if(ast) free(ast);
+  //free(ast);
 }
 
 void ast_free(node *ast) {
@@ -344,6 +343,11 @@ void ast_print(node *ast) {
   fprintf(dumpFile, "\n");
 }
 
+//do post order traversal
+void semantic_check() {
+  ast_visit(0, ast, &ast_semantic_check, NULL);
+}
+
 char* get_op(int op) {
   switch(op) {
     case SUB:
@@ -396,6 +400,7 @@ char* get_type(int type, int vec) {
 }
 
 char* get_func(int func) {
+  fprintf(dumpFile, "%d", func);
   switch(func) {
     case 0:
       return "dp3";

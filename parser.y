@@ -212,16 +212,16 @@ declaration
                                                 $$ = ast_allocate(DECLARATION_NODE, 0, $2, $1, $4); }
   |   CONST type IDENTIFIER EQUAL exp COLON  { yTRACE("declaration -> const type identifier = exp ;");
                                                 $$ = ast_allocate(DECLARATION_NODE, 1, $3, $2, $5); }
-  |   /* empty */                         { yTRACE("declaration -> empty"); }
+  |   /* empty */                         { yTRACE("declaration -> empty"); $$ = NULL; }
   ;
 statement
   :   variable EQUAL exp COLON                            { yTRACE("statement -> variable = exp ;");
-                                                            $$ = ast_allocate(ASSIGNMENT_NODE, 0, $1, $3, NULL, NULL); } 
+                                                            $$ = ast_allocate(ASSIGNMENT_NODE, $1, $3); } 
   |   IF LBRACKET exp RBRACKET statement else_statement   { yTRACE("statement -> if ( exp ) statement else_statement");
                                                             $$ = ast_allocate(STATEMENT_NODE, 1, NULL, $3, $5, $6); }
   // |   WHILE LBRACKET exp RBRACKET statement               { yTRACE("statement -> while ( exp ) statement"); 
   //                                                           $$ = ast_allocate(STATEMENT_NODE, $3, $5);}
-  |   COLON                                               { yTRACE("statement -> ;"); }
+  |   COLON                                               { yTRACE("statement -> ;"); $$ = NULL; }
   |   scope                                               { yTRACE("statement -> scope");
                                                             $$ = ast_allocate(NESTED_SCOPE_NODE, $1); }                      
   ;
@@ -258,8 +258,8 @@ type
   ;				  
 exp
   :  
-  | constructor			{ yTRACE("exp -> constructor"); }
-  | function				{ yTRACE("exp -> function");}
+  | constructor			{ yTRACE("exp -> constructor"); $$ = NULL; }
+  | function				{ yTRACE("exp -> function"); $$ = NULL; }
   | INT				  	  { yTRACE("exp -> integer_literal"); 
                       $$ = ast_allocate(INT_NODE, $1); }
   | FLOAT				    { yTRACE("exp -> float_literal"); 
@@ -306,7 +306,7 @@ variable
   : IDENTIFIER		  		      { yTRACE("variable -> identifier");
                                 $$ = ast_allocate(VAR_NODE, $1, 0, 0); }
   | IDENTIFIER LSQUARE INT RSQUARE	  	    { yTRACE("variable -> identifier[integer_literal]"); 
-                                              $$ = ast_allocate(VAR_NODE, $1, $3, 0); }
+                                              $$ = ast_allocate(VAR_NODE, $1, 0, $3); }
   ;
 // unary_op
 //   : EXCLAM		  		{ yTRACE("unary_op -> !"); 
