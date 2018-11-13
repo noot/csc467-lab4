@@ -22,6 +22,7 @@ void ast_semantic_check(node* current, int i) {
 
 		case DECLARATIONS_NODE: {break; } //break
 		case STATEMENTS_NODE: {break;} //break
+		//in the unary op node we check whether the appropriate type is pointed to by the node
 		case UNARY_OP_NODE: {
 			int right = current->unary_expr.right->type.type_name;
 			int op = current->unary_expr.op;
@@ -40,6 +41,9 @@ void ast_semantic_check(node* current, int i) {
 			current->type.type_name = right;
 			current->type.vec = current->unary_expr.right->type.vec;
 		break;} 
+		//in the binary node we check multiple cases according to Table 1 of Lab 3 handout
+		// 1) whether the right category types are present
+		// 2) whether the correct operand classes are present
 
 		case BINARY_OP_NODE: {
 			int left = current->binary_expr.left->type.type_name;
@@ -267,24 +271,29 @@ void ast_semantic_check(node* current, int i) {
 			current->type.vec = 1;
 			current->type.is_const = 1;
 			break; }
+		//for var node we check if the variable has been declared in the scope, whether it has been initialized
+		//and whether it is a predefined variable. we also check that sorrect vector indexing is done.
 		case VAR_NODE: {
 			//check if it exists in symbol table first
 			_entry *findVar;
 			findVar = find_entry(current->variable.id);
 
 			if(findVar!= NULL){
-				fprintf(errorFile, "Error: this has been declared already\n");	
+				//declared already
 				findVar = find_entry(current->variable.id); //find_entry function calls from scope
 
 			if(findVar!= NULL){
-				fprintf(errorFile, "Error: This has been declared already\n");	
 				//if it has been initialized
 				if (findVar->is_init == 0){
-					fprintf(errorFile, "Error: this variable hasn't been initialized"); //does it have to be initialized?
+					fprintf(errorFile, "Error: this variable hasn't been initialized");
 					break;
 					
 				}
 
+			}
+
+			else if (findVar == NULL){
+				fprintf(errorFile, "Error: this variable hasn't been declared"); 
 			}
 			
 			else{
@@ -367,7 +376,8 @@ void ast_semantic_check(node* current, int i) {
 			break;
 		}
 				
-
+		//for all three functions we make sure that the correct function names are being called and 
+		//that their return types and argument types are correct according to Lab 3 handout
 		case FUNCTION_NODE:{
 			node* next_arg = current->function.args;
 
@@ -500,6 +510,7 @@ void ast_semantic_check(node* current, int i) {
 					break;
 			}
 		}
+		//we make sure that the type and arguments type of the contructor is correct
         	case CONSTRUCTOR_NODE:{
 		     	    int num_args, num_type;
 			    int i = 0;
@@ -577,6 +588,7 @@ void ast_semantic_check(node* current, int i) {
 				break;		
 			}
 		}
+		//we make sure that both sides of the assignment have the same type and that predefined variables are dealt with properly
 		case ASSIGNMENT_NODE:{ 
 			_entry *findVar;
 			findVar = find_entry(current->assignment.variable->variable.id); //call to find var
@@ -620,6 +632,9 @@ void ast_semantic_check(node* current, int i) {
 		  	current->type.type_name = current->exp.variable->type.type_name;
 			current->type.vec = current->exp.variable->type.vec; 
 			break; }
+
+		//we make sure that declarations do not exist more than once in same scope and that predefined variables are handled
+		//according to Lab 3 handout
 		case DECLARATION_NODE:{		
 
 			if (strcmp(current->declaration.id, "gl_TexCoord") == 0 || strcmp(current->declaration.id, "gl_Color") == 0 || strcmp(current->declaration.id, "gl_Secondary") == 0 || 
