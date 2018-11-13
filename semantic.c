@@ -3,19 +3,6 @@
 #include <stdlib.h>
 #include "semantic.h"
 
-
-//checking functiontion and functiontion arguments
-/*
-1. Please define the nested scope and assignment nodes because I use them
-1. I call a function called find_entry() which takes in a variable id and should return an element of type _entry -->please implement
-2. I call your function called in_scope() which should return whether or not a variable has already been declared in that scope --> you already implemented
-3. I call your function new_entry() which adds the entry to the symbol table --> you already implemented
-4. I call enter_scope and exit_scope but I don't know how to call them properly --> I'm using a boolean called enterScope but don't know where I should call it from
-5. I try to pass your my function to traverse
-6. Please check the function traverse_and_check, I don't know if I implemented it right
-
-*/
-
 void ast_semantic_check(node* current, int i) {
 	if (current == NULL) {
 		errorOccurred = 1;
@@ -33,21 +20,20 @@ void ast_semantic_check(node* current, int i) {
 			fprintf(errorFile,"Reached scope\n");
 			break;}
 
-		case DECLARATIONS_NODE: {fprintf(errorFile,"Reached declarations node\n");break; } //break
-		case STATEMENTS_NODE: {fprintf(errorFile,"Reached statements node\n");break;} //break
+		case DECLARATIONS_NODE: {break; } //break
+		case STATEMENTS_NODE: {break;} //break
 		case UNARY_OP_NODE: {
-			fprintf(errorFile,"Reached unary");	
 			int right = current->unary_expr.right->type.type_name;
 			int op = current->unary_expr.op;
 			if (op == EXCLAM ){
 				if (right!=BOOL_T){
-					fprintf(errorFile,"Error: unary expression ! expects a boolean type");
+					fprintf(errorFile,"Error: unary expression '!' expects a boolean type");
 				}
 				
 			}
 			else{
 				if (right == BOOL_T){
-					fprintf(errorFile,"Error: unary expression - expects an arithmetic type");				
+					fprintf(errorFile,"Error: unary expression '-' expects an arithmetic type");				
 				}
 			}
 
@@ -61,6 +47,8 @@ void ast_semantic_check(node* current, int i) {
 			int op = current->binary_expr.op;
 
 			int num_argsL, num_argsR, num_typeL,num_typeR;
+
+			//convert vectors to their base type
 
 			switch (left) {
 				    case(BOOL_T): {num_argsL = 1; num_typeL = BOOL_T;break;}
@@ -91,14 +79,12 @@ void ast_semantic_check(node* current, int i) {
 				    case(VEC3): {num_argsR = 3; num_typeR = FLOAT_T;break;}
 				    case(VEC2): {num_argsR = 2; num_typeR = FLOAT_T;break;}
 			 }
-			//fprintf(errorFile,"Type codes of binary expression Val left:%d Val right:%d\n",left,right);
 			if (op == EQ||op == NEQ){
 				if (left == right){
 					current->type.type_name = BOOL_T; //assign it bool and not bvec for if conditions
-
 					if (num_argsL > 1 && num_argsR > 1){
 						if (num_argsL != num_argsR){
-							fprintf(errorFile,"Expecting same size vectors on both sides\n");
+							fprintf(errorFile,"Error: Expecting same size vectors on both sides of operator\n");
 							break;		
 							//FIX ME: ASSIGN THE VECTOR TYPE TO CURRENT											
 						}	
@@ -116,7 +102,7 @@ void ast_semantic_check(node* current, int i) {
 					
 				}	
 				else{
-					fprintf(errorFile,"Error: Expecting same type on both sides\n");
+					fprintf(errorFile,"Error: Expecting same type on both sides of operator\n");
 					break;
 				}
 			}
@@ -139,7 +125,7 @@ void ast_semantic_check(node* current, int i) {
 				else if (num_typeL == num_typeR){ //base type is same
 					if (num_argsL > 1 && num_argsR >1){ //vector*vector
 						if (num_argsL != num_argsR){
-							fprintf(errorFile,"Error: vectors for MULiplication must be of same length");	
+							fprintf(errorFile,"Error: Expecting same size vectors on both sides of multiplication operator");	
 							break;						
 						}
 						current->type.type_name = left;
@@ -169,7 +155,7 @@ void ast_semantic_check(node* current, int i) {
 				}
 
 				else{
-					fprintf(errorFile,"Error: these types are not compatible for MULiplication\n");
+					fprintf(errorFile,"Error: these types are not compatible for multiplication\n");
 					break;	
 				}
 			}
@@ -195,18 +181,16 @@ void ast_semantic_check(node* current, int i) {
 
 				else if (num_typeR == num_typeL){
 					if (num_argsL != num_argsR){
-						fprintf(errorFile,"Error: Vector must be of same length\n");	
+						fprintf(errorFile,"Error: Vectors must be of same length\n");	
 						break;					
 					}
 
 					current->type.type_name = BOOL_T;
 					current->type.vec = 1;
-					fprintf(errorFile,"Assigning type code of boolean: %d\n",current->type.type_name);
-					break;//this wasn't there before and was causing problems!!! remember to break!!!
+					break;
 				}	
 				else{
 					fprintf(errorFile,"Error: Expecting same type on both sides\n");
-					//current->type.type_name = -1;
 					break;
 				}
 			}
@@ -214,7 +198,6 @@ void ast_semantic_check(node* current, int i) {
 				if (left == right){
 					current->type.type_name = left;
 					current->type.vec = 1;
-					fprintf(errorFile,"Assigning type code of left side: %d\n",current->type.type_name);
 				}
 				else{
 					fprintf(errorFile,"Error: Expecting same type on both sides\n");
@@ -225,7 +208,7 @@ void ast_semantic_check(node* current, int i) {
 
 			else if (op == DIV || op == EXP){
 				if (right!=left){
-					fprintf(errorFile,"Error: Vector must be of same type\n");
+					fprintf(errorFile,"Error: Vectors must be of same type\n");
 					break;						
 				}
 				if (num_argsR != 1 && num_argsL!=1){
@@ -294,10 +277,10 @@ void ast_semantic_check(node* current, int i) {
 				findVar = find_entry(current->variable.id); //find_entry function calls from scope
 
 			if(findVar!= NULL){
-				fprintf(errorFile, "this has been declared already\n");	
+				fprintf(errorFile, "Error: This has been declared already\n");	
 				//if it has been initialized
 				if (findVar->is_init == 0){
-					fprintf(errorFile, "Error this variable hasn't been initialized"); //does it have to be initialized?
+					fprintf(errorFile, "Error: this variable hasn't been initialized"); //does it have to be initialized?
 					break;
 					
 				}
@@ -310,7 +293,7 @@ void ast_semantic_check(node* current, int i) {
 					!strcmp(current->variable.id, "gl_Material_Shininess") == 0 && !strcmp(current->variable.id, "env1") == 0 && !strcmp(current->variable.id, "env2") == 0 && 
 					!strcmp(current->variable.id, "env3") == 0 && !strcmp(current->variable.id, "gl_FragColor") == 0 && !strcmp(current->variable.id, "gl_FragDepth") == 0 && 
 					!strcmp(current->variable.id, "gl_FragCoord") == 0){
-					fprintf(errorFile, "Error: this variable has not been declared...\n");
+					fprintf(errorFile, "Error: this variable has not been declared\n");
 					break;
 				}
 				break;
@@ -348,7 +331,7 @@ void ast_semantic_check(node* current, int i) {
 				current->type.type_name = VEC4;
 				current->type.vec = 4;
 				current->type.is_const = 0;
-				fprintf(errorFile, "Error you cannot use predefined variables as variable names");
+				fprintf(errorFile, "Error: you cannot use predefined variables as variable names");
 				break; 	
 			}
 	
@@ -358,7 +341,7 @@ void ast_semantic_check(node* current, int i) {
 				current->type.type_name = VEC4;
 				current->type.vec = 4;
 				current->type.is_const = 1;
-				fprintf(errorFile, "Error you cannot use predefined variables as variable names");
+				fprintf(errorFile, "Error: you cannot use predefined variables as variable names");
 				break; 	
 			}
 
@@ -376,7 +359,7 @@ void ast_semantic_check(node* current, int i) {
 					current->type.vec = 4;
 				}
 
-				fprintf(errorFile, "Error you cannot use predefined variables as variable names");
+				fprintf(errorFile, "Error: you cannot use predefined variables as variable names");
 				break; 	
 			}
 
@@ -400,7 +383,6 @@ void ast_semantic_check(node* current, int i) {
 
 			//current->type.type_name will be the return type of the functiontion
 			if (current->function.function_name == 2) { //rsq
-				fprintf(errorFile,"Type of args:%d \n",next_arg->type.type_name);
 				if (!(next_arg->type.type_name == FLOAT_T ||next_arg->type.type_name == INT_T )) {
 					fprintf(errorFile,"Error: Expecting float or integer for first argument\n");
 					break;
@@ -408,7 +390,7 @@ void ast_semantic_check(node* current, int i) {
 				
 				next_arg = next_arg->arguments.args;
 				if (next_arg != NULL){
-					fprintf(errorFile,"Error: Too many arguments for this functiontiontion\n");					
+					fprintf(errorFile,"Error: Too many arguments for this function\n");					
 				}
 
 				current->type.type_name = FLOAT_T;
@@ -419,21 +401,21 @@ void ast_semantic_check(node* current, int i) {
 			else if (current->function.function_name == 0) { //dp3
 				//case:vec4
 				if (next_arg == NULL){
-					fprintf(errorFile, "Input argument cannot be void\n");	
+					fprintf(errorFile, "Error: Input argument cannot be void\n");	
 					break;
 				}
 				if (!(next_arg->type.type_name == VEC4 && next_arg->type.vec == 4)){
-					fprintf(errorFile, "First argument is of incorrect type\n");	
+					fprintf(errorFile, "Error: First argument is of incorrect type\n");	
 					break;
 				}
 				else if (next_arg->type.type_name == VEC4 && next_arg->type.vec == 4){
 					next_arg = next_arg->arguments.args;
 					if (next_arg == NULL){
-						fprintf(errorFile, "Input argument cannot be void\n");	
+						fprintf(errorFile, "Error: Input argument cannot be void\n");	
 						break;
 					}
 					if (!(next_arg->type.type_name == VEC4 && next_arg->type.vec == 4)) {
-						fprintf(errorFile, "Second argument is of incorrect type\n");	
+						fprintf(errorFile, "Error: Second argument is of incorrect type\n");	
 						break;
 					}
 	
@@ -441,59 +423,59 @@ void ast_semantic_check(node* current, int i) {
 		
 				//other vector type case:vec3
 				if (next_arg == NULL){
-					fprintf(errorFile, "Input argument cannot be void\n");		
+					fprintf(errorFile, "Error: Input argument cannot be void\n");		
 					break;
 				}
 
 				if (!(next_arg->type.type_name == VEC3 && next_arg->type.vec == 3)){
-					fprintf(errorFile, "First argument is of incorrect type\n");		
+					fprintf(errorFile, "Error: First argument is of incorrect type\n");		
 					break;
 				}
 				else if (next_arg->type.type_name == VEC3 && next_arg->type.vec == 3){
 					next_arg = next_arg->arguments.args;
 					if (next_arg == NULL){
-						fprintf(errorFile, "Input argument cannot be void\n");	
+						fprintf(errorFile, "Error: Input argument cannot be void\n");	
 						break;
 					}
 					if (!(next_arg->type.type_name == VEC3 && next_arg->type.vec == 3)) {
-						fprintf(errorFile, "Second argument is of incorrect type\n");
+						fprintf(errorFile, "Error: Second argument is of incorrect type\n");
 						break;
 					}
 	
 				}
 				//other vector type case:ivec4
 				if (!(next_arg->type.type_name == IVEC4 && next_arg->type.vec == 4)){
-					fprintf(errorFile, "First argument is of incorrect type\n");	
+					fprintf(errorFile, "Error: First argument is of incorrect type\n");	
 					break;
 				}
 
 				else if (next_arg->type.type_name == IVEC4 && next_arg->type.vec == 4){
 					next_arg = next_arg->arguments.args;
 					if (next_arg == NULL){
-						fprintf(errorFile, "Input argument cannot be void\n");
+						fprintf(errorFile, "Error: Input argument cannot be void\n");
 						break;
 					}
 
 					if (!(next_arg->type.type_name == IVEC4 && next_arg->type.vec == 4)) {
-						fprintf(errorFile, "Second argument is of incorrect type\n");
+						fprintf(errorFile, "Error: Second argument is of incorrect type\n");
 						break;
 					}
 	
 				}
 				//last vector type case: ivec3
 				if (!(next_arg->type.type_name == IVEC3 && next_arg->type.vec == 3)){
-					fprintf(errorFile, "First argument is of incorrect type\n");
+					fprintf(errorFile, "Error: First argument is of incorrect type\n");
 					break;
 				}
 				else if (next_arg->type.type_name == IVEC3 && next_arg->type.vec == 3){
 					next_arg = next_arg->arguments.args;
 					if (next_arg == NULL){
-						fprintf(errorFile, "Input argument cannot be void\n");
+						fprintf(errorFile, "Error: Input argument cannot be void\n");
 						break;
 					}
 
 					if (!(next_arg->type.type_name == IVEC3 && next_arg->type.vec == 3)) {
-						fprintf(errorFile, "Second argument is of incorrect type\n");
+						fprintf(errorFile, "Error: Second argument is of incorrect type\n");
 						break;
 					}
 	
@@ -505,7 +487,7 @@ void ast_semantic_check(node* current, int i) {
 
 			else if (current->function.function_name == 1) { //lit
 				if (!(next_arg->type.type_name == VEC4 && next_arg->type.vec == 4)) {
-					fprintf(errorFile,"Error: LIT functiontiontion only takes in arguments of type vec4\n");
+					fprintf(errorFile,"Error: LIT function only takes in arguments of type vec4\n");
 					break;
 				}
 
@@ -514,17 +496,16 @@ void ast_semantic_check(node* current, int i) {
 				break;
 			}
 			else {
-				fprintf(errorFile,"Error: functiontiontion name not recognized\n");
+				fprintf(errorFile,"Error: Function name not recognized\n");
 					break;
 			}
 		}
         	case CONSTRUCTOR_NODE:{
-			    fprintf(errorFile, "Entering constructor node\n");
 		     	    int num_args, num_type;
 			    int i = 0;
 			    node* next_arg = current->constructor.args;
 			    if (next_arg == NULL) {
-					fprintf(errorFile, "Error construconstructor cannot be empty");
+					fprintf(errorFile, "Error: constructor cannot be empty");
 				break;
 			    }
 
@@ -534,7 +515,7 @@ void ast_semantic_check(node* current, int i) {
 				    case(INT_T): {num_args = 1; num_type = INT_T;break;}
 				    case(IVEC4): {num_args = 4; num_type = INT_T;break;}
 				    case(IVEC3): {num_args = 3; num_type = INT_T;break;}
-				    case(IVEC2): {num_args = 2; num_type = INT_T; fprintf(errorFile, "ivec case reached,numer args = %d and num_type = %d \n",num_args,num_type);break;}
+				    case(IVEC2): {num_args = 2; num_type = INT_T; break;}
 				    case(BVEC4): {num_args = 4; num_type = BOOL_T;break;}
 				    case(BVEC3): {num_args = 3; num_type = BOOL_T;break;}
 				    case(BVEC2): {num_args = 2; num_type = BOOL_T;break;}
@@ -545,23 +526,21 @@ void ast_semantic_check(node* current, int i) {
 				
 			    do{
 					if (next_arg == NULL || next_arg->arguments.args == NULL) {
-						fprintf(errorFile, "Error: construconstructor arguments cannot be null\n");
+						fprintf(errorFile, "Error: constructor arguments cannot be null\n");
 						break;
 
 					}
-					fprintf(errorFile, "ivec case reached,numer args = %d and num_type = %d \n",num_args,num_type);
-					fprintf(errorFile, "constructor arguments type:%d, constructor type:%d \n",next_arg->arguments.args->type.type_name, num_type);
-
 					if (next_arg->arguments.args->type.type_name!= num_type) { //type of construconstructor itself
-						fprintf(errorFile, "Error: incorrect construconstructor argument type\n");
+						fprintf(errorFile, "Error: incorrect constructor argument type\n");
 					}
 
 					else{
-						fprintf(errorFile, "This argument type is correct\n");
+						//fprintf(errorFile, "This argument type is correct\n");
 
 					}
 					i++;
-					next_arg = next_arg->arguments.args;
+					next_arg = next_arg->arguments.args
+;
 
 			    }while (i < num_args && next_arg);
 
@@ -574,15 +553,13 @@ void ast_semantic_check(node* current, int i) {
 			if (current->arguments.exp){
 				//arguments must be of expected type  
 				current->type.is_const = current->arguments.exp->type.is_const;	
-				fprintf(errorFile,"Type code args: %d\n",current->arguments.exp->type.type_name);
 				current->type.type_name = current->arguments.exp->type.type_name;
 				current->type.vec = current->arguments.exp->type.vec;
 				break;
 			}
 			else{
-				current->type.is_const = 0; //verify
-				current->type.type_name = -1; //verify
-				fprintf(errorFile,"Type code args: %d\n",current->type.type_name);
+				current->type.is_const = 0; 
+				current->type.type_name = -1; //assign a random non-token number
 				current->type.vec = 1;
 				break;
 				
@@ -595,21 +572,18 @@ void ast_semantic_check(node* current, int i) {
 			break;}
 
 		case STATEMENT_NODE:{		
-			fprintf(errorFile,"Type code of conditional expression: %d\n",current->statement.exp->type.type_name);
 			if (!(current->statement.exp->type.type_name == BOOL_T && current->statement.exp->type.vec == 1)){ //can't be bvec
 				fprintf(errorFile, "Error: conditional expression must be of type boolean\n");	
 				break;		
 			}
 		}
-		case ASSIGNMENT_NODE:{ //need an assignment node in ast.h
+		case ASSIGNMENT_NODE:{ 
 			_entry *findVar;
 			findVar = find_entry(current->assignment.variable->variable.id); //call to find var
 			if (findVar == NULL){
 				fprintf(errorFile, "Error: this variable has not been declared\n");  //Implicit type conversions
 			}
 			if (findVar->is_init){
-				fprintf(errorFile,"Variable:%d, Expression:%d \n",current->assignment.variable->type.type_name, current->assignment.exp->type.type_name);
-				//if (current->assignment.variable->type.type_name != current->assignment.exp->type.type_name){
 				if (findVar->type_name != current->assignment.exp->type.type_name){
 					fprintf(errorFile, "Error: both sides of assignment must be of same type\n");  //Implicit type conversions
 					break;
@@ -644,7 +618,6 @@ void ast_semantic_check(node* current, int i) {
 
 			current->type.is_const = current->exp.variable->type.is_const;
 		  	current->type.type_name = current->exp.variable->type.type_name;
-			fprintf(errorFile,"Type code exp_var: %d\n",current->type.type_name);
 			current->type.vec = current->exp.variable->type.vec; 
 			break; }
 		case DECLARATION_NODE:{		
