@@ -17,6 +17,8 @@ bool isArithmeticOp(int opTokenId) {
 }
 
 
+
+
 main() {
 	curr = ast;
 	generateAssembly(curr, regNum);
@@ -53,7 +55,16 @@ MOV result.color temp
 
 
 */
+//how to manage scope?
+//how to manage if else conditions
+//moving stack pointer?
+//how to manage float to int conversions
 
+https://viswesh.github.io/astVisualizer/
+https://resources.jointjs.com/demos/javascript-ast
+https://godbolt.org/
+http://www.eecg.toronto.edu/~enright/teaching/ece243S/notes/
+https://astexplorer.net/
 
 
 */
