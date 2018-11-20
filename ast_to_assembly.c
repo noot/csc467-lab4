@@ -19,5 +19,21 @@ bool isArithmeticOp(int opTokenId) {
 
 main() {
 	curr = ast;
-	generaateAssembly(curr, regNum);
+	generateAssembly(curr, regNum);
 }
+
+
+//output the assembly to a file
+
+//types of cases to handle
+/*
+declarations--> in assembly this would just be a move statement
+if,else statements --> normally this is a branching statement
+vectors --> the registers that can access the elements of a vector
+operations --> SUB,ADD,MUL,DIV operations on registers in assembly
+
+
+
+
+
+*/
