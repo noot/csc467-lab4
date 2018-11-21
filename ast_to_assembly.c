@@ -1,4 +1,5 @@
 
+assemblyFile = 'assembly.txt'
 void generateAssembly(node* curr, int regNum) {
 	if (isArithmeticOp(label(&curr)) {
 		generateAssembly(curr->left, regNum);
@@ -16,8 +17,49 @@ bool isArithmeticOp(int opTokenId) {
 	}
 }
 
+void generateArithmeticOp(int op, char* reg1, char* reg2) {
+	switch (op) {
+		case ADD:
+			fprintf(assemblyFile, 'ADD %s %s', reg1, reg2);
+		case SUB:
+			fprintf(assemblyFile, 'SUB %s %s', reg1, reg2);
+		case MUL:
+			fprintf(assemblyFile, 'MUL %s %s', reg1, reg2);
+		case DIV:
+			fprintf(assemblyFile, 'DIV %s %s', reg1, reg2);
+		}
+}
 
-
+char* assignReg(char* varName) { //or create a hash map
+	switch (varName) {
+		case gl_FragColor:
+			return "result.color";
+		case gl_FragDepth:
+			return "result.depth";
+		case gl_FragCoord:
+			return "fragment.position";
+		case gl_TexCoord:
+			return "fragment.texcoord";
+		case gl_Color:
+			return "fragment.color";
+		case gl_Secondary:
+			return "fragment.color.secondary";
+		case gl_FogFragCoord:
+			return "fragment.fogcoord";
+		case gl_Light_Half:
+			return "state.light[0].half";
+		case gl_Light_Ambient:
+			return "state.lightmodel.ambient";
+		case gl_Material_Shininess:
+			return "state.material.shininess";
+		case env1:
+			return "program.env[1]";
+		case env2:
+			return "program.env[2]";
+		case env3:
+			return "program.env[3]";
+	}
+}
 
 main() {
 	curr = ast;
