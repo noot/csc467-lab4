@@ -37,6 +37,7 @@ typedef enum {
 } op_type;
 
 typedef struct instr {
+	int is_op; // 1 if operation, 0 if declaration
 	op_type op;
 	char *in1, *in2, *in3;
 	char *out;
