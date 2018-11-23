@@ -29,8 +29,14 @@ node *ast_allocate(node_kind kind, ...) {
       break;
 
     case DECLARATIONS_NODE:
-      ast->declarations.declarations = va_arg(args, node *);
+      //ast->declarations.declarations = va_arg(args, node *);
       ast->declarations.declaration = va_arg(args, node *);
+      //if((unsigned long long)ast->declarations.declarations <= 0x1000) {
+      //  printf("Something declarations is wrong here ... \n");
+      //}
+      if((unsigned long long)ast->declarations.declaration <= 0x1000) {
+        printf("Something declaration is wrong here ... \n");
+      }
       break;
 
     case STATEMENTS_NODE:
@@ -247,6 +253,10 @@ void _ast_print(node *curr, int i) {
   fprintf(dumpFile, "(");
 
   if(!curr) return;
+
+  if((unsigned long long)curr <= 10) {
+    printf("Invalid curr val: %p\n", curr);
+  }
 
   switch(curr->kind) {
     case SCOPE_NODE:

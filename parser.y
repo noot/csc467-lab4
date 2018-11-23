@@ -197,7 +197,7 @@ scope
   ;
 declarations
   :   declarations declaration            { yTRACE("declarations -> declarations declaration"); 
-                                            $$ = ast_allocate(DECLARATIONS_NODE, $1, $2);}
+                                            $$ = ast_allocate(DECLARATIONS_NODE, $2);}
   |   /* empty */                         { yTRACE("declarations -> empty"); }                                              
   ; 
 statements
