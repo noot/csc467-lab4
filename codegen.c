@@ -75,9 +75,21 @@ bool isArithmeticOp(int opTokenId) {
 	}
 }
 
+char* get_op(int op) {
+
+}
+
 void *print_instr(instr *ins) {
 	if(ins->kind == OPERATION) {
-		
+		if(ins->out != NULL && ins->in1 != NULL) {
+			fprintf(assemblyFile, "%s %s %s\n", get_op(ins->op), ins->out, ins->in1);
+		} else if (ins->out != NULL && ins->in1 != NULL && ins->in2 != NULL) {
+			fprintf(assemblyFile, "%s %s %s %s\n", get_op(ins->op), ins->out, ins->in1, ins->in2);
+		} else if (ins->out != NULL && ins->in1 != NULL && ins->in2 != NULL && ins->in3 != NULL) {
+			fprintf(assemblyFile, "%s %s %s %s %s\n", get_op(ins->op), ins->out, ins->in1, ins->in2, ins->in3);
+		}
+	} else if (ins->kind == DECLARATION) {
+		fprintf(assemblyFile, "TEMP %s\n", ins->out);
 	}
 }
 
