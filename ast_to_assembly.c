@@ -2,14 +2,18 @@
 assemblyFile = 'assembly.txt'
 
 void generateAssembly(node* curr, int regNum) {
-	if (isArithmeticOp(label(&curr)) {
+	if (isArithmeticOp(label(&curr))) {
 		generateAssembly(curr->left, regNum);
 		generateAssembly(curr->right, regNum +1);
 		generateArithmeticOp(label(&curr),regNum,regNum+1);
-	}
+	} 
 	else if (curr == assignment){
-		generateLoad(label(&curr), regNum);
+		generateMov(label(&curr), regNum);
 	}
+}
+
+void generateMov(char *val, int reg) {
+	fprintf(assemblyFile, 'MOV %s r%d\n', val, reg);
 }
 
 
@@ -54,7 +58,7 @@ void generateCode(node *curr){
 		}
 
 		case(ARGUMENTS_NODE):{
-			if (curr->arguments
+			if (curr->arguments)
 		}
 		case(CONSTRUCTOR_NODE):{
 		}
@@ -74,11 +78,11 @@ bool isArithmeticOp(int opTokenId) {
 void generateArithmeticOp(int op, char* reg1, char* reg2) {
 	switch (op) {
 		case ADD:
-			fprintf(assemblyFile, 'ADD %s %s', reg1, reg2);
+			fprintf(assemblyFile, 'ADD %s %s\n', reg1, reg2);
 		case SUB:
-			fprintf(assemblyFile, 'SUB %s %s', reg1, reg2);
+			fprintf(assemblyFile, 'SUB %s %s\n', reg1, reg2);
 		case MUL:
-			fprintf(assemblyFile, 'MUL %s %s', reg1, reg2);
+			fprintf(assemblyFile, 'MUL %s %s\n', reg1, reg2);
 		case DIV:
 			fprintf(assemblyFile, 'DIV %s %s', reg1, reg2);
 		}
@@ -156,11 +160,8 @@ MOV result.color temp
 //moving stack pointer?
 //how to manage float to int conversions
 
-https://viswesh.github.io/astVisualizer/
-https://resources.jointjs.com/demos/javascript-ast
-https://godbolt.org/
-http://www.eecg.toronto.edu/~enright/teaching/ece243S/notes/
-https://astexplorer.net/
-
-
-*/
+// https://viswesh.github.io/astVisualizer/
+// https://resources.jointjs.com/demos/javascript-ast
+// https://godbolt.org/
+// http://www.eecg.toronto.edu/~enright/teaching/ece243S/notes/
+// https://astexplorer.net/
