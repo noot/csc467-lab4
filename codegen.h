@@ -1,6 +1,11 @@
 #include "ast.h"
 
 typedef enum {
+	OPERATION = 1,
+	DECLARATION = 0
+} is_op;
+
+typedef enum {
 	ABS = 1,
 	ADD = 2,
 	CMP = 3,

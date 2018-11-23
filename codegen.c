@@ -8,11 +8,11 @@ void generateAssembly(node* curr, int regNum) {
 		generateArithmeticOp(label(&curr),regNum,regNum+1);
 	} 
 	else if (curr == assignment){
-		generateMov(label(&curr), regNum);
+		printMov(label(&curr), regNum);
 	}
 }
 
-void generateMov(char *val, int reg) {
+void printMov(char *val, int reg) {
 	fprintf(assemblyFile, 'MOV %s r%d\n', val, reg);
 }
 
@@ -75,18 +75,24 @@ bool isArithmeticOp(int opTokenId) {
 	}
 }
 
-void generateArithmeticOp(int op, char* reg1, char* reg2) {
-	switch (op) {
-		case ADD:
-			fprintf(assemblyFile, 'ADD %s %s\n', reg1, reg2);
-		case SUB:
-			fprintf(assemblyFile, 'SUB %s %s\n', reg1, reg2);
-		case MUL:
-			fprintf(assemblyFile, 'MUL %s %s\n', reg1, reg2);
-		case DIV:
-			fprintf(assemblyFile, 'DIV %s %s', reg1, reg2);
-		}
+void *print_instr(instr *ins) {
+	if(ins->kind == OPERATION) {
+		
+	}
 }
+
+// void generateArithmeticOp(int op, char* reg1, char* reg2) {
+// 	switch (op) {
+// 		case ADD:
+// 			fprintf(assemblyFile, 'ADD %s %s\n', reg1, reg2);
+// 		case SUB:
+// 			fprintf(assemblyFile, 'SUB %s %s\n', reg1, reg2);
+// 		case MUL:
+// 			fprintf(assemblyFile, 'MUL %s %s\n', reg1, reg2);
+// 		case DIV:
+// 			fprintf(assemblyFile, 'DIV %s %s', reg1, reg2);
+// 		}
+// }
 
 char* assignReg(char* varName) { //or create a hash map
 	switch (varName) {
