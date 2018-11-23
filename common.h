@@ -8,7 +8,6 @@
 #define _COMMON_H_ 
 
 #include <stdio.h> /* for FILE */
-
  
 /**********************************************************************
  * Some useful definitions. These may be modified or removed as needed.
