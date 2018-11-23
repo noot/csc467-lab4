@@ -1,13 +1,67 @@
 
 assemblyFile = 'assembly.txt'
+
 void generateAssembly(node* curr, int regNum) {
 	if (isArithmeticOp(label(&curr)) {
 		generateAssembly(curr->left, regNum);
 		generateAssembly(curr->right, regNum +1);
 		generateArithmeticOp(label(&curr),regNum,regNum+1);
 	}
-	else {
+	else if (curr == assignment){
 		generateLoad(label(&curr), regNum);
+	}
+}
+
+
+void generateCode(node *curr){
+	node_kind kind = curr->kind;
+	switch(kind){
+		case(BINARY_OP_NODE):{
+			op = curr->binary_expr.op;
+			left = curr->binary_expr.left;
+			right = curr->binary_expr.right;
+			switch(op){
+				case(ADD):{
+					reg1 = assignReg(left);
+					reg2 = assignReg(right);		
+					fprintf(assemblyFile, 'ADD %s %s', reg1, reg2);
+				}
+				case(SUB):{}
+				case(MUL):{}
+				case(DIV):{}
+			}
+			
+		}
+
+		case(ASSIGNMENT_NODE):{
+		}
+	
+		case (DECLARATION_NODE):{
+		}
+
+		case (STATEMENT_NODE):{
+			if (curr->statement.is_if){
+				if (curr->statement.exp == true){
+					//branching
+				}
+			}
+		}	
+
+		case(EXP_NODE):{
+		}
+
+		case(VAR_NODE):{
+		}
+
+		case(ARGUMENTS_NODE):{
+			if (curr->arguments
+		}
+		case(CONSTRUCTOR_NODE):{
+		}
+
+		case(FUNCTION_NODE):{
+		}
+
 	}
 }
 
