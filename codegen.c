@@ -76,7 +76,42 @@ bool isArithmeticOp(int opTokenId) {
 }
 
 char* get_op(int op) {
-
+	switch(op) {
+		case ABS: return "ABS";
+		case ADD: return "ADD";
+		case CMP: return "CMP";
+		case COS: return "COS":
+		case DP3: return "DP3";
+		case DP4: return "DP4";
+		case DPH: return "DPH";
+		case DST: return "DST";
+		case EX2: return "EX2";
+		case FLR: return "FLR";
+		case FRC: return "FRC";
+		case FRC: return "FRC";
+        case KIL: return "KIL";
+        case LG2: return "LG2";
+        case LIT: return "LIT";
+        case LRP: return "LRP";
+        case MAD: return "MAD";
+        case MAX: return "MAX";
+        case MIN: return "MIN";
+        case MOV: return "MOV";
+        case MUL: return "MUL"; 
+        case POW: return "POW";
+        case RCP: return "RCP";
+        case RSQ: return "RSQ";
+        case SCS: return "SCS";
+        case SGE: return "SGE";
+        case SIN: return "SIN";
+        case SLT: return "SLT";
+        case SUB: return "SUB";
+        case SWZ: return "SWZ";
+        case TEX: return "TEX";
+        case TXB: return "TXB";
+        case TXP: return "TXP";
+		default: return NULL;
+	}
 }
 
 void *print_instr(instr *ins) {
