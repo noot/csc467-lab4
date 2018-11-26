@@ -9,6 +9,7 @@ typedef enum {
 } is_op;
 
 typedef enum {
+	NONE = 0,
 	ABS = 1,
 	ADD_ = 2,
 	CMP = 3,
@@ -44,21 +45,21 @@ typedef enum {
 	XPD = 33
 } op_type;
 
-typedef enum {
-	GL_FRAGCOLOR = 1,
-	GL_FRAGDEPTH = 2,
-	GL_FRAGCOORD = 3,
-	GL_TEXCOORD = 4,
-	GL_COLOR = 5,
-	GL_SECONDARY = 6,
-	GL_FOGFRAGCOORD = 7,
-	GL_LIGHT_HALF = 8,
-	GL_LIGHT_AMBIENT = 9,
-	GL_MATERIAL_SHININESS = 10,
-	ENV1 = 11,
-	ENV2 = 12,
-	ENV3 = 13
-} reg_type;
+// typedef enum {
+// 	GL_FRAGCOLOR = 1,
+// 	GL_FRAGDEPTH = 2,
+// 	GL_FRAGCOORD = 3,
+// 	GL_TEXCOORD = 4,
+// 	GL_COLOR = 5,
+// 	GL_SECONDARY = 6,
+// 	GL_FOGFRAGCOORD = 7,
+// 	GL_LIGHT_HALF = 8,
+// 	GL_LIGHT_AMBIENT = 9,
+// 	GL_MATERIAL_SHININESS = 10,
+// 	ENV1 = 11,
+// 	ENV2 = 12,
+// 	ENV3 = 13
+// } reg_type;
 
 typedef struct instr {
 	int is_op; // 1 if operation, 0 if declaration
@@ -70,6 +71,6 @@ typedef struct instr {
 
 void gen_code(node *ast);
 void gen_code_post(node *ast, int i);
-instr *new_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *out);
+void append_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *out);
 
 #endif 

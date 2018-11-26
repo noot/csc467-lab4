@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "codegen.h"
+#include "parser.tab.h"
 
 instr *ins_list; // beginning instruction
 
@@ -25,8 +26,13 @@ void gen_code(node *ast) {
 // 	fprintf(dumpFile, 'MOV %s r%d\n', val, reg);
 // }
 
-char* get_reg(node *n) {
-	return 0;
+bool t1_taken = false;
+bool t2_taken = false;
+
+char* get_temp_reg(node *n) {
+	if (!t1_taken) return "t1";
+	else if (!t2_taken) return "t2";
+	else return NULL;
 }
 
 char* get_assigned_reg(int var_name) { //or create a hash map
@@ -57,6 +63,8 @@ char* get_assigned_reg(int var_name) { //or create a hash map
 			return "program.env[2]";
 		case ENV3:
 			return "program.env[3]";
+		default:
+			return NULL;
 	}
 }
 
@@ -68,26 +76,59 @@ void gen_code_post(node *curr, int i) {
 			break;
 
 		case BINARY_OP_NODE: {
+			char *temp = get_temp_reg(curr);
 			int op = curr->binary_expr.op;
 			node *left = curr->binary_expr.left;
 			node *right = curr->binary_expr.right;
-			switch(op){
-				case ADD_: {
-					char* reg1 = get_reg(left);
-					char* reg2 = get_reg(right);		
-					//fprintf(dumpFile, 'ADD %s %s', reg1, reg2);
-					instr *ins = new_instr(1, ADD_, reg1, reg2, NULL, reg1);
-				}
-				case SUB_: {
+			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL);
 
+			char* reg1 = get_temp_reg(left);
+			char* reg2 = get_temp_reg(right);
+
+			switch(op){
+				case ADD: {
+					append_instr(OPERATION, ADD_, reg1, reg2, NULL, temp);
+					break;
+				}
+				case SUB: {
+					append_instr(OPERATION, SUB_, reg1, reg2, NULL, temp);
+					break;
 				}
 				
-				case MUL_:{
-
+				case MUL:{	
+					append_instr(OPERATION, MUL_, reg1, reg2, NULL, temp);
+					break;
 				}
 
-				default: {
+				case EXP:{
+					char* reg1 = get_temp_reg(left);
+					char* reg2 = get_temp_reg(right);		
+					append_instr(OPERATION, POW, reg1, reg2, NULL, temp);
+					break;
+				}
 
+				case LEQ:{
+					char* reg1 = get_temp_reg(left);
+					char* reg2 = get_temp_reg(right);		
+					append_instr(OPERATION, CMP, reg1, reg2, NULL, temp);
+					break;
+				}
+
+				case GEQ:{
+					char* reg1 = get_temp_reg(left);
+					char* reg2 = get_temp_reg(right);		
+					append_instr(OPERATION, CMP, reg1, reg2, NULL, temp);
+					break;
+				}
+
+				case EQ:{
+					char* reg1 = get_temp_reg(left);
+					char* reg2 = get_temp_reg(right);		
+					append_instr(OPERATION, CMP, reg1, reg2, NULL, temp);
+					break;
+				}
+				default: {
+					break;
 				}
 			}
 
@@ -95,7 +136,7 @@ void gen_code_post(node *curr, int i) {
 		}
 
 		case UNARY_OP_NODE: {
-			char *tmp = get_reg(curr->unary_expr.right);
+			char *tmp = get_temp_reg(curr->unary_expr.right);
 			break;
 		}
 
@@ -139,14 +180,6 @@ void gen_code_post(node *curr, int i) {
 			break;
 		
 	}
-
-	if (!ins_list) {
-		ins_list = ins;
-	} else {
-		ins_list->next = ins;
-		ins_list = ins;
-	}
-
 }
 
 // bool isArithmeticOp(int opTokenId) {
@@ -193,7 +226,7 @@ char* get_op_char(int op) {
 	}
 }
 
-instr *new_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *out) {
+void append_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *out) {
 	instr *ins = (instr *)malloc(sizeof(instr));
 	ins->is_op = is_op;
 	ins->op = op;
@@ -201,17 +234,23 @@ instr *new_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *o
 	ins->in2 = in2;
 	ins->in3 = in3;
 	ins->out = out;
-	return ins;
+
+	if (!ins_list) {
+		ins_list = ins;
+	} else {
+		ins_list->next = ins;
+		ins_list = ins;
+	}
 } 
 
 void print_instr(instr *ins) {
 	if(ins->is_op == OPERATION) {
 		if(ins->out != NULL && ins->in1 != NULL) {
-			fprintf(dumpFile, "%s %s %s\n", get_op(ins->op), ins->out, ins->in1);
+			fprintf(dumpFile, "%s %s %s\n", get_op_char(ins->op), ins->out, ins->in1);
 		} else if (ins->out != NULL && ins->in1 != NULL && ins->in2 != NULL) {
-			fprintf(dumpFile, "%s %s %s %s\n", get_op(ins->op), ins->out, ins->in1, ins->in2);
+			fprintf(dumpFile, "%s %s %s %s\n", get_op_char(ins->op), ins->out, ins->in1, ins->in2);
 		} else if (ins->out != NULL && ins->in1 != NULL && ins->in2 != NULL && ins->in3 != NULL) {
-			fprintf(dumpFile, "%s %s %s %s %s\n", get_op(ins->op), ins->out, ins->in1, ins->in2, ins->in3);
+			fprintf(dumpFile, "%s %s %s %s %s\n", get_op_char(ins->op), ins->out, ins->in1, ins->in2, ins->in3);
 		}
 	} else if (ins->is_op == DECLARATION) {
 		fprintf(dumpFile, "TEMP %s\n", ins->out);
