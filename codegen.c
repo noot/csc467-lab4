@@ -1,72 +1,104 @@
+#include "codegen.h"
 
-assemblyFile = 'assembly.txt'
+char *assemblyFile = 'assembly.txt'
 
-void generateAssembly(node* curr, int regNum) {
-	if (isArithmeticOp(label(&curr))) {
-		generateAssembly(curr->left, regNum);
-		generateAssembly(curr->right, regNum +1);
-		generateArithmeticOp(label(&curr),regNum,regNum+1);
-	} 
-	else if (curr == assignment){
-		printMov(label(&curr), regNum);
-	}
+instr *ins_list; // beginning instruction
+
+void gen_code(node *ast) {
+	ast_visit(0, ast, NULL, generateCode);
 }
 
-void printMov(char *val, int reg) {
-	fprintf(assemblyFile, 'MOV %s r%d\n', val, reg);
-}
+// void generateAssembly(node* curr, int regNum) {
+// 	if (isArithmeticOp(label(&curr))) {
+// 		generateAssembly(curr->left, regNum);
+// 		generateAssembly(curr->right, regNum +1);
+// 		generateArithmeticOp(label(&curr),regNum,regNum+1);
+// 	} 
+// 	else if (curr == assignment){
+// 		print_mov(label(&curr), regNum);
+// 	}
+// }
 
+// void print_mov(char *val, int reg) {
+// 	fprintf(assemblyFile, 'MOV %s r%d\n', val, reg);
+// }
 
-void generateCode(node *curr){
-	node_kind kind = curr->kind;
-	switch(kind){
-		case(BINARY_OP_NODE):{
+void gen_code_post(node *curr, int i){
+	instr *ins;
+
+	switch(curr->kind){
+		case SCOPE_NODE:
+			break;
+		case BINARY_OP_NODE: {
 			op = curr->binary_expr.op;
 			left = curr->binary_expr.left;
 			right = curr->binary_expr.right;
 			switch(op){
-				case(ADD):{
+				case ADD:{
 					reg1 = assignReg(left);
 					reg2 = assignReg(right);		
-					fprintf(assemblyFile, 'ADD %s %s', reg1, reg2);
+					//fprintf(assemblyFile, 'ADD %s %s', reg1, reg2);
+					ins = new_instr(1, ADD, reg1, reg2, NULL, reg1)
 				}
-				case(SUB):{}
-				case(MUL):{}
-				case(DIV):{}
+				case SUB:{
+
+				}
+				case MUL:{
+
+				}
+				case DIV:{}
 			}
-			
+
+			break;
 		}
 
-		case(ASSIGNMENT_NODE):{
+		case ASSIGNMENT_NODE: {
+			break;
 		}
 	
-		case (DECLARATION_NODE):{
+		case DECLARATION_NODE: {
+			break;
 		}
 
-		case (STATEMENT_NODE):{
+		case STATEMENT_NODE:{
 			if (curr->statement.is_if){
 				if (curr->statement.exp == true){
 					//branching
 				}
 			}
+			break;
 		}	
 
-		case(EXP_NODE):{
+		case EXP_NODE:{
+			break;
 		}
 
-		case(VAR_NODE):{
+		case VAR_NODE:{
+			break;
 		}
 
-		case(ARGUMENTS_NODE):{
+		case ARGUMENTS_NODE:{
 			if (curr->arguments)
+			break;
 		}
-		case(CONSTRUCTOR_NODE):{
+		case CONSTRUCTOR_NODE:{
+			break;
 		}
 
-		case(FUNCTION_NODE):{
+		case FUNCTION_NODE:{
+			break;
 		}
 
 	}
+
+	if (!ins_list) {
+		ins_list = ins;
+	} else {
+		ins_list->next = ins;
+		ins_list = ins;
+	}
+
+	return;
 }
 
 bool isArithmeticOp(int opTokenId) {
@@ -114,7 +146,18 @@ char* get_op(int op) {
 	}
 }
 
-void *print_instr(instr *ins) {
+instr *new_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *out) {
+	instr *ins = (instr *)malloc(sizeof(instr));
+	ins->is_op = is_op;
+	ins->op_type = op;
+	ins->in1 = in1;
+	ins->in2 = in2;
+	ins->in3 = in3;
+	ins->out = out;
+	return ins;
+} 
+
+void print_instr(instr *ins) {
 	if(ins->kind == OPERATION) {
 		if(ins->out != NULL && ins->in1 != NULL) {
 			fprintf(assemblyFile, "%s %s %s\n", get_op(ins->op), ins->out, ins->in1);
@@ -171,12 +214,6 @@ char* assignReg(char* varName) { //or create a hash map
 			return "program.env[3]";
 	}
 }
-
-main() {
-	curr = ast;
-	generateAssembly(curr, regNum);
-}
-
 
 //output the assembly to a file
 

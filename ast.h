@@ -3,6 +3,9 @@
 #define AST_H_ 1
 
 #include <stdarg.h>
+// #include "common.h"
+// #include "parser.tab.h"
+// #include "semantic.h"
 
 // Dummy node just so everything compiles, create your own node/nodes
 //

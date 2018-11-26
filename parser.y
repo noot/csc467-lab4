@@ -19,6 +19,8 @@
 #include "ast.h"
 //#include "symbol.h"
 #include "semantic.h"
+//#include "codegen.h"
+
 #define YYERROR_VERBOSE
 #define yTRACE(x)    { if (traceParser) fprintf(traceFile, "%s\n", x); }
 
@@ -27,11 +29,11 @@ int yylex();              /* procedure for calling lexical analyzer */
 extern int yyline;        /* variable holding current line number   */
 extern int yyval;      /* text that is matched by scanner */
 
-typedef enum {
-  DP3 = 0,
-  LIT = 1, 
-  RSQ = 2
-} function_name;
+// typedef enum {
+//   DP3 = 0,
+//   LIT = 1, 
+//   RSQ = 2
+// } function_name;
 %}
 
 /***********************************************************************
@@ -186,8 +188,6 @@ typedef enum {
  ***********************************************************************/
 program
   :   scope                               { yTRACE("program -> scope");
-                                            //ast = (node *)malloc(sizeof(node));
-                                            //$$ = ast_allocate(SCOPE_NODE); 
                                             ast = $1;
                                           }     
   ;
@@ -206,21 +206,19 @@ statements
   |   /* empty */                         { yTRACE("statements -> empty"); }
   ;
 declaration
-  :   type IDENTIFIER COLON               { yTRACE("declaration -> type identifier ;"); 
-                                            $$ = ast_allocate(DECLARATION_NODE, 0, $2, $1, NULL);}
+  :   type IDENTIFIER COLON                  { yTRACE("declaration -> type identifier ;"); 
+                                                $$ = ast_allocate(DECLARATION_NODE, 0, $2, $1, NULL);}
   |   type IDENTIFIER EQUAL exp COLON        { yTRACE("declaration -> type idenfifier = exp ;");
                                                 $$ = ast_allocate(DECLARATION_NODE, 0, $2, $1, $4); }
   |   CONST type IDENTIFIER EQUAL exp COLON  { yTRACE("declaration -> const type identifier = exp ;");
                                                 $$ = ast_allocate(DECLARATION_NODE, 1, $3, $2, $5); }
-  |   /* empty */                         { yTRACE("declaration -> empty"); $$ = NULL; }
+  |   /* empty */                            { yTRACE("declaration -> empty"); $$ = NULL; }
   ;
 statement
   :   variable EQUAL exp COLON                            { yTRACE("statement -> variable = exp ;");
                                                             $$ = ast_allocate(ASSIGNMENT_NODE, $1, $3); } 
   |   IF LBRACKET exp RBRACKET statement else_statement   { yTRACE("statement -> if ( exp ) statement else_statement");
                                                             $$ = ast_allocate(STATEMENT_NODE, 1, NULL, $3, $5, $6); }
-  // |   WHILE LBRACKET exp RBRACKET statement               { yTRACE("statement -> while ( exp ) statement"); 
-  //                                                           $$ = ast_allocate(STATEMENT_NODE, $3, $5);}
   |   COLON                                               { yTRACE("statement -> ;"); $$ = NULL; }
   |   scope                                               { yTRACE("statement -> scope");
                                                             $$ = ast_allocate(NESTED_SCOPE_NODE, $1); }                      

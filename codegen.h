@@ -1,5 +1,8 @@
 #include "ast.h"
 
+#ifndef CODEGEN_H_
+#define CODEGEN_H_ 1
+
 typedef enum {
 	OPERATION = 1,
 	DECLARATION = 0
@@ -7,7 +10,7 @@ typedef enum {
 
 typedef enum {
 	ABS = 1,
-	ADD = 2,
+	ADD_ = 2,
 	CMP = 3,
 	COS = 4,
 	DP3 = 5,
@@ -25,7 +28,7 @@ typedef enum {
 	MAX = 17,
 	MIN = 18,
 	MOV = 19,
-	MUL = 20,
+	MUL_ = 20,
 	POW = 21,
 	RCP = 22,
 	RSQ = 22,
@@ -33,7 +36,7 @@ typedef enum {
 	SGE = 24,
 	SIN = 25,
 	SLT = 26,
-	SUB = 27,
+	SUB_ = 27,
 	SWZ = 28,
 	TEX = 29,
 	TXB = 30,
@@ -49,4 +52,7 @@ typedef struct instr {
 	struct instr *next;
 } instr;
 
-void generateCode(node *ast);
+void gen_code(node *ast);
+void generateCode(node *ast, int i);
+
+#endif 

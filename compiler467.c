@@ -25,7 +25,7 @@
 
 /* Phases 3,4: Uncomment following includes as needed */
 #include "ast.h"
-#include "semantic.h"
+//#include "semantic.h"
 #include "codegen.h"
 
 /***********************************************************************
@@ -98,7 +98,7 @@ int main (int argc, char *argv[]) {
   if (errorOccurred)
     fprintf(outputFile,"Failed to compile\n");
   else 
-   // genCode(ast);
+    //gen_code(ast);
     ;
 /***********************************************************************
  * Post Compilation Cleanup

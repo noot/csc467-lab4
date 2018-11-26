@@ -241,7 +241,7 @@ void ast_visit(int depth, node *curr, func pre, func post) {
 void _ast_free(node *ast, int i) {
   //if(ast->kind == DECLARATION_NODE) free(ast->declaration.id);
   //else if (ast->kind == VAR_NODE) free(ast->variable.id);
-  //free(ast);
+  free(ast);
 }
 
 void ast_free(node *ast) {
