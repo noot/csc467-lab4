@@ -7,6 +7,8 @@
 
 instr *ins_list; // beginning instruction
 
+char *ZERO = "0";
+
 void gen_code(node *ast) {
 	ast_visit(0, ast, NULL, gen_code_post);
 }
@@ -100,30 +102,22 @@ void gen_code_post(node *curr, int i) {
 					break;
 				}
 
-				case EXP:{
-					char* reg1 = get_temp_reg(left);
-					char* reg2 = get_temp_reg(right);		
+				case EXP:{	
 					append_instr(OPERATION, POW, reg1, reg2, NULL, temp);
 					break;
 				}
 
-				case LEQ:{
-					char* reg1 = get_temp_reg(left);
-					char* reg2 = get_temp_reg(right);		
+				case LEQ:{	
 					append_instr(OPERATION, CMP, reg1, reg2, NULL, temp);
 					break;
 				}
 
-				case GEQ:{
-					char* reg1 = get_temp_reg(left);
-					char* reg2 = get_temp_reg(right);		
+				case GEQ:{	
 					append_instr(OPERATION, CMP, reg1, reg2, NULL, temp);
 					break;
 				}
 
 				case EQ:{
-					char* reg1 = get_temp_reg(left);
-					char* reg2 = get_temp_reg(right);		
 					append_instr(OPERATION, CMP, reg1, reg2, NULL, temp);
 					break;
 				}
@@ -136,7 +130,29 @@ void gen_code_post(node *curr, int i) {
 		}
 
 		case UNARY_OP_NODE: {
-			char *tmp = get_temp_reg(curr->unary_expr.right);
+			char *temp = get_temp_reg(curr);
+
+			int op = curr->unary_expr.op;
+			node *right = curr->unary_expr.right;
+			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL);
+
+			char* reg = get_temp_reg(right);
+
+			switch(op) {
+				case SUB: {
+					append_instr(OPERATION, SUB_, temp, ZERO, reg, NULL);
+					break;
+				}
+
+				// case EXCLAM: {
+				// 	append_instr(OPERATION, CMP, reg1, reg2, NULL, temp);
+				// 	break;
+				// }
+
+				default:
+					break;
+			}
+
 			break;
 		}
 
