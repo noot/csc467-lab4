@@ -1,6 +1,6 @@
 #include "codegen.h"
 
-char *assemblyFile = 'assembly.txt'
+char *assemblyFile = 'assembly.txt';
 
 instr *ins_list; // beginning instruction
 
@@ -23,74 +23,77 @@ void gen_code(node *ast) {
 // 	fprintf(assemblyFile, 'MOV %s r%d\n', val, reg);
 // }
 
-void gen_code_post(node *curr, int i){
+int get_reg() {
+	return 0;
+}
+
+void gen_code_post(node *curr, int i) {
 	instr *ins;
 
-	switch(curr->kind){
-		case SCOPE_NODE:
+	switch(curr->kind) {
+		case SCOPE_NODE: 
 			break;
-		case BINARY_OP_NODE: {
+
+		case BINARY_OP_NODE: 
 			op = curr->binary_expr.op;
 			left = curr->binary_expr.left;
 			right = curr->binary_expr.right;
 			switch(op){
-				case ADD:{
+				case ADD:
 					reg1 = assignReg(left);
 					reg2 = assignReg(right);		
 					//fprintf(assemblyFile, 'ADD %s %s', reg1, reg2);
-					ins = new_instr(1, ADD, reg1, reg2, NULL, reg1)
-				}
-				case SUB:{
+					ins = new_instr(1, ADD, reg1, reg2, NULL, reg1);
+					break;
+				case SUB:
+					break;
+				
+				case MUL:
+					break;
+				
+				case DIV:
+					break;
 
-				}
-				case MUL:{
-
-				}
-				case DIV:{}
+				default: 
+					break;
 			}
 
 			break;
-		}
 
-		case ASSIGNMENT_NODE: {
+		case UNARY_OP_NODE:
+			char *tmp = get_reg();
 			break;
-		}
+
+		case ASSIGNMENT_NODE:
+			break;
 	
-		case DECLARATION_NODE: {
+		case DECLARATION_NODE: 
 			break;
-		}
 
-		case STATEMENT_NODE:{
+		case STATEMENT_NODE:
 			if (curr->statement.is_if){
 				if (curr->statement.exp == true){
 					//branching
 				}
 			}
 			break;
-		}	
 
-		case EXP_NODE:{
+		case EXP_NODE:
 			break;
-		}
 
-		case VAR_NODE:{
+		case VAR_NODE:
 			break;
-		}
 
-		case ARGUMENTS_NODE:{
-			if (curr->arguments)
+		case ARGUMENTS_NODE:
+			if (curr->arguments);
 			break;
-		}
-		case CONSTRUCTOR_NODE:{
+		
+		case CONSTRUCTOR_NODE:
 			break;
-		}
 
-		case FUNCTION_NODE:{
+		case FUNCTION_NODE:
 			break;
-		}
-
-	}
-
+		
 	if (!ins_list) {
 		ins_list = ins;
 	} else {
@@ -98,7 +101,6 @@ void gen_code_post(node *curr, int i){
 		ins_list = ins;
 	}
 
-	return;
 }
 
 bool isArithmeticOp(int opTokenId) {

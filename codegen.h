@@ -53,6 +53,6 @@ typedef struct instr {
 } instr;
 
 void gen_code(node *ast);
-void generateCode(node *ast, int i);
+void gen_code_post(node *ast, int i);
 
 #endif 
