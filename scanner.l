@@ -149,8 +149,6 @@ const/{WS}			{ yTRACE(CONST); return CONST;}
 								}
 							}
 
-[0-9]+[a-zA-z_]+ 	{ yERROR("identifier cannot start with a number");}	
-
 .         			{ yERROR("invalid token");} 
 
 %%

@@ -307,6 +307,11 @@ variable
                                 $$ = ast_allocate(VAR_NODE, $1, 0, 0); }
   | IDENTIFIER LSQUARE INT RSQUARE	  	    { yTRACE("variable -> identifier[integer_literal]"); 
                                               $$ = ast_allocate(VAR_NODE, $1, 0, $3); }
+  | GL_LIGHT_AMBIENT          { yTRACE("variable -> GL_LIGHT_AMBIENT");
+                                $$ = ast_allocate(VAR_NODE, $1, 0, 0); }
+
+  | GL_FRAGCOLOR          { yTRACE("variable -> GL_FRAGCOLOR");
+                                $$ = ast_allocate(VAR_NODE, $1, 0, 0); }
   ;
 // unary_op
 //   : EXCLAM		  		{ yTRACE("unary_op -> !"); 
