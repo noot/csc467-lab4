@@ -98,7 +98,7 @@ int main (int argc, char *argv[]) {
   if (errorOccurred)
     fprintf(outputFile,"Failed to compile\n");
   else 
-    //gen_code(ast);
+    gen_code(ast);
     ;
 /***********************************************************************
  * Post Compilation Cleanup

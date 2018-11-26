@@ -1,11 +1,13 @@
-#include "codegen.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-char *assemblyFile = 'assembly.txt';
+#include "common.h"
+#include "codegen.h"
 
 instr *ins_list; // beginning instruction
 
 void gen_code(node *ast) {
-	ast_visit(0, ast, NULL, generateCode);
+	ast_visit(0, ast, NULL, gen_code_post);
 }
 
 // void generateAssembly(node* curr, int regNum) {
@@ -20,11 +22,42 @@ void gen_code(node *ast) {
 // }
 
 // void print_mov(char *val, int reg) {
-// 	fprintf(assemblyFile, 'MOV %s r%d\n', val, reg);
+// 	fprintf(dumpFile, 'MOV %s r%d\n', val, reg);
 // }
 
-int get_reg() {
+char* get_reg(node *n) {
 	return 0;
+}
+
+char* get_assigned_reg(int var_name) { //or create a hash map
+	switch (var_name) {
+		case GL_FRAGCOLOR:
+			return "result.color";
+		case GL_FRAGDEPTH:
+			return "result.depth";
+		case GL_FRAGCOORD:
+			return "fragment.position";
+		case GL_TEXCOORD:
+			return "fragment.texcoord";
+		case GL_COLOR:
+			return "fragment.color";
+		case GL_SECONDARY:
+			return "fragment.color.secondary";
+		case GL_FOGFRAGCOORD:
+			return "fragment.fogcoord";
+		case GL_LIGHT_HALF:
+			return "state.light[0].half";
+		case GL_LIGHT_AMBIENT:
+			return "state.lightmodel.ambient";
+		case GL_MATERIAL_SHININESS:
+			return "state.material.shininess";
+		case ENV1:
+			return "program.env[1]";
+		case ENV2:
+			return "program.env[2]";
+		case ENV3:
+			return "program.env[3]";
+	}
 }
 
 void gen_code_post(node *curr, int i) {
@@ -34,66 +67,79 @@ void gen_code_post(node *curr, int i) {
 		case SCOPE_NODE: 
 			break;
 
-		case BINARY_OP_NODE: 
-			op = curr->binary_expr.op;
-			left = curr->binary_expr.left;
-			right = curr->binary_expr.right;
+		case BINARY_OP_NODE: {
+			int op = curr->binary_expr.op;
+			node *left = curr->binary_expr.left;
+			node *right = curr->binary_expr.right;
 			switch(op){
-				case ADD:
-					reg1 = assignReg(left);
-					reg2 = assignReg(right);		
-					//fprintf(assemblyFile, 'ADD %s %s', reg1, reg2);
-					ins = new_instr(1, ADD, reg1, reg2, NULL, reg1);
-					break;
-				case SUB:
-					break;
+				case ADD_: {
+					char* reg1 = get_reg(left);
+					char* reg2 = get_reg(right);		
+					//fprintf(dumpFile, 'ADD %s %s', reg1, reg2);
+					instr *ins = new_instr(1, ADD_, reg1, reg2, NULL, reg1);
+				}
+				case SUB_: {
+
+				}
 				
-				case MUL:
-					break;
-				
-				case DIV:
-					break;
+				case MUL_:{
 
-				default: 
-					break;
-			}
+				}
 
-			break;
+				default: {
 
-		case UNARY_OP_NODE:
-			char *tmp = get_reg();
-			break;
-
-		case ASSIGNMENT_NODE:
-			break;
-	
-		case DECLARATION_NODE: 
-			break;
-
-		case STATEMENT_NODE:
-			if (curr->statement.is_if){
-				if (curr->statement.exp == true){
-					//branching
 				}
 			}
-			break;
 
-		case EXP_NODE:
 			break;
+		}
 
-		case VAR_NODE:
+		case UNARY_OP_NODE: {
+			char *tmp = get_reg(curr->unary_expr.right);
 			break;
+		}
 
-		case ARGUMENTS_NODE:
-			if (curr->arguments);
+		case ASSIGNMENT_NODE: {
+			break;
+		}
+	
+		case DECLARATION_NODE: {
+			break;
+		}
+
+		case STATEMENT_NODE: {
+			if (curr->statement.is_if){
+				// branch
+			}
+			break;			
+		}
+
+
+		case EXP_NODE: {
+			break;
+		}
+
+		case VAR_NODE: {
+			break;
+		}
+
+		case ARGUMENTS_NODE: {
+			break;
+		}
+		
+		case CONSTRUCTOR_NODE: {
+			break;
+		}
+
+		case FUNCTION_NODE: {
+			break;
+		}
+
+		default:
 			break;
 		
-		case CONSTRUCTOR_NODE:
-			break;
+	}
 
-		case FUNCTION_NODE:
-			break;
-		
 	if (!ins_list) {
 		ins_list = ins;
 	} else {
@@ -103,25 +149,24 @@ void gen_code_post(node *curr, int i) {
 
 }
 
-bool isArithmeticOp(int opTokenId) {
-	if (opTokenId == SUB || opTokenId == ADD || opTokenId == DIV || opTokenId == MUL) {
-		return true;
-	}
-}
+// bool isArithmeticOp(int opTokenId) {
+// 	if (opTokenId == SUB || opTokenId == ADD || opTokenId == DIV || opTokenId == MUL) {
+// 		return true;
+// 	}
+// }
 
-char* get_op(int op) {
+char* get_op_char(int op) {
 	switch(op) {
 		case ABS: return "ABS";
-		case ADD: return "ADD";
+		case ADD_: return "ADD";
 		case CMP: return "CMP";
-		case COS: return "COS":
+		case COS: return "COS";
 		case DP3: return "DP3";
 		case DP4: return "DP4";
 		case DPH: return "DPH";
 		case DST: return "DST";
 		case EX2: return "EX2";
 		case FLR: return "FLR";
-		case FRC: return "FRC";
 		case FRC: return "FRC";
         case KIL: return "KIL";
         case LG2: return "LG2";
@@ -131,7 +176,7 @@ char* get_op(int op) {
         case MAX: return "MAX";
         case MIN: return "MIN";
         case MOV: return "MOV";
-        case MUL: return "MUL"; 
+        case MUL_: return "MUL"; 
         case POW: return "POW";
         case RCP: return "RCP";
         case RSQ: return "RSQ";
@@ -139,7 +184,7 @@ char* get_op(int op) {
         case SGE: return "SGE";
         case SIN: return "SIN";
         case SLT: return "SLT";
-        case SUB: return "SUB";
+        case SUB_: return "SUB";
         case SWZ: return "SWZ";
         case TEX: return "TEX";
         case TXB: return "TXB";
@@ -151,7 +196,7 @@ char* get_op(int op) {
 instr *new_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *out) {
 	instr *ins = (instr *)malloc(sizeof(instr));
 	ins->is_op = is_op;
-	ins->op_type = op;
+	ins->op = op;
 	ins->in1 = in1;
 	ins->in2 = in2;
 	ins->in3 = in3;
@@ -160,62 +205,31 @@ instr *new_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *o
 } 
 
 void print_instr(instr *ins) {
-	if(ins->kind == OPERATION) {
+	if(ins->is_op == OPERATION) {
 		if(ins->out != NULL && ins->in1 != NULL) {
-			fprintf(assemblyFile, "%s %s %s\n", get_op(ins->op), ins->out, ins->in1);
+			fprintf(dumpFile, "%s %s %s\n", get_op(ins->op), ins->out, ins->in1);
 		} else if (ins->out != NULL && ins->in1 != NULL && ins->in2 != NULL) {
-			fprintf(assemblyFile, "%s %s %s %s\n", get_op(ins->op), ins->out, ins->in1, ins->in2);
+			fprintf(dumpFile, "%s %s %s %s\n", get_op(ins->op), ins->out, ins->in1, ins->in2);
 		} else if (ins->out != NULL && ins->in1 != NULL && ins->in2 != NULL && ins->in3 != NULL) {
-			fprintf(assemblyFile, "%s %s %s %s %s\n", get_op(ins->op), ins->out, ins->in1, ins->in2, ins->in3);
+			fprintf(dumpFile, "%s %s %s %s %s\n", get_op(ins->op), ins->out, ins->in1, ins->in2, ins->in3);
 		}
-	} else if (ins->kind == DECLARATION) {
-		fprintf(assemblyFile, "TEMP %s\n", ins->out);
+	} else if (ins->is_op == DECLARATION) {
+		fprintf(dumpFile, "TEMP %s\n", ins->out);
 	}
 }
 
 // void generateArithmeticOp(int op, char* reg1, char* reg2) {
 // 	switch (op) {
 // 		case ADD:
-// 			fprintf(assemblyFile, 'ADD %s %s\n', reg1, reg2);
+// 			fprintf(dumpFile, 'ADD %s %s\n', reg1, reg2);
 // 		case SUB:
-// 			fprintf(assemblyFile, 'SUB %s %s\n', reg1, reg2);
+// 			fprintf(dumpFile, 'SUB %s %s\n', reg1, reg2);
 // 		case MUL:
-// 			fprintf(assemblyFile, 'MUL %s %s\n', reg1, reg2);
+// 			fprintf(dumpFile, 'MUL %s %s\n', reg1, reg2);
 // 		case DIV:
-// 			fprintf(assemblyFile, 'DIV %s %s', reg1, reg2);
+// 			fprintf(dumpFile, 'DIV %s %s', reg1, reg2);
 // 		}
 // }
-
-char* assignReg(char* varName) { //or create a hash map
-	switch (varName) {
-		case gl_FragColor:
-			return "result.color";
-		case gl_FragDepth:
-			return "result.depth";
-		case gl_FragCoord:
-			return "fragment.position";
-		case gl_TexCoord:
-			return "fragment.texcoord";
-		case gl_Color:
-			return "fragment.color";
-		case gl_Secondary:
-			return "fragment.color.secondary";
-		case gl_FogFragCoord:
-			return "fragment.fogcoord";
-		case gl_Light_Half:
-			return "state.light[0].half";
-		case gl_Light_Ambient:
-			return "state.lightmodel.ambient";
-		case gl_Material_Shininess:
-			return "state.material.shininess";
-		case env1:
-			return "program.env[1]";
-		case env2:
-			return "program.env[2]";
-		case env3:
-			return "program.env[3]";
-	}
-}
 
 //output the assembly to a file
 
