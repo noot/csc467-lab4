@@ -155,7 +155,6 @@ extern int yyval;      /* text that is matched by scanner */
 %type <ast_t> binary_op
 %type <ast_t> constructor
 %type <ast_t> function
-%type <ast_t> arguments_opt
 %type <ast_t> arguments
 
 %type <int> function_name
@@ -311,33 +310,19 @@ variable
   | GL_FRAGCOLOR                            { yTRACE("variable -> GL_FRAGCOLOR");
                                               $$ = ast_allocate(VAR_NODE, $1, 0, 0); }
   ;
-// unary_op
-//   : EXCLAM		  		{ yTRACE("unary_op -> !"); 
-//                       $$ = ast_allocate(UNARY_OP_NODE, EXCLAM); }
-//   | SUB		  			{ yTRACE("unary_op -> -");
-//                     $$ = ast_allocate(UNARY_OP_NODE, SUB); }
-//   ; 
 constructor 
   : type LBRACKET arguments RBRACKET    		  { yTRACE("constructor -> type ( arguments )");
                                                 $$ = ast_allocate(CONSTRUCTOR_NODE, $1, $3); }	
   ;
 function
-  : FUNC LBRACKET arguments_opt RBRACKET       { yTRACE("function -> function_name ( arguments_opt )");
+  : FUNC LBRACKET arguments RBRACKET       { yTRACE("function -> function_name ( arguments_opt )");
                                                   $$ = ast_allocate(FUNCTION_NODE, $1, $3); }
   ;
-// function_name
-//   : DP3        				{ yTRACE("function_name -> dp3");
-//                         /*$$ = ast_allocate(FUNCTION_NODE, $1);*/ }
-//   | LIT        				{ yTRACE("function_name -> lit");
-//                        /* $$ = ast_allocate(FUNCTION_NODE, $1); */}
-//   | RSQ        				{ yTRACE("function_name -> rsq");
-//                         /*$$ = ast_allocate(FUNCTION_NODE, $1); */}
+// arguments_opt
+//   : arguments				{ yTRACE("arguments_opt -> arguments");
+//                       $$ = ast_allocate(ARGUMENTS_OPT_NODE, $1); }
+//   | /*empty*/				{ yTRACE("arguments_opt -> empty"); $$ = NULL; }
 //   ;
-arguments_opt
-  : arguments				{ yTRACE("arguments_opt -> arguments");
-                      $$ = ast_allocate(ARGUMENTS_OPT_NODE, $1); }
-  | /*empty*/				{ yTRACE("arguments_opt -> empty"); $$ = NULL; }
-  ;
 arguments
   : arguments COMMA exp			  { yTRACE("arguments -> arguments , exp");
                                 $$ = ast_allocate(ARGUMENTS_NODE, $1, $3); }

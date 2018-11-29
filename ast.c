@@ -119,9 +119,9 @@ node *ast_allocate(node_kind kind, ...) {
       ast->function.args = va_arg(args, node *);
       break;
 
-    case ARGUMENTS_OPT_NODE:
-      ast->arguments_opt.args = va_arg(args, node *);
-      break;
+    // case ARGUMENTS_OPT_NODE:
+    //   ast->arguments_opt.args = va_arg(args, node *);
+    //   break;
 
     case ARGUMENTS_NODE:
       ast->arguments.args = va_arg(args, node *);
@@ -207,9 +207,9 @@ void ast_visit(int depth, node *curr, func pre, func post) {
       if(curr->function.args) ast_visit(depth, curr->function.args, pre, post); 
       break;
 
-    case ARGUMENTS_OPT_NODE:
-      if(curr->arguments_opt.args) ast_visit(depth, curr->arguments_opt.args, pre, post); 
-      break;
+    // case ARGUMENTS_OPT_NODE:
+    //   if(curr->arguments_opt.args) ast_visit(depth, curr->arguments_opt.args, pre, post); 
+    //   break;
 
     case ARGUMENTS_NODE:
       if(curr->arguments.args) ast_visit(depth, curr->arguments.args, pre, post); 

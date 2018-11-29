@@ -152,10 +152,13 @@ void gen_code_post(node *curr, int i) {
 		}
 
 		case ASSIGNMENT_NODE: {
+			// assign expression to variable
+			append_instr(OPERATION, MOV, curr->assignment.exp->variable.id, NULL, NULL, curr->assignment.variable->variable.id);
 			break;
 		}
 	
 		case DECLARATION_NODE: {
+			append_instr(DECLARATION, NONE, curr->variable.id, NULL, NULL, NULL);
 			break;
 		}
 
@@ -186,6 +189,18 @@ void gen_code_post(node *curr, int i) {
 		}
 
 		case FUNCTION_NODE: {
+			char *temp = get_temp_reg(curr);
+			switch(curr->function.function_name) {
+				case DP3: {
+					break;
+				}
+				case RSQ: {
+					break;
+				}
+				case LIT: {
+					break;
+				}
+			}
 			break;
 		}
 

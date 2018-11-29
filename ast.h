@@ -139,9 +139,9 @@ struct node_ {
       node *args;
     } function;
 
-    struct {
-      node *args;
-    } arguments_opt;
+    // struct {
+    //   node *args;
+    // } arguments_opt;
 
     struct {
       node *args;
