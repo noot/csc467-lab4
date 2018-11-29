@@ -198,12 +198,12 @@ scope
 declarations
   :   declarations declaration            { yTRACE("declarations -> declarations declaration"); 
                                             $$ = ast_allocate(DECLARATIONS_NODE, $2);}
-  |   /* empty */                         { yTRACE("declarations -> empty"); }                                              
+  |   /* empty */                         { yTRACE("declarations -> empty"); $$ = NULL; }                                              
   ; 
 statements
   :   statements statement                { yTRACE("statements -> statements statement"); 
                                             $$ = ast_allocate(STATEMENTS_NODE, $1, $2);}
-  |   /* empty */                         { yTRACE("statements -> empty"); }
+  |   /* empty */                         { yTRACE("statements -> empty"); $$ = NULL; }
   ;
 declaration
   :   type IDENTIFIER COLON                  { yTRACE("declaration -> type identifier ;"); 
@@ -217,16 +217,16 @@ declaration
 statement
   :   variable EQUAL exp COLON                            { yTRACE("statement -> variable = exp ;");
                                                             $$ = ast_allocate(ASSIGNMENT_NODE, $1, $3); } 
-  |   IF LBRACKET exp RBRACKET scope else_statement   { yTRACE("statement -> if ( exp ) statement else_statement");
+  |   IF LBRACKET exp RBRACKET statement else_statement   { yTRACE("statement -> if ( exp ) statement else_statement");
                                                             $$ = ast_allocate(STATEMENT_NODE, 1, NULL, $3, $5, $6); }
   |   COLON                                               { yTRACE("statement -> ;"); $$ = NULL; }
   |   scope                                               { yTRACE("statement -> scope");
-                                                            $$ = ast_allocate(NESTED_SCOPE_NODE, $1); }                      
+                                                            $$ = ast_allocate(SCOPE_NODE, NULL, $1); }                      
   ;
 else_statement
-  :   ELSE scope                      { yTRACE("else_statement -> else statement");
-                                            $$ = ast_allocate(ELSE_STATEMENT_NODE, $1); }
-  |   /* empty */                         { yTRACE("else_statement -> empty"); }
+  :   ELSE statement                      { yTRACE("else_statement -> else statement");
+                                            $$ = ast_allocate(ELSE_STATEMENT_NODE, $2); }
+  |   /* empty */                         { yTRACE("else_statement -> empty"); $$ = NULL; }
   ;
 type
   :   INT_T				  { yTRACE("type -> int"); 
@@ -301,15 +301,15 @@ exp
                               $$ = ast_allocate(BINARY_OP_NODE, GEQ, $1, $3); }
   ;
 variable
-  : IDENTIFIER		  		      { yTRACE("variable -> identifier");
-                                $$ = ast_allocate(VAR_NODE, $1, 0, 0); }
+  : IDENTIFIER		  		                    { yTRACE("variable -> identifier");
+                                              $$ = ast_allocate(VAR_NODE, $1, 0, 0); }
   | IDENTIFIER LSQUARE INT RSQUARE	  	    { yTRACE("variable -> identifier[integer_literal]"); 
                                               $$ = ast_allocate(VAR_NODE, $1, 0, $3); }
-  | GL_LIGHT_AMBIENT          { yTRACE("variable -> GL_LIGHT_AMBIENT");
-                                $$ = ast_allocate(VAR_NODE, $1, 0, 0); }
+  | GL_LIGHT_AMBIENT                        { yTRACE("variable -> GL_LIGHT_AMBIENT");
+                                              $$ = ast_allocate(VAR_NODE, $1, 0, 0); }
 
-  | GL_FRAGCOLOR          { yTRACE("variable -> GL_FRAGCOLOR");
-                                $$ = ast_allocate(VAR_NODE, $1, 0, 0); }
+  | GL_FRAGCOLOR                            { yTRACE("variable -> GL_FRAGCOLOR");
+                                              $$ = ast_allocate(VAR_NODE, $1, 0, 0); }
   ;
 // unary_op
 //   : EXCLAM		  		{ yTRACE("unary_op -> !"); 
@@ -318,12 +318,12 @@ variable
 //                     $$ = ast_allocate(UNARY_OP_NODE, SUB); }
 //   ; 
 constructor 
-  : type LBRACKET arguments RBRACKET    		{ yTRACE("constructor -> type ( arguments )");
-                                              $$ = ast_allocate(CONSTRUCTOR_NODE, $1, $3); }	
+  : type LBRACKET arguments RBRACKET    		  { yTRACE("constructor -> type ( arguments )");
+                                                $$ = ast_allocate(CONSTRUCTOR_NODE, $1, $3); }	
   ;
 function
   : FUNC LBRACKET arguments_opt RBRACKET       { yTRACE("function -> function_name ( arguments_opt )");
-                                                          $$ = ast_allocate(FUNCTION_NODE, $1, $3); }
+                                                  $$ = ast_allocate(FUNCTION_NODE, $1, $3); }
   ;
 // function_name
 //   : DP3        				{ yTRACE("function_name -> dp3");
@@ -336,7 +336,7 @@ function
 arguments_opt
   : arguments				{ yTRACE("arguments_opt -> arguments");
                       $$ = ast_allocate(ARGUMENTS_OPT_NODE, $1); }
-  | /*empty*/				{ yTRACE("arguments_opt -> empty"); }
+  | /*empty*/				{ yTRACE("arguments_opt -> empty"); $$ = NULL; }
   ;
 arguments
   : arguments COMMA exp			  { yTRACE("arguments -> arguments , exp");
