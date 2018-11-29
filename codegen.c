@@ -172,6 +172,8 @@ void gen_code_post(node *curr, int i) {
 		}
 
 		case VAR_NODE: {
+			// assign register with same name as variable
+			append_instr(DECLARATION, NONE, curr->variable.id, NULL, NULL, NULL);
 			break;
 		}
 
