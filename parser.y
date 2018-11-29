@@ -260,12 +260,13 @@ exp
   | INT				  	  { yTRACE("exp -> integer_literal"); 
                       $$ = ast_allocate(INT_NODE, $1); }
   | FLOAT				    { yTRACE("exp -> float_literal"); 
-                      $$ = ast_allocate(EXP_NODE, FLOAT_NODE, $1); }
+                      $$ = ast_allocate(FLOAT_NODE, $1); }
   | T 				  	  { yTRACE("exp -> true"); 
-                      $$ = ast_allocate(EXP_NODE, BOOL_NODE, 1);}
+                      $$ = ast_allocate(BOOL_NODE, 1);}
   | F				  	    { yTRACE("exp -> false"); 
-                      $$ = ast_allocate(EXP_NODE, BOOL_NODE, 0); }
-  | variable				          { yTRACE("exp -> variable"); }
+                      $$ = ast_allocate(BOOL_NODE, 0); }
+  | variable				          { yTRACE("exp -> variable"); 
+                                $$ = ast_allocate(EXP_NODE, $1); }
   | EXCLAM exp			        { yTRACE("exp -> unary_op ex");
                                 $$ = ast_allocate(UNARY_OP_NODE, $1, $2); }
   | SUB exp                 { yTRACE("exp -> unary_op ex");

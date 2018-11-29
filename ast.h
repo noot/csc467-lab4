@@ -148,17 +148,17 @@ struct node_ {
       node *exp;
     } arguments; 
 
-    struct {
-      int type;
-    } int_node;
+    // struct {
+    //   int type;
+    // } int_node;
 
-    struct {
-      int type;
-    } float_node;  
+    // struct {
+    //   int type;
+    // } float_node;  
 
-    struct {
-      int is_true;
-    } bool_node;
+    // struct {
+    //   int is_true;
+    // } bool_node;
     
     node *nested_scope;
   };

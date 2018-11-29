@@ -192,6 +192,15 @@ void gen_code_post(node *curr, int i) {
 			char *temp = get_temp_reg(curr);
 			switch(curr->function.function_name) {
 				case DP3: {
+					// move this part to ARGUMENTS_NODE ?
+					node *arg1 = curr->function.args->arguments.exp;
+					node *arg2 = curr->function.args->arguments.args->arguments.exp;
+					// declarate the arguments
+					append_instr(DECLARATION, NONE, arg1->exp.variable->variable.id, NULL, NULL, NULL);
+					append_instr(DECLARATION, NONE, arg2->exp.variable->variable.id, NULL, NULL, NULL);
+					// move args to temp regs
+					// call DP3
+					append_instr(OPERATION, DP3, arg1->exp.variable->variable.id, arg2->exp.variable->variable.id, NULL, temp);
 					break;
 				}
 				case RSQ: {
@@ -222,9 +231,7 @@ void gen_code_post(node *curr, int i) {
 			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL);
 		}
 
-		default:
-			break;
-		
+		default: break;
 	}
 }
 
