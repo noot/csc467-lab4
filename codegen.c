@@ -30,12 +30,21 @@ void gen_code(node *ast) {
 
 bool t1_taken = false;
 bool t2_taken = false;
+char* tempRegName;
 
 char* get_temp_reg(node *n) {
 	if (!t1_taken) return "t1";
 	else if (!t2_taken) return "t2";
 	else return NULL;
 }
+
+char* assign_temp_variable(node *n){
+	if (n == variable){
+		return variable.id;
+	}
+}
+
+
 
 char* get_assigned_reg(int var_name) { //or create a hash map
 	switch (var_name) {
@@ -157,10 +166,26 @@ void gen_code_post(node *curr, int i) {
 		}
 
 		case ASSIGNMENT_NODE: {
+			//node* temp = get_temp_reg(curr);
+			node* resultReg = assign_temp_variable(curr);
+			node* leftHandSide = curr->assignment.variable;
+			node* rightHandSide = curr->assignement.exp;
+			
+			//char *reg1 = get_temp_reg(leftHandSide);
+			//char *reg2 = get_temp_reg(rightHandSide);
+
+			char* reg1 = assign_temp_variable(leftHandSide);
+			char* reg2 = assign_temp_variable(rightHandSide);
+
+			append_instr(ASSIGNMENT, NONE, reg1, reg2, NULL, temp); //this would be a move operation 
 			break;
 		}
 	
 		case DECLARATION_NODE: {
+			int is_const = curr->is_const;
+			char id = curr->id; 
+			node* type = curr->type;
+			node* exp = curr->exp;
 			break;
 		}
 
@@ -177,6 +202,13 @@ void gen_code_post(node *curr, int i) {
 		}
 
 		case VAR_NODE: {
+			char* id = curr->variable.id;
+			int is_vec = curr->is_vec;
+			int idx = curr->idx;
+
+			//other variables need to be able to access the name
+
+			//this is where we assign the final name of the variable --> i.e. register name will be variable name
 			break;
 		}
 
@@ -217,27 +249,27 @@ char* get_op_char(int op) {
 		case EX2: return "EX2";
 		case FLR: return "FLR";
 		case FRC: return "FRC";
-        case KIL: return "KIL";
-        case LG2: return "LG2";
-        case LIT: return "LIT";
-        case LRP: return "LRP";
-        case MAD: return "MAD";
-        case MAX: return "MAX";
-        case MIN: return "MIN";
-        case MOV: return "MOV";
-        case MUL_: return "MUL"; 
-        case POW: return "POW";
-        case RCP: return "RCP";
-        case RSQ: return "RSQ";
-        case SCS: return "SCS";
-        case SGE: return "SGE";
-        case SIN: return "SIN";
-        case SLT: return "SLT";
-        case SUB_: return "SUB";
-        case SWZ: return "SWZ";
-        case TEX: return "TEX";
-        case TXB: return "TXB";
-        case TXP: return "TXP";
+		case KIL: return "KIL";
+		case LG2: return "LG2";
+		case LIT: return "LIT";
+		case LRP: return "LRP";
+		case MAD: return "MAD";
+		case MAX: return "MAX";
+		case MIN: return "MIN";
+		case MOV: return "MOV";
+		case MUL_: return "MUL"; 
+		case POW: return "POW";
+		case RCP: return "RCP";
+		case RSQ: return "RSQ";
+		case SCS: return "SCS";
+		case SGE: return "SGE";
+		case SIN: return "SIN";
+		case SLT: return "SLT";
+		case SUB_: return "SUB";
+		case SWZ: return "SWZ";
+		case TEX: return "TEX";
+		case TXB: return "TXB";
+		case TXP: return "TXP";
 		default: return NULL;
 	}
 }

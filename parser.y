@@ -202,7 +202,7 @@ declarations
   ; 
 statements
   :   statements statement                { yTRACE("statements -> statements statement"); 
-                                            $$ = ast_allocate(STATEMENTS_NODE, $1, $2);}
+                                            $$ = ast_allocate(STATEMENTS_NODE, $2);}
   |   /* empty */                         { yTRACE("statements -> empty"); }
   ;
 declaration
