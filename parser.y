@@ -217,14 +217,14 @@ declaration
 statement
   :   variable EQUAL exp COLON                            { yTRACE("statement -> variable = exp ;");
                                                             $$ = ast_allocate(ASSIGNMENT_NODE, $1, $3); } 
-  |   IF LBRACKET exp RBRACKET statement else_statement   { yTRACE("statement -> if ( exp ) statement else_statement");
+  |   IF LBRACKET exp RBRACKET scope else_statement   { yTRACE("statement -> if ( exp ) statement else_statement");
                                                             $$ = ast_allocate(STATEMENT_NODE, 1, NULL, $3, $5, $6); }
   |   COLON                                               { yTRACE("statement -> ;"); $$ = NULL; }
   |   scope                                               { yTRACE("statement -> scope");
                                                             $$ = ast_allocate(NESTED_SCOPE_NODE, $1); }                      
   ;
 else_statement
-  :   ELSE statement                      { yTRACE("else_statement -> else statement");
+  :   ELSE scope                      { yTRACE("else_statement -> else statement");
                                             $$ = ast_allocate(ELSE_STATEMENT_NODE, $1); }
   |   /* empty */                         { yTRACE("else_statement -> empty"); }
   ;
