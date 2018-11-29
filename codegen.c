@@ -135,6 +135,7 @@ void gen_code_post(node *curr, int i) {
 			int op = curr->unary_expr.op;
 			node *right = curr->unary_expr.right;
 			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL);
+			append_instr(OPERATION, MOV, temp, "%s", NULL, NULL);
 
 			char* reg = get_temp_reg(right);
 
@@ -143,12 +144,6 @@ void gen_code_post(node *curr, int i) {
 					append_instr(OPERATION, SUB_, temp, ZERO, reg, NULL);
 					break;
 				}
-
-				// case EXCLAM: {
-				// 	append_instr(OPERATION, CMP, reg1, reg2, NULL, temp);
-				// 	break;
-				// }
-
 				default:
 					break;
 			}
@@ -192,17 +187,29 @@ void gen_code_post(node *curr, int i) {
 			break;
 		}
 
+		// todo: need to figure out how to store INT in registers
+		case INT_NODE: {
+			char *temp = get_temp_reg(curr);
+			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL);
+			break;
+		}
+
+		case FLOAT_NODE: {
+			char *temp = get_temp_reg(curr);
+			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL);
+			break;		
+		}
+
+		case BOOL_NODE: {
+			char *temp = get_temp_reg(curr);
+			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL);
+		}
+
 		default:
 			break;
 		
 	}
 }
-
-// bool isArithmeticOp(int opTokenId) {
-// 	if (opTokenId == SUB || opTokenId == ADD || opTokenId == DIV || opTokenId == MUL) {
-// 		return true;
-// 	}
-// }
 
 char* get_op_char(int op) {
 	switch(op) {

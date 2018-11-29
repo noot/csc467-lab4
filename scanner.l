@@ -52,6 +52,10 @@ DELIM		[ \t\n\(\)\[\]\{\},;\+\-|*\/\^=!\<\?]|&&|"||"|==|!=|"<"=|">"=
 
 [ \t\n]			;
 
+if				{ yTRACE(IF); return IF; }
+else			{ yTRACE(ELSE); return ELSE; }
+while 			{ yTRACE(WHILE); return WHILE; }
+
 ([0-9]*)		{ 	
 					char *tmp;
 					long ret = strtol(yytext, &tmp, 10);
@@ -93,10 +97,6 @@ DELIM		[ \t\n\(\)\[\]\{\},;\+\-|*\/\^=!\<\?]|&&|"||"|==|!=|"<"=|">"=
 dp3/{DELIM}				{ yTRACE(FUNC); return FUNC; }
 rsq/{DELIM}				{ yTRACE(FUNC); return FUNC; }
 lit/{DELIM}				{ yTRACE(FUNC); return FUNC; }
-
-'if'				{ yTRACE(IF); return IF; }
-'else'				{ yTRACE(ELSE); return ELSE; }
-'while' 			{ yTRACE(WHILE); return WHILE; }
 
 "int"/{WS}			{ yTRACE(INT_T); return INT_T;}
 "float"/{WS}			{ yTRACE(FLOAT_T); return FLOAT_T;}
