@@ -39,9 +39,9 @@ char* get_temp_reg(node *n) {
 }
 
 char* assign_temp_variable(node *n){
-	if (n == variable){
-		return variable.id;
-	}
+	//if (n == variable){
+	//	return variable.id;
+	//}
 }
 
 
@@ -161,26 +161,64 @@ void gen_code_post(node *curr, int i) {
 		}
 
 		case ASSIGNMENT_NODE: {
-			//node* temp = get_temp_reg(curr);
-			node* resultReg = assign_temp_variable(curr);
+
+			_entry *findVar;
+
 			node* leftHandSide = curr->assignment.variable;
 			node* rightHandSide = curr->assignement.exp;
+			char* regType = "TEMP";
+
+			//need to fetch that variable from the symbol table
+			findVar = find_entry(leftHandSide->variable.id); //call to findEntry
+			findExp = find_entry(rightHandSide->variable.id); //call to findEntry
 			
-			//char *reg1 = get_temp_reg(leftHandSide);
-			//char *reg2 = get_temp_reg(rightHandSide);
+			char *resultReg = get_temp_reg(findVar); //if variable exists, assign to this 
+			if (findExp){
+				char *inputReg = get_temp_reg(findExp); //if the right hand side is also a declared variable, use that name
+			}
+			else{
+				char* inputReg = get_temp_reg(rightHandSide); //else use the expression variable
+			}
 
-			char* reg1 = assign_temp_variable(leftHandSide);
-			char* reg2 = assign_temp_variable(rightHandSide);
+			//char* reg1 = assign_temp_variable(leftHandSide);
+			//char* reg2 = assign_temp_variable(rightHandSide);
 
-			append_instr(ASSIGNMENT, NONE, reg1, reg2, NULL, temp); //this would be a move operation 
-			break;
-		}
+			append_instr(ASSIGNMENT, NONE, reg1, reg2, NULL, temp, regType); //this would be a move operation 
+			break; */
+		}s
 	
 		case DECLARATION_NODE: {
 			int is_const = curr->is_const;
 			char id = curr->id; 
 			node* type = curr->type;
 			node* exp = curr->exp;
+			char* regType = "TEMP";
+
+			//is constant				
+			if (is_const){
+				regType = "CONST";
+			}
+
+			//if it's initialized
+			if (curr->exp){
+				node* leftHandSide = id;
+				node* rightHandSide = exp;
+
+				resultReg = get_temp_reg(leftHandSide);
+				inputReg = get_temp_reg(rightHandSide);
+
+				append_instr(DECLARATION, NONE, reg1, NULL, NULL, resultReg, regType); //mov instruction
+			}
+			//not initialized, so set to zero
+			else{
+				node* leftHandSide = id;
+				node* rightHandSide = 0;
+
+				resultReg = get_temp_reg(leftHandSide); //change this to variable name
+				inputReg = get_temp_reg(rightHandSide);
+
+				append_instr(DECLARATION, NONE, inputReg, NULL, NULL, resultReg, regType); //mov instruction 
+			}
 			break;
 		}
 
@@ -197,26 +235,66 @@ void gen_code_post(node *curr, int i) {
 		}
 
 		case VAR_NODE: {
-			char* id = curr->variable.id;
+			/*char* id = curr->variable.id;
 			int is_vec = curr->is_vec;
-			int idx = curr->idx;
+			int idx = curr->idx;*/
 
 			//other variables need to be able to access the name
 
 			//this is where we assign the final name of the variable --> i.e. register name will be variable name
+			
+			char regname
+			if (var.idx == 0){
+			}
+			else if (var.idx == 1){
+				curr = regname.x
+			}
+			else if (var.idx == 2){
+				curr = regname.y
+			}
+			else if (var.idx == 3){
+				curr = regname.z
+			}
+			else if (var.idx == 4){
+
+			}
 			break;
 		}
 
 		case ARGUMENTS_NODE: {
+			
 			break;
 		}
 		
 		case CONSTRUCTOR_NODE: {
+			node* type = curr->constructor.type;
+			node* args = curr->constructor.args->arguments;
+			
+			node* ptr = args;
+			int counter = 0;
+
+			while(ptr!=NULL){
+				counter = counter + 1;
+				if (counter == 1){
+					regname.x = exp;
+				}
+				else if (counter == 2){
+					regname.y = exp;
+				}
+				else if (counter  == 3){
+					regname.z = exp;
+				}
+				else if(counter == 4){
+					regname.w = exp;
+				}
+				ptr = ptr->arguments.args;
+			}
+			
 			break;
 		}
 
 		case FUNCTION_NODE: {
-			break;
+
 		}
 
 		// todo: need to figure out how to store INT in registers
@@ -281,7 +359,7 @@ char* get_op_char(int op) {
 	}
 }
 
-void append_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *out) {
+void append_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *out, char* regType) {
 	instr *ins = (instr *)malloc(sizeof(instr));
 	ins->is_op = is_op;
 	ins->op = op;
@@ -289,6 +367,8 @@ void append_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *
 	ins->in2 = in2;
 	ins->in3 = in3;
 	ins->out = out;
+	ins->regType = regType;
+
 
 	if (!ins_list) {
 		ins_list = ins;
@@ -299,6 +379,7 @@ void append_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *
 } 
 
 void print_instr(instr *ins) {
+
 	if(ins->is_op == OPERATION) {
 		if(ins->out != NULL && ins->in1 != NULL) {
 			fprintf(dumpFile, "%s %s %s\n", get_op_char(ins->op), ins->out, ins->in1);
@@ -307,8 +388,13 @@ void print_instr(instr *ins) {
 		} else if (ins->out != NULL && ins->in1 != NULL && ins->in2 != NULL && ins->in3 != NULL) {
 			fprintf(dumpFile, "%s %s %s %s %s\n", get_op_char(ins->op), ins->out, ins->in1, ins->in2, ins->in3);
 		}
-	} else if (ins->is_op == DECLARATION) {
-		fprintf(dumpFile, "TEMP %s\n", ins->out);
+	} else if (ins->is_op == DECLARATION || ASSIGNMENT) {
+		if (regType == "TEMP"){
+			fprintf(dumpFile, "TEMP MOV %s %s\n", ins->reg1, ins->out);
+		}
+		else if (regType == "CONST"){
+			fprintf(dumpFile, "CONST MOV %s %s\n", ins->reg1, ins->out);
+		}
 	}
 }
 
