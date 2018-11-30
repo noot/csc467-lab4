@@ -95,39 +95,40 @@ void gen_code_post(node *curr, int i) {
 
 			char* reg1 = get_temp_reg(left);
 			char* reg2 = get_temp_reg(right);
+			char* regType = "TEMP";
 
 			switch(op){
 				case ADD: {
-					append_instr(OPERATION, ADD_, reg1, reg2, NULL, temp);
+					append_instr(OPERATION, ADD_, reg1, reg2, NULL, regType);
 					break;
 				}
 				case SUB: {
-					append_instr(OPERATION, SUB_, reg1, reg2, NULL, temp);
+					append_instr(OPERATION, SUB_, reg1, reg2, NULL, regType);
 					break;
 				}
 				
 				case MUL:{	
-					append_instr(OPERATION, MUL_, reg1, reg2, NULL, temp);
+					append_instr(OPERATION, MUL_, reg1, reg2, NULL, regType);
 					break;
 				}
 
 				case EXP:{	
-					append_instr(OPERATION, POW, reg1, reg2, NULL, temp);
+					append_instr(OPERATION, POW, reg1, reg2, NULL, regType);
 					break;
 				}
 
 				case LEQ:{	
-					append_instr(OPERATION, CMP, reg1, reg2, NULL, temp);
+					append_instr(OPERATION, CMP, reg1, reg2, NULL, regType);
 					break;
 				}
 
 				case GEQ:{	
-					append_instr(OPERATION, CMP, reg1, reg2, NULL, temp);
+					append_instr(OPERATION, CMP, reg1, reg2, NULL, regType);
 					break;
 				}
 
 				case EQ:{
-					append_instr(OPERATION, CMP, reg1, reg2, NULL, temp);
+					append_instr(OPERATION, CMP, reg1, reg2, NULL, temp, regType);
 					break;
 				}
 				default: {
@@ -140,6 +141,7 @@ void gen_code_post(node *curr, int i) {
 
 		case UNARY_OP_NODE: {
 			char *temp = get_temp_reg(curr);
+			char* regType = "TEMP";
 
 			int op = curr->unary_expr.op;
 			node *right = curr->unary_expr.right;
@@ -150,7 +152,7 @@ void gen_code_post(node *curr, int i) {
 
 			switch(op) {
 				case SUB: {
-					append_instr(OPERATION, SUB_, temp, ZERO, reg, NULL);
+					append_instr(OPERATION, SUB_, temp, ZERO, reg, NULL, regType);
 					break;
 				}
 				default:
@@ -161,7 +163,6 @@ void gen_code_post(node *curr, int i) {
 		}
 
 		case ASSIGNMENT_NODE: {
-
 			_entry *findVar;
 
 			node* leftHandSide = curr->assignment.variable;
@@ -184,8 +185,8 @@ void gen_code_post(node *curr, int i) {
 			//char* reg2 = assign_temp_variable(rightHandSide);
 
 			append_instr(ASSIGNMENT, NONE, reg1, reg2, NULL, temp, regType); //this would be a move operation 
-			break; */
-		}s
+			break; 
+		}
 	
 		case DECLARATION_NODE: {
 			int is_const = curr->is_const;
@@ -219,8 +220,11 @@ void gen_code_post(node *curr, int i) {
 
 				append_instr(DECLARATION, NONE, inputReg, NULL, NULL, resultReg, regType); //mov instruction 
 			}
+			// assign expression to variable
+			//append_instr(OPERATION, MOV, curr->assignment.exp->variable.id, NULL, NULL, curr->assignment.variable->variable.id);
 			break;
 		}
+
 
 		case STATEMENT_NODE: {
 			if (curr->statement.is_if){
@@ -258,6 +262,8 @@ void gen_code_post(node *curr, int i) {
 			else if (var.idx == 4){
 
 			}
+			// assign register with same name as variable
+			append_instr(DECLARATION, NONE, curr->variable.id, NULL, NULL, NULL);
 			break;
 		}
 
@@ -294,7 +300,28 @@ void gen_code_post(node *curr, int i) {
 		}
 
 		case FUNCTION_NODE: {
-
+			char *temp = get_temp_reg(curr);
+			switch(curr->function.function_name) {
+				case DP3: {
+					// move this part to ARGUMENTS_NODE ?
+					node *arg1 = curr->function.args->arguments.exp;
+					node *arg2 = curr->function.args->arguments.args->arguments.exp;
+					// declarate the arguments
+					append_instr(DECLARATION, NONE, arg1->exp.variable->variable.id, NULL, NULL, NULL);
+					append_instr(DECLARATION, NONE, arg2->exp.variable->variable.id, NULL, NULL, NULL);
+					// move args to temp regs
+					// call DP3
+					append_instr(OPERATION, DP3, arg1->exp.variable->variable.id, arg2->exp.variable->variable.id, NULL, temp);
+					break;
+				}
+				case RSQ: {
+					break;
+				}
+				case LIT: {
+					break;
+				}
+			}
+			break;
 		}
 
 		// todo: need to figure out how to store INT in registers
@@ -315,9 +342,7 @@ void gen_code_post(node *curr, int i) {
 			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL);
 		}
 
-		default:
-			break;
-		
+		default: break;
 	}
 }
 

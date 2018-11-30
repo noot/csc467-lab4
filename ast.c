@@ -31,12 +31,6 @@ node *ast_allocate(node_kind kind, ...) {
     case DECLARATIONS_NODE:
       //ast->declarations.declarations = va_arg(args, node *);
       ast->declarations.declaration = va_arg(args, node *);
-      //if((unsigned long long)ast->declarations.declarations <= 0x1000) {
-      //  printf("Something declarations is wrong here ... \n");
-      //}
-      if((unsigned long long)ast->declarations.declaration <= 0x1000) {
-        printf("Something declaration is wrong here ... \n");
-      }
       break;
 
     case STATEMENTS_NODE:
@@ -70,10 +64,9 @@ node *ast_allocate(node_kind kind, ...) {
 
     case TYPE_NODE:
       ast->type.type_name = va_arg(args, int);
-      ast->type.vec = va_arg(args, int); // how to do this?
+      ast->type.vec = va_arg(args, int);
       break;
 
-    // expressions
     case EXP_NODE:
       ast->exp.variable = va_arg(args, node *);
       break;
@@ -126,9 +119,9 @@ node *ast_allocate(node_kind kind, ...) {
       ast->function.args = va_arg(args, node *);
       break;
 
-    case ARGUMENTS_OPT_NODE:
-      ast->arguments_opt.args = va_arg(args, node *);
-      break;
+    // case ARGUMENTS_OPT_NODE:
+    //   ast->arguments_opt.args = va_arg(args, node *);
+    //   break;
 
     case ARGUMENTS_NODE:
       ast->arguments.args = va_arg(args, node *);
@@ -147,7 +140,6 @@ node *ast_allocate(node_kind kind, ...) {
 }
 
 void ast_visit(int depth, node *curr, func pre, func post) {
-  //printf("visiting ast...");
   if (NULL == curr) return;
 
   depth++;
@@ -215,9 +207,9 @@ void ast_visit(int depth, node *curr, func pre, func post) {
       if(curr->function.args) ast_visit(depth, curr->function.args, pre, post); 
       break;
 
-    case ARGUMENTS_OPT_NODE:
-      if(curr->arguments_opt.args) ast_visit(depth, curr->arguments_opt.args, pre, post); 
-      break;
+    // case ARGUMENTS_OPT_NODE:
+    //   if(curr->arguments_opt.args) ast_visit(depth, curr->arguments_opt.args, pre, post); 
+    //   break;
 
     case ARGUMENTS_NODE:
       if(curr->arguments.args) ast_visit(depth, curr->arguments.args, pre, post); 
