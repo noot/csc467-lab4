@@ -10,6 +10,7 @@
 #include "semantic.h"
 
 instr *ins_list; // beginning instruction
+constructorReg *cnstReg; 
 
 char *ZERO = "0";
 
@@ -230,6 +231,11 @@ void gen_code_post(node *curr, int i) {
 			}
 			// assign expression to variable
 			//append_instr(OPERATION, MOV, curr->assignment.exp->variable.id, NULL, NULL, curr->assignment.variable->variable.id);
+
+			if (exp->kind == CONSTRUCTOR){ // is this valid
+				constructorReg *cnstr  = exp->constructor;
+				append_instr(DECLARATION, NONE, NULL,NULL, resultReg, regType,cnstr); 
+			}
 			break;
 		}
 
@@ -285,6 +291,9 @@ void gen_code_post(node *curr, int i) {
 			char* regType = "TEMP";
 			node* type = curr->constructor.type;
 			node* args = curr->constructor.args->arguments;
+			char* x,y,z,w;
+			constructorReg *cnstr = (cnstr *)malloc(sizeof(cnstr));
+
 			
 			node* ptr = args;
 			int counter = 0;
@@ -292,21 +301,26 @@ void gen_code_post(node *curr, int i) {
 			while(ptr!=NULL){
 				counter = counter + 1;
 				if (counter == 1){
-					regname.x = exp;
+					x = exp;
+					cnstr.x = x;
 				}
 				else if (counter == 2){
-					regname.y = exp;
+					y = exp;
+					cnstr.y = y;
 				}
 				else if (counter  == 3){
-					regname.z = exp;
+					z = exp;
+					cnstr.z = z;
 				}
 				else if(counter == 4){
-					regname.w = exp;
+					w = exp;	
+					cnstr.w = w;
 				}
 				ptr = ptr->arguments.args;
 			}
 			
 			break;
+
 		}
 
 		case FUNCTION_NODE: {
@@ -398,7 +412,7 @@ char* get_op_char(int op) {
 	}
 }
 
-void append_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *out, char* regType) {
+void append_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *out, char* regType, constructorReg *cnstr) {
 	instr *ins = (instr *)malloc(sizeof(instr));
 	ins->is_op = is_op;
 	ins->op = op;
@@ -407,6 +421,7 @@ void append_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *
 	ins->in3 = in3;
 	ins->out = out;
 	ins->regType = regType;
+	ins->cnstr = cnstr;
 
 
 	if (!ins_list) {
@@ -429,11 +444,19 @@ void print_instr(instr *ins) {
 		}
 	} else if (ins->is_op == DECLARATION) {
 		if (ins->regType == "TEMP"){
-			fprintf(dumpFile, "TEMP MOV %s %s\n", ins->in1, ins->out);
+			fprintf(dumpFile, "TEMP MOV %s %s\n", ins->out, ins->in1);
+			if (ins->cnstr != NULL){
+				fprintf(dumpFile, "TEMP MOV %s.x %s\n", ins->out, ins->in1);
+				fprintf(dumpFile, "TEMP MOV %s.y %s\n", ins->out, ins->in1);
+				fprintf(dumpFile, "TEMP MOV %s.z %s\n", ins->out, ins->in1);
+				fprintf(dumpFile, "TEMP MOV %s.w %s\n", ins->out, ins->in1); //check if they are null or not
+			}
 		}
 		else if (ins->regType == "CONST"){
-			fprintf(dumpFile, "CONST MOV %s %s\n", ins->in1, ins->out);
+			fprintf(dumpFile, "CONST MOV %s %s\n", ins->out, ins->in1);
 		}
+
+
 	}
 }
 
