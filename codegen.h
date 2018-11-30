@@ -61,6 +61,10 @@ typedef enum {
 // 	ENV3 = 13
 // } reg_type;
 
+typdef struct constructorReg{
+	char* x,y,z,w;
+}constructorReg;
+
 typedef struct instr {
 	int is_op; // 1 if operation, 0 if declaration
 	op_type op;
