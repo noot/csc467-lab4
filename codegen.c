@@ -71,8 +71,6 @@ char* get_assigned_reg(int var_name) { //or create a hash map
 }
 
 void gen_code_post(node *curr, int i) {
-	instr *ins;
-
 	switch(curr->kind) {
 		case SCOPE_NODE: 
 			break;
