@@ -4,6 +4,10 @@
 #include "common.h"
 #include "codegen.h"
 #include "parser.tab.h"
+#include "ast.h"
+#include "symbol.h"
+#include <string.h>
+#include "semantic.h"
 
 instr *ins_list; // beginning instruction
 
@@ -91,39 +95,40 @@ void gen_code_post(node *curr, int i) {
 			int op = curr->binary_expr.op;
 			node *left = curr->binary_expr.left;
 			node *right = curr->binary_expr.right;
-			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL);
+			char* regType = "TEMP";
+			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL,regType);
 
 			char* reg1 = get_temp_reg(left);
 			char* reg2 = get_temp_reg(right);
-			char* regType = "TEMP";
+
 
 			switch(op){
 				case ADD: {
-					append_instr(OPERATION, ADD_, reg1, reg2, NULL, regType);
+					append_instr(OPERATION, ADD_, reg1, reg2, NULL, temp, regType);
 					break;
 				}
 				case SUB: {
-					append_instr(OPERATION, SUB_, reg1, reg2, NULL, regType);
+					append_instr(OPERATION, SUB_, reg1, reg2, NULL, temp, regType);
 					break;
 				}
 				
 				case MUL:{	
-					append_instr(OPERATION, MUL_, reg1, reg2, NULL, regType);
+					append_instr(OPERATION, MUL_, reg1, reg2, NULL, temp, regType);
 					break;
 				}
 
 				case EXP:{	
-					append_instr(OPERATION, POW, reg1, reg2, NULL, regType);
+					append_instr(OPERATION, POW, reg1, reg2, NULL, temp, regType);
 					break;
 				}
 
 				case LEQ:{	
-					append_instr(OPERATION, CMP, reg1, reg2, NULL, regType);
+					append_instr(OPERATION, CMP, reg1, reg2, NULL, temp, regType);
 					break;
 				}
 
 				case GEQ:{	
-					append_instr(OPERATION, CMP, reg1, reg2, NULL, regType);
+					append_instr(OPERATION, CMP, reg1, reg2, NULL, temp, regType);
 					break;
 				}
 
@@ -145,8 +150,8 @@ void gen_code_post(node *curr, int i) {
 
 			int op = curr->unary_expr.op;
 			node *right = curr->unary_expr.right;
-			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL);
-			append_instr(OPERATION, MOV, temp, "%s", NULL, NULL);
+			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL, regType);
+			append_instr(OPERATION, MOV, temp, "%s", NULL, NULL,regType);
 
 			char* reg = get_temp_reg(right);
 
@@ -164,10 +169,12 @@ void gen_code_post(node *curr, int i) {
 
 		case ASSIGNMENT_NODE: {
 			_entry *findVar;
+			_entry *findExp;
 
 			node* leftHandSide = curr->assignment.variable;
-			node* rightHandSide = curr->assignement.exp;
+			node* rightHandSide = curr->assignment.exp;
 			char* regType = "TEMP";
+			char* inputReg = '/0';
 
 			//need to fetch that variable from the symbol table
 			findVar = find_entry(leftHandSide->variable.id); //call to findEntry
@@ -180,19 +187,20 @@ void gen_code_post(node *curr, int i) {
 			else{
 				char* inputReg = get_temp_reg(rightHandSide); //else use the expression variable
 			}
-
+		
+			char* outputReg = get_temp_reg(findVar);
 			//char* reg1 = assign_temp_variable(leftHandSide);
 			//char* reg2 = assign_temp_variable(rightHandSide);
 
-			append_instr(ASSIGNMENT, NONE, reg1, reg2, NULL, temp, regType); //this would be a move operation 
+			append_instr(DECLARATION, NONE, inputReg, NULL, NULL, outputReg, regType); //this would be a move operation 
 			break; 
 		}
 	
 		case DECLARATION_NODE: {
-			int is_const = curr->is_const;
-			char id = curr->id; 
-			node* type = curr->type;
-			node* exp = curr->exp;
+			int is_const = curr->declaration.is_const;
+			char id = curr->declaration.id; 
+			node* type = curr->declaration.type;
+			node* exp = curr->declaration.exp;
 			char* regType = "TEMP";
 
 			//is constant				
@@ -201,7 +209,7 @@ void gen_code_post(node *curr, int i) {
 			}
 
 			//if it's initialized
-			if (curr->exp){
+			if (exp){
 				node* leftHandSide = id;
 				node* rightHandSide = exp;
 
@@ -239,6 +247,7 @@ void gen_code_post(node *curr, int i) {
 		}
 
 		case VAR_NODE: {
+			char* regType = "TEMP";
 			/*char* id = curr->variable.id;
 			int is_vec = curr->is_vec;
 			int idx = curr->idx;*/
@@ -263,7 +272,7 @@ void gen_code_post(node *curr, int i) {
 
 			}
 			// assign register with same name as variable
-			append_instr(DECLARATION, NONE, curr->variable.id, NULL, NULL, NULL);
+			append_instr(DECLARATION, NONE, curr->variable.id, NULL, NULL, NULL,regType);
 			break;
 		}
 
@@ -273,6 +282,7 @@ void gen_code_post(node *curr, int i) {
 		}
 		
 		case CONSTRUCTOR_NODE: {
+			char* regType = "TEMP";
 			node* type = curr->constructor.type;
 			node* args = curr->constructor.args->arguments;
 			
@@ -300,6 +310,7 @@ void gen_code_post(node *curr, int i) {
 		}
 
 		case FUNCTION_NODE: {
+			char* regType = "TEMP";
 			char *temp = get_temp_reg(curr);
 			switch(curr->function.function_name) {
 				case DP3: {
@@ -307,8 +318,8 @@ void gen_code_post(node *curr, int i) {
 					node *arg1 = curr->function.args->arguments.exp;
 					node *arg2 = curr->function.args->arguments.args->arguments.exp;
 					// declarate the arguments
-					append_instr(DECLARATION, NONE, arg1->exp.variable->variable.id, NULL, NULL, NULL);
-					append_instr(DECLARATION, NONE, arg2->exp.variable->variable.id, NULL, NULL, NULL);
+					append_instr(DECLARATION, NONE, arg1->exp.variable->variable.id, NULL, NULL, NULL,regType);
+					append_instr(DECLARATION, NONE, arg2->exp.variable->variable.id, NULL, NULL, NULL,regType);
 					// move args to temp regs
 					// call DP3
 					append_instr(OPERATION, DP3, arg1->exp.variable->variable.id, arg2->exp.variable->variable.id, NULL, temp);
@@ -326,20 +337,23 @@ void gen_code_post(node *curr, int i) {
 
 		// todo: need to figure out how to store INT in registers
 		case INT_NODE: {
+			char* regType = "TEMP";
 			char *temp = get_temp_reg(curr);
-			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL);
+			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL,regType);
 			break;
 		}
 
 		case FLOAT_NODE: {
+			char* regType = "TEMP";
 			char *temp = get_temp_reg(curr);
-			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL);
+			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL,regType);
 			break;		
 		}
 
 		case BOOL_NODE: {
+			char* regType = "TEMP";
 			char *temp = get_temp_reg(curr);
-			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL);
+			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL,regType);
 		}
 
 		default: break;
@@ -413,12 +427,12 @@ void print_instr(instr *ins) {
 		} else if (ins->out != NULL && ins->in1 != NULL && ins->in2 != NULL && ins->in3 != NULL) {
 			fprintf(dumpFile, "%s %s %s %s %s\n", get_op_char(ins->op), ins->out, ins->in1, ins->in2, ins->in3);
 		}
-	} else if (ins->is_op == DECLARATION || ASSIGNMENT) {
-		if (regType == "TEMP"){
-			fprintf(dumpFile, "TEMP MOV %s %s\n", ins->reg1, ins->out);
+	} else if (ins->is_op == DECLARATION) {
+		if (ins->regType == "TEMP"){
+			fprintf(dumpFile, "TEMP MOV %s %s\n", ins->in1, ins->out);
 		}
-		else if (regType == "CONST"){
-			fprintf(dumpFile, "CONST MOV %s %s\n", ins->reg1, ins->out);
+		else if (ins->regType == "CONST"){
+			fprintf(dumpFile, "CONST MOV %s %s\n", ins->in1, ins->out);
 		}
 	}
 }

@@ -67,10 +67,11 @@ typedef struct instr {
 	char *in1, *in2, *in3;
 	char *out;
 	struct instr *next;
+	char* regType;
 } instr;
 
 void gen_code(node *ast);
 void gen_code_post(node *ast, int i);
-void append_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *out);
+void append_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *out, char* regType);
 
 #endif 
