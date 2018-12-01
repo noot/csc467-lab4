@@ -61,9 +61,9 @@ typedef enum {
 // 	ENV3 = 13
 // } reg_type;
 
-typdef struct constructorReg{
+typedef struct vec_reg {
 	char* x,y,z,w;
-}constructorReg;
+} vec_reg;
 
 typedef struct instr {
 	int is_op; // 1 if operation, 0 if declaration
@@ -71,11 +71,12 @@ typedef struct instr {
 	char *in1, *in2, *in3;
 	char *out;
 	struct instr *next;
-	char* regType;
 } instr;
 
+void print_code();
+void print_instr(instr *ins);
 void gen_code(node *ast);
 void gen_code_post(node *ast, int i);
-void append_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *out, char* regType);
+void append_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *out);
 
 #endif 

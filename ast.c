@@ -75,21 +75,21 @@ node *ast_allocate(node_kind kind, ...) {
       ast->type.is_const = false;
       ast->type.type_name = INT_T;
       ast->type.vec = false;
-      ast->type.int_val = va_arg(args, int);
+      ast->int_v = va_arg(args, int);
       break;
 
     case FLOAT_NODE:
       ast->type.is_const = false;
       ast->type.type_name = FLOAT_T;
       ast->type.vec = false;
-      ast->type.int_val = va_arg(args, int);
+      ast->float_v = va_arg(args, int);
       break;
 
     case BOOL_NODE:
       ast->type.is_const = false;
       ast->type.type_name = BOOL_T;
       ast->type.vec = false;
-      ast->type.bool_val = va_arg(args, int);
+      ast->bool_v = va_arg(args, int);
       break;
 
     case VAR_NODE:
