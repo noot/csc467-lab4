@@ -304,12 +304,13 @@ variable
   : IDENTIFIER		  		                    { yTRACE("variable -> identifier");
                                               $$ = ast_allocate(VAR_NODE, $1, 0, 0); }
   | IDENTIFIER LSQUARE INT RSQUARE	  	    { yTRACE("variable -> identifier[integer_literal]"); 
-                                              $$ = ast_allocate(VAR_NODE, $1, 0, $3); }
+                                              $$ = ast_allocate(VAR_NODE, $1, 1, $3); }
   | GL_LIGHT_AMBIENT                        { yTRACE("variable -> GL_LIGHT_AMBIENT");
                                               $$ = ast_allocate(VAR_NODE, $1, 0, 0); }
 
   | GL_FRAGCOLOR                            { yTRACE("variable -> GL_FRAGCOLOR");
                                               $$ = ast_allocate(VAR_NODE, $1, 0, 0); }
+  | GL_FRAGCOORD                            { $$ = ast_allocate(VAR_NODE, $1, 0, 0); }
   ;
 constructor 
   : type LBRACKET arguments RBRACKET    		  { yTRACE("constructor -> type ( arguments )");

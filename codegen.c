@@ -103,17 +103,18 @@ void gen_code_post(node *curr, int i) {
 
 		case BINARY_OP_NODE: {
 			char *temp = get_temp_reg(curr);
+			//char *temp = "temp";
 			int op = curr->binary_expr.op;
 			node *left = curr->binary_expr.left;
 			node *right = curr->binary_expr.right;
 			//append_instr(DECLARATION, NONE, NULL, NULL, NULL, temp);
 
-			// char* reg1 = get_temp_reg(left);
-			// char* reg2 = get_temp_reg(right);
 			// char* reg1 = left->exp.variable->variable.id;
 			// char* reg2 = right->exp.variable->variable.id;
 			char* reg1 = left->reg_name;
-			char* reg2 = right->reg_name;
+			printf("%s\n", reg1);
+			char* reg2 = right->exp.variable->reg_name;
+			printf("%s\n", reg2);
 
 			switch(op){
 				case ADD: {
@@ -162,7 +163,7 @@ void gen_code_post(node *curr, int i) {
 
 			int op = curr->unary_expr.op;
 			node *right = curr->unary_expr.right;
-			append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL);
+			//append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL);
 			append_instr(OPERATION, MOV, temp, "%s", NULL, NULL);
 
 			char* reg = get_temp_reg(right);
@@ -180,78 +181,21 @@ void gen_code_post(node *curr, int i) {
 		}
 
 		case ASSIGNMENT_NODE: {
-			//append_instr(OPERATION, MOV, curr->assignment.variable->variable.id, NULL, NULL, curr->assignment.exp->exp.variable->variable.id);
-			// _entry *findVar;
-			// _entry *findExp;
-
-			// node* leftHandSide = curr->assignment.variable;
-			// node* rightHandSide = curr->assignment.exp;
-			// char* regType = "TEMP";
-			// char* inputReg = '0';
-
-			// //need to fetch that variable from the symbol table
-			// findVar = find_entry(leftHandSide->variable.id); //call to findEntry
-			// findExp = find_entry(rightHandSide->variable.id); //call to findEntry
-			
-			// char *resultReg = get_temp_reg(findVar); //if variable exists, assign to this 
-			// if (findExp){
-			// 	char *inputReg = get_temp_reg(findExp); //if the right hand side is also a declared variable, use that name
-			// }
-			// else{
-			// 	char* inputReg = get_temp_reg(rightHandSide); //else use the expression variable
-			// }
-		
-			// char* outputReg = get_temp_reg(findVar);
-			// //char* reg1 = assign_temp_variable(leftHandSide);
-			// //char* reg2 = assign_temp_variable(rightHandSide);
-
-			// append_instr(DECLARATION, NONE, inputReg, NULL, NULL, outputReg, regType); //this would be a move operation 
+			if(curr->assignment.variable && curr->assignment.exp->exp.variable) {
+				//append_instr(OPERATION, MOV, curr->assignment.variable->reg_name, NULL, NULL, curr->assignment.exp->exp.variable->reg_name);
+			}
 			break; 
 		}
 	
 		case DECLARATION_NODE: {
-			append_instr(DECLARATION, NONE, NULL, NULL, NULL, curr->declaration.id);
+			if(!curr->reg_name) {
+				append_instr(DECLARATION, NONE, NULL, NULL, NULL, curr->declaration.id);
+				curr->reg_name = curr->declaration.id;
+			}
 			char val[64];
+			// move initial value to register
 			sprintf(val, "%d", curr->declaration.type->type.int_val);
 			append_instr(OPERATION, MOV, curr->declaration.id, val, NULL, NULL);
-			// int is_const = curr->declaration.is_const;
-			// char* id = curr->declaration.id; 
-			// node* type = curr->declaration.type;
-			// node* exp = curr->declaration.exp;
-			// char* regType = "TEMP";
-
-			// //is constant				
-			// if (is_const){
-			// 	regType = "CONST";
-			// }
-
-			// //if it's initialized
-			// if (exp){
-			// 	node* leftHandSide = id;
-			// 	node* rightHandSide = exp;
-
-			// 	resultReg = get_temp_reg(leftHandSide);
-			// 	inputReg = get_temp_reg(rightHandSide);
-
-			// 	append_instr(DECLARATION, NONE, reg1, NULL, NULL, resultReg, regType); //mov instruction
-			// }
-			// //not initialized, so set to zero
-			// else{
-			// 	node* leftHandSide = id;
-			// 	node* rightHandSide = 0;
-
-			// 	resultReg = get_temp_reg(leftHandSide); //change this to variable name
-			// 	inputReg = get_temp_reg(rightHandSide);
-
-			// 	append_instr(DECLARATION, NONE, inputReg, NULL, NULL, resultReg, regType); //mov instruction 
-			// }
-			// // assign expression to variable
-			// //append_instr(OPERATION, MOV, curr->assignment.exp->variable.id, NULL, NULL, curr->assignment.variable->variable.id);
-
-			// if (exp->kind == CONSTRUCTOR){ // is this valid
-			// 	vec_reg *cnstr  = exp->constructor;
-			// 	append_instr(DECLARATION, NONE, NULL,NULL, resultReg, regType,cnstr); 
-			// }
 			break;
 		}
 
@@ -266,8 +210,19 @@ void gen_code_post(node *curr, int i) {
 
 
 		case EXP_NODE: {
+			//if(sizeof(curr->exp.variable->reg_name) > 0) break;
 			if(curr->exp.variable) {
-				curr->reg_name = curr->exp.variable->variable.id;
+				if(curr->exp.variable->variable.is_vec) {
+					char *idx = get_idx(curr->exp.variable->variable.idx);
+					char reg_name[128];
+					sprintf(reg_name, "%s.%s", curr->exp.variable->variable.id, idx);
+					curr->reg_name = reg_name;
+					//printf("%s\n",reg_name);
+				} else {
+					curr->reg_name = curr->exp.variable->variable.id;
+				}
+			} else {
+				curr->reg_name = get_temp_reg(curr);
 			}
 			break;
 		}
@@ -282,6 +237,7 @@ void gen_code_post(node *curr, int i) {
 			if(strcmp(curr->variable.id, "gl_Color") == 0) {
 				id = "fragment.color";
 			} else if (strcmp(curr->variable.id, "gl_FragCoord") == 0) {
+				//printf("noot");
 				id = "fragment.position";
 			} else if (strcmp(curr->variable.id, "gl_FragColor") == 0) {
 				id = "result.color";
@@ -306,17 +262,24 @@ void gen_code_post(node *curr, int i) {
 			} else if (strcmp(curr->variable.id, "env3") == 0) {
 				id = "program.env[3]";
 			} else {
-				append_instr(DECLARATION, NONE, NULL, NULL, NULL, id);
+				//append_instr(DECLARATION, NONE, NULL, NULL, NULL, id);
 			}
 
-			if(curr->variable.is_vec == 1) {
+			if(!curr->reg_name) {
+				curr->reg_name = id;
+			}
+
+			if(curr->variable.is_vec) {
 				char *idx = get_idx(curr->variable.idx);
-				strcat(id, idx);
-				printf(id);
+				char reg_name[128];
+				sprintf(reg_name, "%s.%s", id, idx);
+				id = reg_name;
+				//printf("%s\n", reg_name);
 			}
 
 			curr->reg_name = id;
 
+			//printf(curr->reg_name);
 			break;
 		}
 
@@ -326,7 +289,6 @@ void gen_code_post(node *curr, int i) {
 		}
 		
 		case CONSTRUCTOR_NODE: {
-			char* regType = "TEMP";
 			node* type = curr->constructor.type;
 			node* args = curr->constructor.args->arguments.args;
 			
@@ -385,13 +347,13 @@ void gen_code_post(node *curr, int i) {
 			break;		
 		}
 
-		case BOOL_NODE: {
-			char *temp = get_temp_reg(curr);
-			append_instr(DECLARATION, NONE, NULL, NULL, NULL, temp);
-			char val[64];
-			sprintf(val, "%d", curr->int_v);
-			append_instr(OPERATION, MOV, val, NULL, NULL, temp);
-		}
+		// case BOOL_NODE: {
+		// 	char *temp = get_temp_reg(curr);
+		// 	append_instr(DECLARATION, NONE, NULL, NULL, NULL, temp);
+		// 	char val[64];
+		// 	sprintf(val, "%d", curr->int_v);
+		// 	append_instr(OPERATION, MOV, val, NULL, NULL, temp);
+		// }
 
 		default: break;
 	}
@@ -442,11 +404,10 @@ void append_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *
 	ins->in1 = in1;
 	ins->in2 = in2;
 	ins->in3 = in3;
-	//strsep(&out, " ");
 	
-	ins->out = strsep(&out, "\n");
-	ins->out = strsep(&ins->out, " ");
-	ins->out = strsep(&ins->out, ";");
+	ins->out = out;
+
+	//printf("%s\n", out);
 
 	if (!ins_list) {
 		ins_list = ins;
@@ -468,18 +429,7 @@ void print_instr(instr *ins) {
 			fprintf(dumpFile, "%s %s %s %s %s\n", get_op_char(ins->op), ins->out, ins->in1, ins->in2, ins->in3);
 		}
 	} else if (ins->is_op == DECLARATION) {
-		//if (ins->regType == "TEMP"){
-			fprintf(dumpFile, "TEMP %s\n", ins->out);
-			// if (ins->cnstr != NULL){
-			// 	fprintf(dumpFile, "TEMP MOV %s.x %s\n", ins->out, ins->in1);
-			// 	fprintf(dumpFile, "TEMP MOV %s.y %s\n", ins->out, ins->in1);
-			// 	fprintf(dumpFile, "TEMP MOV %s.z %s\n", ins->out, ins->in1);
-			// 	fprintf(dumpFile, "TEMP MOV %s.w %s\n", ins->out, ins->in1); //check if they are null or not
-			// }
-		//}
-		// else if (ins->regType == "CONST"){
-		// 	fprintf(dumpFile, "CONST MOV %s %s\n", ins->out, ins->in1);
-		// }
+		fprintf(dumpFile, "TEMP %s\n", ins->out);
 	}
 }
 
