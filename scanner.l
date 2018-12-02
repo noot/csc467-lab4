@@ -145,7 +145,7 @@ const/{WS}			{ yTRACE(CONST); return CONST;}
 [a-zA-Z_][a-zA-Z0-9_]* 		{ 	if (yyleng > 32) {
 									yERROR("identifier exceeds maximum length");
 								} else {
-									yylval.name = yytext;
+									yylval.name = strdup(yytext);
 									yTRACE(IDENTIFIER); return IDENTIFIER;
 								}
 							}

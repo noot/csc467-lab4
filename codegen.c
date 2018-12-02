@@ -53,7 +53,15 @@ char* assign_temp_variable(node *n){
 	//}
 }
 
-
+char *get_idx(int i) {
+	switch(i) {
+		case 0: return "x";
+		case 1: return "y";
+		case 2: return "z";
+		case 3: return "w";
+		default: return "";
+	}
+}
 
 char* get_assigned_reg(int var_name) { //or create a hash map
 	switch (var_name) {
@@ -98,11 +106,14 @@ void gen_code_post(node *curr, int i) {
 			int op = curr->binary_expr.op;
 			node *left = curr->binary_expr.left;
 			node *right = curr->binary_expr.right;
-			append_instr(DECLARATION, NONE, NULL, NULL, NULL, temp);
+			//append_instr(DECLARATION, NONE, NULL, NULL, NULL, temp);
 
-			char* reg1 = get_temp_reg(left);
-			char* reg2 = get_temp_reg(right);
-
+			// char* reg1 = get_temp_reg(left);
+			// char* reg2 = get_temp_reg(right);
+			// char* reg1 = left->exp.variable->variable.id;
+			// char* reg2 = right->exp.variable->variable.id;
+			char* reg1 = left->reg_name;
+			char* reg2 = right->reg_name;
 
 			switch(op){
 				case ADD: {
@@ -255,6 +266,9 @@ void gen_code_post(node *curr, int i) {
 
 
 		case EXP_NODE: {
+			if(curr->exp.variable) {
+				curr->reg_name = curr->exp.variable->variable.id;
+			}
 			break;
 		}
 
@@ -291,9 +305,18 @@ void gen_code_post(node *curr, int i) {
 				id = "program.env[2]";
 			} else if (strcmp(curr->variable.id, "env3") == 0) {
 				id = "program.env[3]";
+			} else {
+				append_instr(DECLARATION, NONE, NULL, NULL, NULL, id);
 			}
 
-			append_instr(DECLARATION, NONE, NULL, NULL, NULL, id);
+			if(curr->variable.is_vec == 1) {
+				char *idx = get_idx(curr->variable.idx);
+				strcat(id, idx);
+				printf(id);
+			}
+
+			curr->reg_name = id;
+
 			break;
 		}
 
@@ -333,6 +356,14 @@ void gen_code_post(node *curr, int i) {
 				}
 			}
 			break;
+		}
+
+		case TYPE_NODE: {
+			if(curr->type.vec == 1) {
+				char *idx = get_idx(curr->type.vec);
+				//strcat(id, idx);
+				printf(idx);
+			}		
 		}
 
 		// todo: need to figure out how to store INT in registers
