@@ -109,14 +109,17 @@ void gen_code_post(node *curr, int i) {
 			node *right = curr->binary_expr.right;
 			//append_instr(DECLARATION, NONE, NULL, NULL, NULL, temp);
 
-			// char* reg1 = left->exp.variable->variable.id;
-			// char* reg2 = right->exp.variable->variable.id;
-			char* reg1 = left->reg_name;
-			//printf("%s\n", reg1);
-			char* reg2 = right->exp.variable->reg_name;
-			//int len = strlen(reg2);
-			int len = right->exp.variable->reg_name_len;
-			reg2[len] = '\0';
+			char* reg1;
+			char* reg2;
+			if(curr->binary_expr.left && curr->binary_expr.right->exp.variable) {
+				reg1 = left->reg_name;
+				reg2 = right->reg_name;
+				//int len = right->reg_name_len;
+				//reg2[len] = '\0';	
+			} else {
+
+			}
+
 			//printf("%d\n", len);
 			//printf("%s\n", reg2);
 
@@ -185,8 +188,9 @@ void gen_code_post(node *curr, int i) {
 		}
 
 		case ASSIGNMENT_NODE: {
-			if(curr->assignment.variable && curr->assignment.exp->exp.variable) {
-				//append_instr(OPERATION, MOV, curr->assignment.variable->reg_name, NULL, NULL, curr->assignment.exp->exp.variable->reg_name);
+			if(curr->assignment.variable && curr->assignment.exp) {
+				char* var_reg = curr->assignment.exp->reg_name;
+				append_instr(OPERATION, MOV, curr->assignment.variable->reg_name, NULL, NULL, var_reg);
 			}
 			break; 
 		}
@@ -243,6 +247,7 @@ void gen_code_post(node *curr, int i) {
 
 		case VAR_NODE: {
 			char *id = curr->variable.id;
+			//curr->reg_name = id;
 			if(strcmp(curr->variable.id, "gl_Color") == 0) {
 				id = "fragment.color";
 			} else if (strcmp(curr->variable.id, "gl_FragCoord") == 0) {
@@ -270,13 +275,7 @@ void gen_code_post(node *curr, int i) {
 				id = "program.env[2]";
 			} else if (strcmp(curr->variable.id, "env3") == 0) {
 				id = "program.env[3]";
-			} else {
-				//append_instr(DECLARATION, NONE, NULL, NULL, NULL, id);
-			}
-
-			if(!curr->reg_name) {
-				curr->reg_name = id;
-			}
+			} 
 
 			if(curr->variable.is_vec) {
 				char *idx = get_idx(curr->variable.idx);
@@ -329,6 +328,7 @@ void gen_code_post(node *curr, int i) {
 				case LIT: {
 					break;
 				}
+				default: break;
 			}
 			break;
 		}
@@ -342,23 +342,23 @@ void gen_code_post(node *curr, int i) {
 		}
 
 		// todo: need to figure out how to store INT in registers
-		case INT_NODE: {
-			char *temp = get_temp_reg(curr);
-			append_instr(DECLARATION, NONE, NULL, NULL, NULL, temp);
-			char val[64] = {'\0'};
-			sprintf(val, "%d", curr->int_v);
-			append_instr(OPERATION, MOV, val, NULL, NULL, temp);
-			break;
-		}
+		// case INT_NODE: {
+		// 	char *temp = get_temp_reg(curr);
+		// 	append_instr(DECLARATION, NONE, NULL, NULL, NULL, temp);
+		// 	char val[64] = {'\0'};
+		// 	sprintf(val, "%d", curr->int_v);
+		// 	//append_instr(OPERATION, MOV, val, NULL, NULL, temp);
+		// 	break;
+		// }
 
-		case FLOAT_NODE: {
-			char *temp = get_temp_reg(curr);
-			append_instr(DECLARATION, NONE, NULL, NULL, NULL, temp);
-			char val[64] = {'\0'};
-			sprintf(val, "%d", curr->int_v);
-			append_instr(OPERATION, MOV, val, NULL, NULL, temp);
-			break;		
-		}
+		// case FLOAT_NODE: {
+		// 	char *temp = get_temp_reg(curr);
+		// 	append_instr(DECLARATION, NONE, NULL, NULL, NULL, temp);
+		// 	char val[64] = {'\0'};
+		// 	sprintf(val, "%d", curr->int_v);
+		// 	append_instr(OPERATION, MOV, val, NULL, NULL, temp);
+		// 	break;		
+		// }
 
 		// case BOOL_NODE: {
 		// 	char *temp = get_temp_reg(curr);
@@ -434,11 +434,11 @@ void append_instr(int is_op, op_type op, char *in1, char *in2, char *in3, char *
 
 void print_instr(instr *ins) {
 	if(ins->is_op == OPERATION) {
-		if(ins->out != NULL && ins->in1 != NULL) {
+		if(ins->out != NULL && ins->in1 != NULL && ins->in2 != NULL && ins->in3 != NULL) {
 			fprintf(dumpFile, "%s %s %s\n", get_op_char(ins->op), ins->out, ins->in1);
 		} else if (ins->out != NULL && ins->in1 != NULL && ins->in2 != NULL) {
 			fprintf(dumpFile, "%s %s %s %s\n", get_op_char(ins->op), ins->out, ins->in1, ins->in2);
-		} else if (ins->out != NULL && ins->in1 != NULL && ins->in2 != NULL && ins->in3 != NULL) {
+		} else if (ins->out != NULL && ins->in1 != NULL) {
 			fprintf(dumpFile, "%s %s %s %s %s\n", get_op_char(ins->op), ins->out, ins->in1, ins->in2, ins->in3);
 		}
 	} else if (ins->is_op == DECLARATION) {
