@@ -34,6 +34,7 @@ typedef enum {
   LIT = 1, 
   RSQ = 2
 } function_name;
+
 %}
 
 /***********************************************************************
@@ -109,9 +110,6 @@ typedef enum {
 %token <name> CONST
 
 %token <func> FUNC
-// %token DP3
-// %token LIT
-// %token RSQ
 
 %token <name> INC
 %token <name> DEC
@@ -157,7 +155,7 @@ typedef enum {
 %type <ast_t> function
 %type <ast_t> arguments
 
-%type <int> function_name
+//%type <ast_t> function_name
 // %type <int> DP3
 // %type <int> LIT
 // %type <int> RSQ

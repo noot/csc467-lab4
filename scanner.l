@@ -94,9 +94,9 @@ while 			{ yTRACE(WHILE); return WHILE; }
 "env2"/{WS}  				{yTRACE(ENV2); return ENV2;}
 "env3"/{WS}  				{yTRACE(ENV3); return ENV3;}
 
-dp3/{DELIM}				{ yTRACE(FUNC); return FUNC; }
-rsq/{DELIM}				{ yTRACE(FUNC); return FUNC; }
-lit/{DELIM}				{ yTRACE(FUNC); return FUNC; }
+dp3/{DELIM}				{ yylval.func = 0; yTRACE(FUNC); return FUNC; }
+lit/{DELIM}				{ yylval.func = 1; yTRACE(FUNC); return FUNC; }
+rsq/{DELIM}				{ yylval.func = 2; yTRACE(FUNC); return FUNC; }
 
 "int"/{WS}			{ yTRACE(INT_T); return INT_T;}
 "float"/{WS}			{ yTRACE(FLOAT_T); return FLOAT_T;}

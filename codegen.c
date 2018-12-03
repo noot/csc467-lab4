@@ -10,7 +10,9 @@
 
 instr *ins_list; // beginning instruction
 
-char *ZERO = "0";
+// number literals
+char *ZERO = "$0";
+char *ONE = "$1";
 
 void gen_code(node *ast) {
 	ast_visit(0, ast, NULL, gen_code_post);
@@ -24,33 +26,12 @@ void print_code() {
 	}
 }
 
-// void generateAssembly(node* curr, int regNum) {
-// 	if (isArithmeticOp(label(&curr))) {
-// 		generateAssembly(curr->left, regNum);
-// 		generateAssembly(curr->right, regNum +1);
-// 		generateArithmeticOp(label(&curr),regNum,regNum+1);
-// 	} 
-// 	else if (curr == assignment){
-// 		print_mov(label(&curr), regNum);
-// 	}
-// }
-
-// void print_mov(char *val, int reg) {
-// 	fprintf(dumpFile, 'MOV %s r%d\n', val, reg);
-// }
-
 int temp_count = 0;
 
 char* get_temp_reg(node *n) {
 	char *temp = (char *)calloc(16, sizeof(char)); 
 	sprintf(temp, "tempVar%d", temp_count++);
 	return temp;
-}
-
-char* assign_temp_variable(node *n){
-	//if (n == variable){
-	//	return variable.id;
-	//}
 }
 
 char *get_idx(int i) {
@@ -103,6 +84,7 @@ void gen_code_post(node *curr, int i) {
 
 		case BINARY_OP_NODE: {
 			char *temp = get_temp_reg(curr);
+			//curr->reg_name = temp;
 			//char *temp = "temp";
 			int op = curr->binary_expr.op;
 			node *left = curr->binary_expr.left;
@@ -126,64 +108,70 @@ void gen_code_post(node *curr, int i) {
 			switch(op){
 				case ADD: {
 					append_instr(OPERATION, ADD_, reg1, reg2, NULL, temp);
+					append_instr(OPERATION, MOV, temp, NULL, NULL, curr->reg_name);
 					break;
 				}
 				case SUB: {
 					append_instr(OPERATION, SUB_, reg1, reg2, NULL, temp);
+					append_instr(OPERATION, MOV, temp, NULL, NULL, curr->reg_name);
 					break;
 				}
 				
 				case MUL:{	
 					append_instr(OPERATION, MUL_, reg1, reg2, NULL, temp);
+					append_instr(OPERATION, MOV, temp, NULL, NULL, curr->reg_name);
 					break;
 				}
 
 				case EXP:{	
 					append_instr(OPERATION, POW, reg1, reg2, NULL, temp);
+					append_instr(OPERATION, MOV, temp, NULL, NULL, curr->reg_name);
 					break;
 				}
 
 				case LEQ:{	
-					append_instr(OPERATION, CMP, reg1, reg2, NULL, temp);
+					append_instr(OPERATION, SUB_, reg1, reg2, NULL, temp);
+					append_instr(OPERATION, CMP, temp, ONE, ZERO, temp);
+					append_instr(OPERATION, MOV, temp, NULL, NULL, curr->reg_name);
 					break;
 				}
 
 				case GEQ:{	
-					append_instr(OPERATION, CMP, reg1, reg2, NULL, temp);
+					append_instr(OPERATION, SUB_, reg1, reg2, NULL, temp);
+					append_instr(OPERATION, CMP, temp, ZERO, ONE, temp);
+					append_instr(OPERATION, MOV, temp, NULL, NULL, curr->reg_name);
 					break;
 				}
 
-				case EQ:{
-					append_instr(OPERATION, CMP, reg1, reg2, NULL, temp);
+				case EQ: {
+					append_instr(OPERATION, SUB_, reg1, reg2, NULL, temp);
+					append_instr(OPERATION, CMP, temp, ZERO, ONE, temp);
+					append_instr(OPERATION, MOV, temp, NULL, NULL, curr->reg_name);
 					break;
 				}
 				default: {
 					break;
 				}
 			}
-
 			break;
 		}
 
 		case UNARY_OP_NODE: {
 			char *temp = get_temp_reg(curr);
-
+			curr->reg_name = temp;
 			int op = curr->unary_expr.op;
 			node *right = curr->unary_expr.right;
-			//append_instr(DECLARATION, NONE, temp, NULL, NULL, NULL);
-			append_instr(OPERATION, MOV, temp, "%s", NULL, NULL);
-
-			char* reg = get_temp_reg(right);
+			char* reg = right->reg_name;
 
 			switch(op) {
 				case SUB: {
-					append_instr(OPERATION, SUB_, temp, ZERO, reg, NULL);
+					append_instr(OPERATION, SUB_, ZERO, reg, NULL, temp);
+					append_instr(OPERATION, MOV, temp, NULL, NULL, curr->reg_name);
 					break;
 				}
 				default:
 					break;
 			}
-
 			break;
 		}
 
@@ -200,11 +188,14 @@ void gen_code_post(node *curr, int i) {
 				append_instr(DECLARATION, NONE, NULL, NULL, NULL, curr->declaration.id);
 				curr->reg_name = curr->declaration.id;
 			}
-			int len = strlen(curr->declaration.id);
-			char *val = (char *)malloc(len);
+			// int len = strlen(curr->declaration.id);
+			// char *val = (char *)malloc(len);
 			// move initial value to register
-			sprintf(val, "%d", curr->declaration.type->type.int_val);
-			append_instr(OPERATION, MOV, curr->declaration.id, val, NULL, NULL);
+			//sprintf(val, "%d", curr->declaration.type->type.int_val);
+			if(curr->declaration.exp) {
+				char* reg = curr->declaration.exp->reg_name;
+				append_instr(OPERATION, MOV, reg, NULL, NULL, curr->reg_name);
+			}
 			break;
 		}
 
@@ -296,7 +287,9 @@ void gen_code_post(node *curr, int i) {
 		}
 
 		case ARGUMENTS_NODE: {
-			
+			if(curr->arguments.exp) {
+				append_instr(DECLARATION, NONE, NULL, NULL, NULL, curr->arguments.exp->reg_name);
+			}
 			break;
 		}
 		
@@ -312,7 +305,7 @@ void gen_code_post(node *curr, int i) {
 			char *temp = get_temp_reg(curr);
 			curr->reg_name = temp;
 			switch(curr->function.function_name) {
-				case DP3: {
+				case DP3: { // 0
 					node *arg1 = curr->function.args->arguments.exp;
 					node *arg2 = curr->function.args->arguments.args->arguments.exp;
 					// declarate the arguments
@@ -322,7 +315,7 @@ void gen_code_post(node *curr, int i) {
 					append_instr(OPERATION, DP3, arg1->reg_name, arg2->reg_name, NULL, temp);
 					break;
 				}
-				case RSQ: {
+				case RSQ: { // 1
 					node *arg1 = curr->function.args->arguments.exp;
 					// declarate the arguments
 					append_instr(DECLARATION, NONE, NULL, NULL, NULL, arg1->reg_name);
@@ -330,7 +323,7 @@ void gen_code_post(node *curr, int i) {
 					append_instr(OPERATION, RSQ, arg1->reg_name, NULL, NULL, temp);
 					break;
 				}
-				case LIT: {
+				case LIT: { // 2
 					node *arg1 = curr->function.args->arguments.exp;
 					// declarate the arguments
 					append_instr(DECLARATION, NONE, NULL, NULL, NULL, arg1->reg_name);
