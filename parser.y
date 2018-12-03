@@ -29,11 +29,11 @@ int yylex();              /* procedure for calling lexical analyzer */
 extern int yyline;        /* variable holding current line number   */
 extern int yyval;      /* text that is matched by scanner */
 
-// typedef enum {
-//   DP3 = 0,
-//   LIT = 1, 
-//   RSQ = 2
-// } function_name;
+typedef enum {
+  DP3 = 0,
+  LIT = 1, 
+  RSQ = 2
+} function_name;
 %}
 
 /***********************************************************************

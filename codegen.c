@@ -190,7 +190,7 @@ void gen_code_post(node *curr, int i) {
 		case ASSIGNMENT_NODE: {
 			if(curr->assignment.variable && curr->assignment.exp) {
 				char* var_reg = curr->assignment.exp->reg_name;
-				append_instr(OPERATION, MOV, curr->assignment.variable->reg_name, NULL, NULL, var_reg);
+				append_instr(OPERATION, MOV, var_reg, NULL, NULL, curr->assignment.variable->reg_name);
 			}
 			break; 
 		}
@@ -310,22 +310,32 @@ void gen_code_post(node *curr, int i) {
 
 		case FUNCTION_NODE: {
 			char *temp = get_temp_reg(curr);
+			curr->reg_name = temp;
 			switch(curr->function.function_name) {
 				case DP3: {
-					// move this part to ARGUMENTS_NODE ?
 					node *arg1 = curr->function.args->arguments.exp;
 					node *arg2 = curr->function.args->arguments.args->arguments.exp;
 					// declarate the arguments
-					append_instr(DECLARATION, NONE, NULL, NULL, NULL, arg1->exp.variable->variable.id);
-					append_instr(DECLARATION, NONE, NULL, NULL, NULL, arg2->exp.variable->variable.id);
+					append_instr(DECLARATION, NONE, NULL, NULL, NULL, arg1->reg_name);
+					append_instr(DECLARATION, NONE, NULL, NULL, NULL, arg2->reg_name);
 					// move args to temp regs
-					append_instr(OPERATION, DP3, arg1->exp.variable->variable.id, arg2->exp.variable->variable.id, NULL, temp);
+					append_instr(OPERATION, DP3, arg1->reg_name, arg2->reg_name, NULL, temp);
 					break;
 				}
 				case RSQ: {
+					node *arg1 = curr->function.args->arguments.exp;
+					// declarate the arguments
+					append_instr(DECLARATION, NONE, NULL, NULL, NULL, arg1->reg_name);
+					// move args to temp regs
+					append_instr(OPERATION, RSQ, arg1->reg_name, NULL, NULL, temp);
 					break;
 				}
 				case LIT: {
+					node *arg1 = curr->function.args->arguments.exp;
+					// declarate the arguments
+					append_instr(DECLARATION, NONE, NULL, NULL, NULL, arg1->reg_name);
+					// move args to temp regs
+					append_instr(OPERATION, LIT, arg1->reg_name, NULL, NULL, temp);
 					break;
 				}
 				default: break;
