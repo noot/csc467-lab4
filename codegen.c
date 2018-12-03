@@ -112,9 +112,13 @@ void gen_code_post(node *curr, int i) {
 			// char* reg1 = left->exp.variable->variable.id;
 			// char* reg2 = right->exp.variable->variable.id;
 			char* reg1 = left->reg_name;
-			printf("%s\n", reg1);
+			//printf("%s\n", reg1);
 			char* reg2 = right->exp.variable->reg_name;
-			printf("%s\n", reg2);
+			//int len = strlen(reg2);
+			int len = right->exp.variable->reg_name_len;
+			reg2[len] = '\0';
+			//printf("%d\n", len);
+			//printf("%s\n", reg2);
 
 			switch(op){
 				case ADD: {
@@ -192,7 +196,8 @@ void gen_code_post(node *curr, int i) {
 				append_instr(DECLARATION, NONE, NULL, NULL, NULL, curr->declaration.id);
 				curr->reg_name = curr->declaration.id;
 			}
-			char val[64];
+			int len = strlen(curr->declaration.id);
+			char *val = (char *)malloc(len);
 			// move initial value to register
 			sprintf(val, "%d", curr->declaration.type->type.int_val);
 			append_instr(OPERATION, MOV, curr->declaration.id, val, NULL, NULL);
@@ -214,8 +219,12 @@ void gen_code_post(node *curr, int i) {
 			if(curr->exp.variable) {
 				if(curr->exp.variable->variable.is_vec) {
 					char *idx = get_idx(curr->exp.variable->variable.idx);
-					char reg_name[128];
+					char *reg_name = (char *)malloc(strlen(curr->exp.variable->variable.id) + 2);
 					sprintf(reg_name, "%s.%s", curr->exp.variable->variable.id, idx);
+					int len = strlen(reg_name);
+					//printf("%d", len);
+					reg_name[len] = '\0';
+
 					curr->reg_name = reg_name;
 					//printf("%s\n",reg_name);
 				} else {
@@ -271,9 +280,13 @@ void gen_code_post(node *curr, int i) {
 
 			if(curr->variable.is_vec) {
 				char *idx = get_idx(curr->variable.idx);
-				char reg_name[128];
+				char *reg_name = (char *)malloc(strlen(id) + 2);
 				sprintf(reg_name, "%s.%s", id, idx);
 				id = reg_name;
+				int len = strlen(reg_name);
+				//printf("%d\n", len);
+				curr->reg_name_len = len;
+				//reg_name[len] = '\0';
 				//printf("%s\n", reg_name);
 			}
 
@@ -332,7 +345,7 @@ void gen_code_post(node *curr, int i) {
 		case INT_NODE: {
 			char *temp = get_temp_reg(curr);
 			append_instr(DECLARATION, NONE, NULL, NULL, NULL, temp);
-			char val[64];
+			char val[64] = {'\0'};
 			sprintf(val, "%d", curr->int_v);
 			append_instr(OPERATION, MOV, val, NULL, NULL, temp);
 			break;
@@ -341,7 +354,7 @@ void gen_code_post(node *curr, int i) {
 		case FLOAT_NODE: {
 			char *temp = get_temp_reg(curr);
 			append_instr(DECLARATION, NONE, NULL, NULL, NULL, temp);
-			char val[64];
+			char val[64] = {'\0'};
 			sprintf(val, "%d", curr->int_v);
 			append_instr(OPERATION, MOV, val, NULL, NULL, temp);
 			break;		

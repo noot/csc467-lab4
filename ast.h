@@ -55,7 +55,10 @@ typedef enum {
 struct node_ {
 
   node_kind kind;
-  
+
+  char* reg_name;
+  int reg_name_len;
+
   union {
     int int_v;
     float float_v;
